@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Cloud Sincronizzato</title>
+    <title>Menu Sincronizzato Massimo & Liliana</title>
     
     <link rel="manifest" href="manifest.json">
-    
     <link rel="apple-touch-icon" href="icona.png">
     <link rel="icon" type="image/png" href="icona.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,29 +15,35 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; --danger: #e76f51; }
+        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; --danger: #e76f51; --blue: #a8dadc; --pink: #f1faee; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .main-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
-        .menu-section { flex: 2; min-width: 350px; }
+        .main-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding: 10px; max-width: 1400px; margin: auto; }
+        .menu-section { flex: 2; min-width: 320px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .day-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--accent); }
-        .day-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; color: var(--primary); border-bottom: 1px solid #eee; }
-        .dispensa-section { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 20px; }
+        .day-card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
+        .day-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: var(--primary); text-align: center; text-transform: uppercase; }
+        .dispensa-section { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 10px; }
+        .meal-box { margin-bottom: 15px; padding: 5px; border-radius: 8px; background: #fdfdfd; border: 1px solid #eee; }
+        .meal-label { font-weight: bold; font-size: 0.8rem; color: var(--secondary); margin-bottom: 5px; text-align: center; display: block; background: #eee; border-radius: 4px; }
+        
+        /* Stili per i due utenti */
+        .user-input-group { display: flex; flex-direction: column; gap: 5px; }
+        .user-field { border-radius: 6px; padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; resize: none; width: 100%; box-sizing: border-box; }
+        .user-massimo { background-color: #e3f2fd; border-left: 4px solid #2196f3; }
+        .user-liliana { background-color: #fce4ec; border-left: 4px solid #e91e63; }
+        .user-tag { font-size: 0.65rem; font-weight: bold; margin-bottom: 2px; display: block; }
+        
+        #status { font-size: 0.8rem; font-weight: bold; margin-top: 5px; color: #fff; }
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .chip { background: #e1ecf4; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #ced4da; display: flex; align-items: center; }
-        .meal-box { margin-bottom: 10px; }
-        label { display: block; font-size: 0.75rem; font-weight: bold; color: #888; margin-bottom: 2px; }
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 8px; font-family: inherit; resize: none; box-sizing: border-box; font-size: 0.9rem; }
-        #status { font-size: 0.8rem; font-weight: bold; margin-top: 5px; color: #fff; opacity: 0.8; }
-        .delete-sugg { color: var(--danger); font-weight: bold; margin-left: 8px; cursor: pointer; }
         .btn-danger { background: var(--danger); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>🍎 My Cloud Menu 2026</h1>
+    <h1>🍱 Menu Massimo & Liliana</h1>
     <div id="status">Connessione...</div>
 </div>
 
@@ -48,16 +53,13 @@
     </div>
 
     <div class="dispensa-section">
-        <h3>🍎 Dispensa Condivisa</h3>
+        <h3>🍎 Dispensa Cloud</h3>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
             <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
-            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">+</button>
+            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">+</button>
         </div>
         <div id="listaDispensa" class="chip-container"></div>
-        
-        <button class="btn-danger" onclick="svuotaSettimana()">🗑️ SVUOTA TUTTO IL MENU</button>
-        
-        <p style="font-size: 0.7rem; color: #999; margin-top: 20px;">I dati si salvano automaticamente su tutti i dispositivi.</p>
+        <button class="btn-danger" onclick="svuotaSettimana()">🗑️ SVUOTA TUTTO</button>
     </div>
 </div>
 
@@ -84,19 +86,14 @@
         db.ref('menuApp').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // Pulisce tutto prima di caricare (importante per lo svuota menu)
-                document.querySelectorAll('textarea').forEach(t => t.value = "");
-                
                 if (data.pasti) {
                     Object.keys(data.pasti).forEach(id => {
                         const el = document.getElementById(id);
-                        if (el && document.activeElement !== el) {
-                            el.value = data.pasti[id];
-                        }
+                        if (el && document.activeElement !== el) el.value = data.pasti[id];
                     });
                 }
                 if (data.dispensa) renderingDispensa(data.dispensa);
-                document.getElementById('status').innerText = "✅ Sincronizzato";
+                document.getElementById('status').innerText = "✅ Aggiornato in tempo reale";
             }
         });
     }
@@ -108,11 +105,20 @@
             card.className = 'day-card';
             let html = `<div class="day-title">${giorno}</div>`;
             pasti.forEach(pasto => {
-                const id = `${giorno}-${pasto}`.toLowerCase().replace("ì", "i");
+                const idBase = `${giorno}-${pasto}`.toLowerCase().replace("ì", "i");
                 html += `
                     <div class="meal-box">
-                        <label>${pasto}</label>
-                        <textarea id="${id}" rows="2" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
+                        <span class="meal-label">${pasto}</span>
+                        <div class="user-input-group">
+                            <div>
+                                <span class="user-tag" style="color:#1565c0">♂ Massimo</span>
+                                <textarea id="${idBase}-m" class="user-field user-massimo" rows="1" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
+                            </div>
+                            <div>
+                                <span class="user-tag" style="color:#c2185b">♀ Liliana</span>
+                                <textarea id="${idBase}-l" class="user-field user-liliana" rows="1" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
+                            </div>
+                        </div>
                     </div>`;
             });
             card.innerHTML = html;
@@ -126,15 +132,15 @@
         timeoutSalvataggio = setTimeout(() => {
             const pastiDati = {};
             document.querySelectorAll('textarea').forEach(t => pastiDati[t.id] = t.value);
-            db.ref('menuApp/pasti').set(pastiDati); // Usiamo set per sovrascrivere
+            db.ref('menuApp/pasti').set(pastiDati);
             document.getElementById('status').innerText = "✅ Salvato";
-        }, 1000);
+        }, 800);
     }
 
     function svuotaSettimana() {
-        if(confirm("Sei sicuro di voler cancellare tutti i pasti della settimana?")) {
+        if(confirm("Vuoi cancellare tutto il menu?")) {
             db.ref('menuApp/pasti').remove();
-            document.getElementById('status').innerText = "🗑️ Menu svuotato";
+            document.querySelectorAll('textarea').forEach(t => t.value = "");
         }
     }
 
@@ -166,12 +172,12 @@
         cont.innerHTML = lista.map((c, i) => `
             <div class="chip">
                 <span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span>
-                <span class="delete-sugg" onclick="rimuoviDaDispensa(${i})">×</span>
+                <span style="margin-left:8px; color:red" onclick="rimuoviDaDispensa(${i})">×</span>
             </div>`).join("");
     }
 
     function inserisci(testo) {
-        if(!lastFocusedId) return alert("Clicca in una casella!");
+        if(!lastFocusedId) return alert("Seleziona prima una casella!");
         const area = document.getElementById(lastFocusedId);
         area.value += (area.value ? ", " : "") + testo;
         autoSalvataggio();
