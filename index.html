@@ -7,6 +7,9 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icona.png">
     <link rel="icon" type="image/png" href="icona.png">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -14,22 +17,26 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top:0; z-index:100; }
         
-        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 10px; border-bottom: 2px solid #ddd; position: sticky; top: 60px; z-index: 99; }
+        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 8px; background: #fff; padding: 10px; border-bottom: 2px solid #ddd; position: sticky; top: 60px; z-index: 99; flex-wrap: wrap; }
         .btn-nav { background: var(--secondary); color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
-        .btn-export { background: #6a4c93; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem; margin-left: 5px; }
+        .btn-export { background: #6a4c93; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
         
-        #current-week-display { font-weight: bold; color: var(--text); font-size: 0.85rem; text-align: center; flex: 1; }
+        #current-week-display { font-weight: bold; color: var(--text); font-size: 0.85rem; text-align: center; flex: 1; min-width: 120px; }
 
         .main-wrapper { display: flex; flex-wrap: wrap; gap: 15px; padding: 10px; max-width: 100%; margin: auto; }
         .menu-section { flex: 3; min-width: 320px; }
+        
+        /* Contenitore che verrà "fotografato" */
+        #capture-area { padding: 5px; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
-        .day-card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 6px solid var(--accent); page-break-inside: avoid; }
+        .day-card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 6px solid var(--accent); position: relative; }
         .day-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: var(--primary); text-align: center; border-bottom: 1px solid #eee; text-transform: uppercase; }
         
         .meal-box { margin-bottom: 15px; padding: 5px; border-radius: 10px; background: #fafafa; border: 1px solid #eee; }
         .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 8px; text-align: center; display: block; background: var(--secondary); border-radius: 4px; padding: 2px; }
         
-        .user-field { border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid #ccc; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; }
+        .user-field { border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid #ccc; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: 0.2s; }
         .user-massimo { background-color: #e3f2fd; border-left: 5px solid #2196f3; margin-bottom: 10px; }
         .user-liliana { background-color: #fce4ec; border-left: 5px solid #e91e63; }
         
@@ -39,21 +46,32 @@
         .chip { background: #e1ecf4; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; border: 1px solid #ced4da; }
         #status { font-size: 0.8rem; font-weight: bold; color: #fff; opacity: 0.9; }
 
-        /* STILI PER LA STAMPA / ESPORTAZIONE */
-        @media print {
-            .header, .nav-weeks, .dispensa-section, .btn-nav, .btn-export, .user-tag { display: none !important; }
-            body { background: white; padding: 0; }
-            .main-wrapper { display: block; }
-            .grid { display: block; }
-            .day-card { box-shadow: none; border: 1px solid #eee; margin-bottom: 20px; break-inside: avoid; }
-            .user-field { border: none; background: transparent !important; padding: 0; font-size: 11pt; overflow: visible; height: auto !important; }
-            .user-massimo::before { content: "MASSIMO: "; font-weight: bold; font-size: 9pt; color: #2196f3; }
-            .user-liliana::before { content: "LILIANA: "; font-weight: bold; font-size: 9pt; color: #e91e63; }
-            .meal-label { background: #eee; color: #333; border: 1px solid #ccc; }
-        }
+        /* STILI SPECIALI PER L'ESPORTAZIONE IMMAGINE (Temporanei) */
+        .exporting #capture-area { background: white; padding: 20px; border-radius: 0; width: 800px; } /* Larghezza fissa per export */
+        .exporting .grid { display: block; } /* Lista verticale compatta */
+        .exporting .day-card { box-shadow: none; border: 1px solid #eee; margin-bottom: 15px; border-top: 4px solid var(--accent); padding: 8px; }
+        .exporting .day-title { font-size: 1.1rem; margin-bottom: 5px; padding-bottom: 2px; }
+        .exporting .meal-box { margin-bottom: 10px; padding: 3px; }
+        .exporting .meal-label { font-size: 0.75rem; padding: 1px; margin-bottom: 4px; }
+        .exporting .user-field { border: none; padding: 3px 6px; font-size: 0.9rem; line-height: 1.2; height: auto !important; overflow: visible; border-radius: 4px; }
+        .exporting .user-massimo { border-left: 3px solid #2196f3; margin-bottom: 5px; }
+        .exporting .user-liliana { border-left: 3px solid #e91e63; }
+        .exporting .user-tag { font-size: 0.65rem; margin-bottom: 1px; }
+        
+        /* Nasconde elementi durante export */
+        .exporting .header, .exporting .nav-weeks, .exporting .dispensa-section, .exportinglabel[rows] { display: none !important; }
+        
+        /* Overlay di caricamento export */
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
 <body>
+
+<div id="loading-overlay">
+    <div style="font-size: 2rem; margin-bottom: 10px;">📸</div>
+    <div>Creazione immagine in corso...</div>
+    <div style="font-size: 0.8rem; margin-top: 5px;">Porta pazienza, sto compattando tutto.</div>
+</div>
 
 <div class="header">
     <h1>🍱 Menu Massimo & Liliana</h1>
@@ -61,22 +79,26 @@
 </div>
 
 <div class="nav-weeks">
-    <button class="btn-nav" onclick="cambiaSettimana(-1)">◀</button>
+    <button class="btn-nav" onclick="cambiaSettimana(-1)">◀ SETT.</button>
     <div id="current-week-display">Caricamento...</div>
-    <button class="btn-nav" onclick="cambiaSettimana(1)">▶</button>
-    <button class="btn-export" onclick="window.print()">🖨️ ESPORTA</button>
+    <button class="btn-nav" onclick="cambiaSettimana(1)">SUCC. ▶</button>
+    <button class="btn-export" onclick="esportaComeImmagine()">📸 SALVA IMMAGINE</button>
 </div>
 
 <div class="main-wrapper">
-    <div class="menu-section"><div id="grid-container" class="grid"></div></div>
+    <div class="menu-section">
+        <div id="capture-area">
+            <div id="grid-container" class="grid"></div>
+        </div>
+    </div>
     <div class="dispensa-section">
-        <h3>🍎 Dispensa</h3>
+        <h3>🍎 Dispensa Condivisa</h3>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
             <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
-            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:10px 15px; border-radius:6px;">+</button>
+            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:10px 15px; border-radius:6px; font-weight:bold;">+</button>
         </div>
         <div id="listaDispensa" class="chip-container"></div>
-        <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-top:25px; font-weight:bold;">🗑️ SVUOTA SETTIMANA</button>
+        <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-top:25px; font-weight:bold; cursor:pointer;">🗑️ SVUOTA SETTIMANA</button>
     </div>
 </div>
 
@@ -104,7 +126,11 @@
     function aggiornaLabelSettimana() {
         const fineSett = new Date(dataCorrente);
         fineSett.setDate(fineSett.getDate() + 6);
-        document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}) + " - " + fineSett.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
+        const opzioni = {day:'2-digit', month:'2-digit'};
+        const testoData = dataCorrente.toLocaleDateString('it-IT', opzioni) + " al " + fineSett.toLocaleDateString('it-IT', opzioni);
+        document.getElementById('current-week-display').innerText = testoData;
+        // Aggiungiamo il titolo anche nell'area di cattura per l'export
+        document.getElementById('grid-container').setAttribute('data-week', "MENU SETTIMANA: " + testoData);
     }
 
     function creaGriglia() {
@@ -199,7 +225,7 @@
     }
 
     function inserisci(t) {
-        if(!window.lastFocusedId) return;
+        if(!window.lastFocusedId) return alert("Seleziona prima una casella di testo!");
         const a = document.getElementById(window.lastFocusedId);
         a.value += (a.value ? ", " : "") + t;
         autoSalvataggio();
@@ -209,6 +235,51 @@
         if(confirm("Svuotare questa settimana?")) {
             db.ref('settimane/' + getIDSettimana(dataCorrente)).remove();
         }
+    }
+
+    // FUNZIONE EXPORT IMMAGINE COMPATTA
+    function esportaComeImmagine() {
+        const overlay = document.getElementById('loading-overlay');
+        overlay.style.display = 'flex'; // Mostra caricamento
+
+        // 1. Attiva la modalità export (cambia CSS temporaneamente)
+        document.body.classList.add('exporting');
+        
+        // Aggiungi titolo settimana all'area di cattura
+        const grid = document.getElementById('grid-container');
+        const titoloExport = document.createElement('div');
+        titoloExport.id = "titolo-export-temporaneo";
+        titoloExport.innerText = grid.getAttribute('data-week');
+        titoloExport.style.cssText = "font-weight:bold; font-size:1.4rem; text-align:center; color:#2a9d8f; text-transform:uppercase; margin-bottom:15px; padding:10px; border-bottom:2px solid #eee;";
+        grid.prepend(titoloExport);
+
+        // 2. Aspetta un attimo che il CSS si applichi e scatta la foto
+        setTimeout(() => {
+            html2canvas(document.getElementById('capture-area'), {
+                scale: 2, // Doppia risoluzione per WhatsApp
+                backgroundColor: "#ffffff",
+                logging: false,
+                useCORS: true // Per eventuali immagini esterne
+            }).then(canvas => {
+                // 3. Crea il link per scaricare l'immagine
+                const dataUrl = canvas.toDataUrl("image/png");
+                const link = document.createElement('a');
+                const weekID = getIDSettimana(dataCorrente);
+                link.download = `Menu_Massimo_Liliana_${weekID}.png`;
+                link.href = dataUrl;
+                link.click(); // Avvia download
+
+                // 4. Ripristina l'app normale
+                document.body.classList.remove('exporting');
+                titoloExport.remove();
+                overlay.style.display = 'none'; // Nascondi caricamento
+                
+                // Alert di successo specifico per mobile
+                if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+                    alert("Immagine compatta generata! Controlla la cartella 'Download' del telefono o condividila subito.");
+                }
+            });
+        }, 500); // Mezzo secondo di attesa per applicare CSS
     }
 
     creaGriglia();
