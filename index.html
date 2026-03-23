@@ -32,18 +32,22 @@
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .chip { background: #e1ecf4; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; border: 1px solid #ced4da; }
         #status { font-size: 0.8rem; font-weight: bold; color: #fff; opacity: 0.9; }
+        .btn-notifiche { background: #ff9800; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="header"><h1>🍱 Menu Massimo & Liliana</h1><div id="status">Connessione...</div></div>
 <div class="nav-weeks">
-    <button class="btn-nav" onclick="cambiaSettimana(-1)">◀ SETT. PREC.</button>
+    <button class="btn-nav" onclick="cambiaSettimana(-1)">◀ SETT.</button>
     <div id="current-week-display">Caricamento...</div>
     <button class="btn-nav" onclick="cambiaSettimana(1)">SUCC. ▶</button>
 </div>
 <div class="main-wrapper">
     <div class="menu-section"><div id="grid-container" class="grid"></div></div>
     <div class="dispensa-section">
+        <h3>🔔 Notifiche</h3>
+        <button class="btn-notifiche" onclick="richiediPermessoNotifiche()">Attiva Promemoria Pasti</button>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
         <h3>🍎 Dispensa</h3>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
             <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
@@ -67,15 +71,27 @@
     const db = firebase.database();
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
+
+    function richiediPermessoNotifiche() {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                alert("Notifiche attivate! L'app ti avviserà all'ora dei pasti se la tieni aperta o nel multitasking.");
+                programmaNotifiche();
+            }
+        });
+    }
+
     function getIDSettimana(d) {
         const lun = new Date(d);
         return lun.getFullYear() + "-" + (lun.getMonth() + 1).toString().padStart(2, '0') + "-" + lun.getDate().toString().padStart(2, '0');
     }
+
     function aggiornaLabelSettimana() {
         const fineSett = new Date(dataCorrente);
         fineSett.setDate(fineSett.getDate() + 6);
         document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " al " + fineSett.toLocaleDateString('it-IT');
     }
+
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
@@ -88,10 +104,9 @@
             pasti.forEach(pasto => {
                 const idBase = `${giorno}-${pasto}`.toLowerCase().replace("ì", "i");
                 const labelClass = pasto === "Allenamento" ? "meal-label workout-label" : "meal-label";
-                const labelEmoji = pasto === "Allenamento" ? "🏋️ " : "";
                 html += `
                     <div class="meal-box">
-                        <span class="${labelClass}">${labelEmoji}${pasto}</span>
+                        <span class="${labelClass}">${pasto}</span>
                         <div class="user-input-group">
                             <div><span class="user-tag" style="color:#1565c0">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
                             <div><span class="user-tag" style="color:#c2185b">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
@@ -102,12 +117,12 @@
             container.appendChild(card);
         });
     }
-    let currentRef;
+
     function caricaDatiSettimana() {
         const weekID = getIDSettimana(dataCorrente);
-        if(currentRef) currentRef.off();
-        currentRef = db.ref('settimane/' + weekID);
-        currentRef.on('value', (snap) => {
+        if(window.currentRef) window.currentRef.off();
+        window.currentRef = db.ref('settimane/' + weekID);
+        window.currentRef.on('value', (snap) => {
             const data = snap.val();
             document.querySelectorAll('textarea').forEach(t => { if(document.activeElement !== t) t.value = ""; });
             if (data) {
@@ -115,21 +130,54 @@
                     const el = document.getElementById(id);
                     if (el && document.activeElement !== el) el.value = data[id];
                 });
+                programmaNotifiche(data);
             }
             document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
+
+    function programmaNotifiche(data) {
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+        
+        const oggi = new Date();
+        const nomeGiorno = ["domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato"][oggi.getDay()];
+        
+        // Orari notifiche (cambiali se preferisci altri orari)
+        const orari = { "colazione": 8, "pranzo": 12, "cena": 19 };
+
+        Object.keys(orari).forEach(pasto => {
+            const oraNotifica = new Date();
+            oraNotifica.setHours(orari[pasto], 0, 0);
+
+            if (oggi < oraNotifica) {
+                const m = data[`${nomeGiorno}-${pasto}-m`] || "Non segnato";
+                const l = data[`${nomeGiorno}-${pasto}-l`] || "Non segnato";
+                
+                const tempoMancante = oraNotifica.getTime() - oggi.getTime();
+                
+                setTimeout(() => {
+                    new Notification(`🍴 Menù ${pasto} di Oggi`, {
+                        body: `Massimo: ${m}\nLiliana: ${l}`,
+                        icon: 'icona.png'
+                    });
+                }, tempoMancante);
+            }
+        });
+    }
+
     db.ref('dispensa').on('value', snap => {
         const lista = snap.val() || [];
         const cont = document.getElementById('listaDispensa');
         cont.innerHTML = lista.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red;font-weight:bold" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
     });
+
     function cambiaSettimana(diff) {
         dataCorrente.setDate(dataCorrente.getDate() + (diff * 7));
         aggiornaLabelSettimana();
         creaGriglia();
         caricaDatiSettimana();
     }
+
     function autoSalvataggio() {
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(window.timeoutSalvataggio);
@@ -138,9 +186,9 @@
             const dati = {};
             document.querySelectorAll('textarea').forEach(t => dati[t.id] = t.value);
             db.ref('settimane/' + weekID).update(dati);
-            document.getElementById('status').innerText = "✅ Salvato";
         }, 800);
     }
+
     function aggiungiADispensa() {
         const input = document.getElementById('nuovoCibo');
         if (input.value.trim()) {
@@ -152,6 +200,7 @@
             });
         }
     }
+
     function rimuoviDaDispensa(i) {
         if(confirm("Rimuovere?")) {
             db.ref('dispensa').once('value').then(snap => {
@@ -161,17 +210,20 @@
             });
         }
     }
+
     function inserisci(t) {
         if(!window.lastFocusedId) return;
         const a = document.getElementById(window.lastFocusedId);
         a.value += (a.value ? ", " : "") + t;
         autoSalvataggio();
     }
+
     function svuotaSettimana() {
         if(confirm("Svuotare questa settimana?")) {
             db.ref('settimane/' + getIDSettimana(dataCorrente)).remove();
         }
     }
+
     creaGriglia();
     aggiornaLabelSettimana();
     caricaDatiSettimana();
