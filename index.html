@@ -57,6 +57,7 @@
         <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-top:25px; font-weight:bold;">🗑️ SVUOTA SETTIMANA</button>
     </div>
 </div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
@@ -72,11 +73,16 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
+    // REGISTRAZIONE SERVICE WORKER
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registrato'));
+    }
+
     function richiediPermessoNotifiche() {
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
-                alert("Notifiche attivate! L'app ti avviserà all'ora dei pasti se la tieni aperta o nel multitasking.");
-                programmaNotifiche();
+                alert("Notifiche attivate! L'app ti avviserà all'ora dei pasti.");
+                caricaDatiSettimana(); // Ricarica per programmare
             }
         });
     }
@@ -140,9 +146,9 @@
         if (!("Notification" in window) || Notification.permission !== "granted") return;
         
         const oggi = new Date();
-        const nomeGiorno = ["domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato"][oggi.getDay()];
+        const giorniSemplici = ["domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato"];
+        const nomeGiorno = giorniSemplici[oggi.getDay()];
         
-        // Orari notifiche (cambiali se preferisci altri orari)
         const orari = { "colazione": 8, "pranzo": 12, "cena": 19 };
 
         Object.keys(orari).forEach(pasto => {
@@ -150,15 +156,18 @@
             oraNotifica.setHours(orari[pasto], 0, 0);
 
             if (oggi < oraNotifica) {
-                const m = data[`${nomeGiorno}-${pasto}-m`] || "Non segnato";
-                const l = data[`${nomeGiorno}-${pasto}-l`] || "Non segnato";
-                
+                const m = (data && data[`${nomeGiorno}-${pasto}-m`]) || "Non segnato";
+                const l = (data && data[`${nomeGiorno}-${pasto}-l`]) || "Non segnato";
                 const tempoMancante = oraNotifica.getTime() - oggi.getTime();
                 
                 setTimeout(() => {
-                    new Notification(`🍴 Menù ${pasto} di Oggi`, {
-                        body: `Massimo: ${m}\nLiliana: ${l}`,
-                        icon: 'icona.png'
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.showNotification(`🍴 Menù ${pasto} di Oggi`, {
+                            body: `Massimo: ${m}\nLiliana: ${l}`,
+                            icon: 'icona.png',
+                            badge: 'icona.png',
+                            vibrate: [200, 100, 200]
+                        });
                     });
                 }, tempoMancante);
             }
