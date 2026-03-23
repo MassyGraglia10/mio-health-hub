@@ -119,4 +119,86 @@
     }
 
     let currentRef;
-    function caricaDatiSettimana()
+    function caricaDatiSettimana() {
+        const weekID = getIDSettimana(dataCorrente);
+        if(currentRef) currentRef.off();
+        currentRef = db.ref('settimane/' + weekID);
+        currentRef.on('value', (snap) => {
+            const data = snap.val();
+            document.querySelectorAll('textarea').forEach(t => { if(document.activeElement !== t) t.value = ""; });
+            if (data) {
+                Object.keys(data).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && document.activeElement !== el) el.value = data[id];
+                });
+            }
+            document.getElementById('status').innerText = "✅ Sincronizzato";
+        });
+    }
+
+    db.ref('dispensa').on('value', snap => {
+        const lista = snap.val() || [];
+        const cont = document.getElementById('listaDispensa');
+        cont.innerHTML = lista.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red;font-weight:bold" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
+    });
+
+    function cambiaSettimana(diff) {
+        dataCorrente.setDate(dataCorrente.getDate() + (diff * 7));
+        aggiornaLabelSettimana();
+        creaGriglia();
+        caricaDatiSettimana();
+    }
+
+    function autoSalvataggio() {
+        document.getElementById('status').innerText = "☁️ Salvataggio...";
+        clearTimeout(window.timeoutSalvataggio);
+        window.timeoutSalvataggio = setTimeout(() => {
+            const weekID = getIDSettimana(dataCorrente);
+            const dati = {};
+            document.querySelectorAll('textarea').forEach(t => dati[t.id] = t.value);
+            db.ref('settimane/' + weekID).update(dati);
+            document.getElementById('status').innerText = "✅ Salvato";
+        }, 800);
+    }
+
+    function aggiungiADispensa() {
+        const input = document.getElementById('nuovoCibo');
+        if (input.value.trim()) {
+            db.ref('dispensa').once('value').then(snap => {
+                let l = snap.val() || [];
+                l.push(input.value.trim());
+                db.ref('dispensa').set(l);
+                input.value = "";
+            });
+        }
+    }
+
+    function rimuoviDaDispensa(i) {
+        if(confirm("Rimuovere dalla dispensa?")) {
+            db.ref('dispensa').once('value').then(snap => {
+                let l = snap.val() || [];
+                l.splice(i, 1);
+                db.ref('dispensa').set(l);
+            });
+        }
+    }
+
+    function inserisci(t) {
+        if(!window.lastFocusedId) return alert("Seleziona prima una casella di testo!");
+        const a = document.getElementById(window.lastFocusedId);
+        a.value += (a.value ? ", " : "") + t;
+        autoSalvataggio();
+    }
+
+    function svuotaSettimana() {
+        if(confirm("Sei sicuro? Questo cancellerà tutti i pasti di questa settimana per entrambi.")) {
+            db.ref('settimane/' + getIDSettimana(dataCorrente)).remove();
+        }
+    }
+
+    creaGriglia();
+    aggiornaLabelSettimana();
+    caricaDatiSettimana();
+</script>
+</body>
+</html>
