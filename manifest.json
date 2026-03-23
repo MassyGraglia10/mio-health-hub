@@ -1,0 +1,21 @@
+{
+  "name": "Mio Menu Cloud 2026",
+  "short_name": "Mio Menu",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2a9d8f",
+  "theme_color": "#2a9d8f",
+  "icons": [
+    {
+      "src": "icona.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icona.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
