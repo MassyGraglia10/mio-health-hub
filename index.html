@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu Cloud Sincronizzato</title>
     
+    <link rel="manifest" href="manifest.json">
+    
     <link rel="apple-touch-icon" href="icona.png">
+    <link rel="icon" type="image/png" href="icona.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -13,7 +16,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; }
+        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; --danger: #e76f51; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .main-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
@@ -28,7 +31,8 @@
         label { display: block; font-size: 0.75rem; font-weight: bold; color: #888; margin-bottom: 2px; }
         textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 8px; font-family: inherit; resize: none; box-sizing: border-box; font-size: 0.9rem; }
         #status { font-size: 0.8rem; font-weight: bold; margin-top: 5px; color: #fff; opacity: 0.8; }
-        .delete-sugg { color: #e76f51; font-weight: bold; margin-left: 8px; cursor: pointer; }
+        .delete-sugg { color: var(--danger); font-weight: bold; margin-left: 8px; cursor: pointer; }
+        .btn-danger { background: var(--danger); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -50,12 +54,14 @@
             <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">+</button>
         </div>
         <div id="listaDispensa" class="chip-container"></div>
+        
+        <button class="btn-danger" onclick="svuotaSettimana()">🗑️ SVUOTA TUTTO IL MENU</button>
+        
         <p style="font-size: 0.7rem; color: #999; margin-top: 20px;">I dati si salvano automaticamente su tutti i dispositivi.</p>
     </div>
 </div>
 
 <script>
-    // Configurazione Firebase con i tuoi dati
     const firebaseConfig = {
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
         authDomain: "miomenu-e2e51.firebaseapp.com",
@@ -66,7 +72,6 @@
         appId: "1:996699369968:web:0cbdd7de424b093355ed35"
     };
 
-    // Inizializzazione
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
@@ -76,11 +81,12 @@
 
     function inizializzaApp() {
         creaGriglia();
-        
-        // Ascolta i cambiamenti dal Cloud in tempo reale
         db.ref('menuApp').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                // Pulisce tutto prima di caricare (importante per lo svuota menu)
+                document.querySelectorAll('textarea').forEach(t => t.value = "");
+                
                 if (data.pasti) {
                     Object.keys(data.pasti).forEach(id => {
                         const el = document.getElementById(id);
@@ -92,8 +98,6 @@
                 if (data.dispensa) renderingDispensa(data.dispensa);
                 document.getElementById('status').innerText = "✅ Sincronizzato";
             }
-        }, (error) => {
-            document.getElementById('status').innerText = "❌ Errore: Controlla Regole Database";
         });
     }
 
@@ -116,19 +120,24 @@
         });
     }
 
-    // Salvataggio automatico (aspetta 1 secondo da quando smetti di scrivere)
     function autoSalvataggio() {
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(timeoutSalvataggio);
         timeoutSalvataggio = setTimeout(() => {
             const pastiDati = {};
             document.querySelectorAll('textarea').forEach(t => pastiDati[t.id] = t.value);
-            db.ref('menuApp/pasti').update(pastiDati);
+            db.ref('menuApp/pasti').set(pastiDati); // Usiamo set per sovrascrivere
             document.getElementById('status').innerText = "✅ Salvato";
         }, 1000);
     }
 
-    // Gestione Dispensa Cloud
+    function svuotaSettimana() {
+        if(confirm("Sei sicuro di voler cancellare tutti i pasti della settimana?")) {
+            db.ref('menuApp/pasti').remove();
+            document.getElementById('status').innerText = "🗑️ Menu svuotato";
+        }
+    }
+
     function aggiungiADispensa() {
         const input = document.getElementById('nuovoCibo');
         const nuovo = input.value.trim();
