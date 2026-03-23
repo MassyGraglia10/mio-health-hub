@@ -15,29 +15,39 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; --danger: #e76f51; --blue: #a8dadc; --pink: #f1faee; }
+        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; --danger: #e76f51; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .main-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding: 10px; max-width: 1400px; margin: auto; }
-        .menu-section { flex: 2; min-width: 320px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .day-card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
-        .day-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: var(--primary); text-align: center; text-transform: uppercase; }
+        
+        /* Layout allargato */
+        .main-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding: 15px; max-width: 100%; margin: auto; }
+        .menu-section { flex: 3; min-width: 350px; }
+        
+        /* Griglia più spaziosa */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        
+        .day-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 6px solid var(--accent); }
+        .day-title { font-weight: bold; font-size: 1.3rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
+        
         .dispensa-section { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 10px; }
-        .meal-box { margin-bottom: 15px; padding: 5px; border-radius: 8px; background: #fdfdfd; border: 1px solid #eee; }
-        .meal-label { font-weight: bold; font-size: 0.8rem; color: var(--secondary); margin-bottom: 5px; text-align: center; display: block; background: #eee; border-radius: 4px; }
         
-        /* Stili per i due utenti */
-        .user-input-group { display: flex; flex-direction: column; gap: 5px; }
-        .user-field { border-radius: 6px; padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; resize: none; width: 100%; box-sizing: border-box; }
-        .user-massimo { background-color: #e3f2fd; border-left: 4px solid #2196f3; }
-        .user-liliana { background-color: #fce4ec; border-left: 4px solid #e91e63; }
-        .user-tag { font-size: 0.65rem; font-weight: bold; margin-bottom: 2px; display: block; }
+        .meal-box { margin-bottom: 20px; padding: 10px; border-radius: 10px; background: #fafafa; border: 1px solid #eee; }
+        .meal-label { font-weight: bold; font-size: 0.9rem; color: #fff; margin-bottom: 8px; text-align: center; display: block; background: var(--secondary); border-radius: 5px; padding: 3px; }
         
-        #status { font-size: 0.8rem; font-weight: bold; margin-top: 5px; color: #fff; }
+        .user-input-group { display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Campi di testo più alti e larghi */
+        .user-field { border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid #ccc; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; }
+        .user-massimo { background-color: #e3f2fd; border-left: 5px solid #2196f3; }
+        .user-liliana { background-color: #fce4ec; border-left: 5px solid #e91e63; }
+        
+        .user-tag { font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        #status { font-size: 0.85rem; font-weight: bold; margin-top: 5px; color: #fff; }
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .chip { background: #e1ecf4; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #ced4da; display: flex; align-items: center; }
-        .btn-danger { background: var(--danger); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold; }
+        .chip { background: #e1ecf4; padding: 8px 14px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; border: 1px solid #ced4da; transition: 0.2s; }
+        .chip:active { transform: scale(0.95); background: var(--accent); }
+        .btn-danger { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 20px; font-weight: bold; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -55,11 +65,12 @@
     <div class="dispensa-section">
         <h3>🍎 Dispensa Cloud</h3>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
-            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">+</button>
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi alimento..." style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
+            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold;">+</button>
         </div>
         <div id="listaDispensa" class="chip-container"></div>
-        <button class="btn-danger" onclick="svuotaSettimana()">🗑️ SVUOTA TUTTO</button>
+        <button class="btn-danger" onclick="svuotaSettimana()">🗑️ SVUOTA TUTTO IL MENU</button>
+        <p style="font-size: 0.75rem; color: #999; margin-top: 20px; text-align: center;">Le modifiche sono istantanee su tutti i dispositivi.</p>
     </div>
 </div>
 
@@ -93,7 +104,7 @@
                     });
                 }
                 if (data.dispensa) renderingDispensa(data.dispensa);
-                document.getElementById('status').innerText = "✅ Aggiornato in tempo reale";
+                document.getElementById('status').innerText = "✅ Sincronizzato";
             }
         });
     }
@@ -112,11 +123,11 @@
                         <div class="user-input-group">
                             <div>
                                 <span class="user-tag" style="color:#1565c0">♂ Massimo</span>
-                                <textarea id="${idBase}-m" class="user-field user-massimo" rows="1" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
+                                <textarea id="${idBase}-m" class="user-field user-massimo" rows="3" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
                             </div>
                             <div>
                                 <span class="user-tag" style="color:#c2185b">♀ Liliana</span>
-                                <textarea id="${idBase}-l" class="user-field user-liliana" rows="1" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
+                                <textarea id="${idBase}-l" class="user-field user-liliana" rows="3" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
                             </div>
                         </div>
                     </div>`;
@@ -138,7 +149,7 @@
     }
 
     function svuotaSettimana() {
-        if(confirm("Vuoi cancellare tutto il menu?")) {
+        if(confirm("Vuoi cancellare tutto il menu della settimana?")) {
             db.ref('menuApp/pasti').remove();
             document.querySelectorAll('textarea').forEach(t => t.value = "");
         }
@@ -172,12 +183,12 @@
         cont.innerHTML = lista.map((c, i) => `
             <div class="chip">
                 <span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span>
-                <span style="margin-left:8px; color:red" onclick="rimuoviDaDispensa(${i})">×</span>
+                <span style="margin-left:10px; color:#e76f51; font-weight:bold" onclick="rimuoviDaDispensa(${i})">×</span>
             </div>`).join("");
     }
 
     function inserisci(testo) {
-        if(!lastFocusedId) return alert("Seleziona prima una casella!");
+        if(!lastFocusedId) return alert("Clicca prima in una casella di testo!");
         const area = document.getElementById(lastFocusedId);
         area.value += (area.value ? ", " : "") + testo;
         autoSalvataggio();
