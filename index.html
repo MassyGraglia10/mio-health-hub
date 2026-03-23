@@ -1,158 +1,171 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<link rel="apple-touch-icon" href="icona.png">
-<link rel="icon" type="image/png" href="icona.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Annuale & Dispensa</title>
+    <title>Menu Cloud Sincronizzato</title>
+    
+    <link rel="apple-touch-icon" href="icona.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
     <style>
         :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        /* Navigazione Temporale */
-        .nav-settimana { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 15px; background: white; sticky; top: 0; z-index: 100; border-bottom: 1px solid #ddd; }
-        .nav-btn { background: var(--secondary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        #label-settimana { font-weight: bold; color: var(--primary); min-width: 200px; text-align: center; }
-
         .main-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; max-width: 1400px; margin: auto; }
         .menu-section { flex: 2; min-width: 350px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .day-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--accent); }
         .day-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; color: var(--primary); border-bottom: 1px solid #eee; }
-        .date-sub { font-size: 0.8rem; color: #888; display: block; }
-        
-        .dispensa-section { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 80px; }
+        .dispensa-section { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 20px; }
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .chip { background: #e1ecf4; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #ced4da; display: flex; align-items: center; gap: 5px; }
-        .delete-sugg { color: #e76f51; font-weight: bold; cursor: pointer; }
-
+        .chip { background: #e1ecf4; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #ced4da; display: flex; align-items: center; }
         .meal-box { margin-bottom: 10px; }
         label { display: block; font-size: 0.75rem; font-weight: bold; color: #888; margin-bottom: 2px; }
         textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 8px; font-family: inherit; resize: none; box-sizing: border-box; font-size: 0.9rem; }
-        
-        .actions { text-align: center; margin-top: 20px; padding-bottom: 40px; }
-        button { cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-save { background: var(--primary); color: white; padding: 15px 30px; border: none; border-radius: 25px; font-size: 1rem; }
+        #status { font-size: 0.8rem; font-weight: bold; margin-top: 5px; color: #fff; opacity: 0.8; }
+        .delete-sugg { color: #e76f51; font-weight: bold; margin-left: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>📅 Archivio Menu Annuale</h1>
-</div>
-
-<div class="nav-settimana">
-    <button class="nav-btn" onclick="cambiaSettimana(-7)">◀ Prec.</button>
-    <div id="label-settimana">Caricamento...</div>
-    <button class="nav-btn" onclick="cambiaSettimana(7)">Succ. ▶</button>
+    <h1>🍎 My Cloud Menu 2026</h1>
+    <div id="status">Connessione...</div>
 </div>
 
 <div class="main-wrapper">
     <div class="menu-section">
         <div id="grid-container" class="grid"></div>
-        <div class="actions">
-            <button class="btn-save" onclick="salvaTutto()">💾 Salva Questa Settimana</button>
-        </div>
     </div>
 
     <div class="dispensa-section">
-        <h3>🍎 Dispensa Rapida</h3>
-        <input type="text" id="nuovoCibo" placeholder="Aggiungi cibo..." style="width:70%; padding:8px;">
-        <button onclick="aggiungiADispensa()" style="padding:8px; background:var(--secondary); color:white; border:none; border-radius:5px;">+</button>
+        <h3>🍎 Dispensa Condivisa</h3>
+        <div style="display:flex; gap:5px; margin-bottom:15px;">
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:8px; border-radius:6px; border:1px solid #ddd;">
+            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">+</button>
+        </div>
         <div id="listaDispensa" class="chip-container"></div>
+        <p style="font-size: 0.7rem; color: #999; margin-top: 20px;">I dati si salvano automaticamente su tutti i dispositivi.</p>
     </div>
 </div>
 
 <script>
-    let dataCorrente = new Date(); // Parte da oggi
-    // Porta al lunedì della settimana corrente
-    dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
+    // Configurazione Firebase con i tuoi dati
+    const firebaseConfig = {
+        apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
+        authDomain: "miomenu-e2e51.firebaseapp.com",
+        databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", 
+        projectId: "miomenu-e2e51",
+        storageBucket: "miomenu-e2e51.firebasestorage.app",
+        messagingSenderId: "996699369968",
+        appId: "1:996699369968:web:0cbdd7de424b093355ed35"
+    };
 
+    // Inizializzazione
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+    const pasti = ["Colazione", "Pranzo", "Cena"];
     let lastFocusedId = "";
-    let dispensa = JSON.parse(localStorage.getItem('miaDispensa')) || ["Mela", "Yogurt", "Pollo", "Riso"];
+    let timeoutSalvataggio;
 
     function inizializzaApp() {
-        aggiornaLabelSettimana();
         creaGriglia();
-        aggiornaVisualizzazioneDispensa();
-    }
-
-    function aggiornaLabelSettimana() {
-        const fineSettimana = new Date(dataCorrente);
-        fineSettimana.setDate(fineSettimana.getDate() + 6);
-        const opzioni = { day: 'numeric', month: 'short' };
-        document.getElementById('label-settimana').innerText = 
-            `Settimana: ${dataCorrente.toLocaleDateString('it-IT', opzioni)} - ${fineSettimana.toLocaleDateString('it-IT', opzioni)} ${fineSettimana.getFullYear()}`;
-    }
-
-    function cambiaSettimana(giorni) {
-        salvaTutto(false); // Salva prima di cambiare
-        dataCorrente.setDate(dataCorrente.getDate() + giorni);
-        inizializzaApp();
+        
+        // Ascolta i cambiamenti dal Cloud in tempo reale
+        db.ref('menuApp').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                if (data.pasti) {
+                    Object.keys(data.pasti).forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && document.activeElement !== el) {
+                            el.value = data.pasti[id];
+                        }
+                    });
+                }
+                if (data.dispensa) renderingDispensa(data.dispensa);
+                document.getElementById('status').innerText = "✅ Sincronizzato";
+            }
+        }, (error) => {
+            document.getElementById('status').innerText = "❌ Errore: Controlla Regole Database";
+        });
     }
 
     function creaGriglia() {
         const container = document.getElementById('grid-container');
-        const archivio = JSON.parse(localStorage.getItem('archivioMenuAnnuale')) || {};
-        container.innerHTML = "";
-
-        const nomiGiorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
-        
-        for (let i = 0; i < 7; i++) {
-            let dataGiorno = new Date(dataCorrente);
-            dataGiorno.setDate(dataGiorno.getDate() + i);
-            let isoData = dataGiorno.toISOString().split('T')[0]; // Chiave unica YYYY-MM-DD
-
+        giorni.forEach(giorno => {
             const card = document.createElement('div');
             card.className = 'day-card';
-            let html = `<div class="day-title">${nomiGiorni[i]} <span class="date-sub">${dataGiorno.toLocaleDateString('it-IT')}</span></div>`;
-            
-            ["Colazione", "Pranzo", "Cena"].forEach(pasto => {
-                const id = `${isoData}-${pasto.toLowerCase()}`;
-                const valore = archivio[id] || "";
+            let html = `<div class="day-title">${giorno}</div>`;
+            pasti.forEach(pasto => {
+                const id = `${giorno}-${pasto}`.toLowerCase().replace("ì", "i");
                 html += `
                     <div class="meal-box">
                         <label>${pasto}</label>
-                        <textarea id="${id}" rows="2" onfocus="lastFocusedId = this.id">${valore}</textarea>
+                        <textarea id="${id}" rows="2" onfocus="lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea>
                     </div>`;
             });
             card.innerHTML = html;
             container.appendChild(card);
+        });
+    }
+
+    // Salvataggio automatico (aspetta 1 secondo da quando smetti di scrivere)
+    function autoSalvataggio() {
+        document.getElementById('status').innerText = "☁️ Salvataggio...";
+        clearTimeout(timeoutSalvataggio);
+        timeoutSalvataggio = setTimeout(() => {
+            const pastiDati = {};
+            document.querySelectorAll('textarea').forEach(t => pastiDati[t.id] = t.value);
+            db.ref('menuApp/pasti').update(pastiDati);
+            document.getElementById('status').innerText = "✅ Salvato";
+        }, 1000);
+    }
+
+    // Gestione Dispensa Cloud
+    function aggiungiADispensa() {
+        const input = document.getElementById('nuovoCibo');
+        const nuovo = input.value.trim();
+        if (nuovo) {
+            db.ref('menuApp/dispensa').once('value').then(snap => {
+                let lista = snap.val() || [];
+                if (!lista.includes(nuovo)) {
+                    lista.push(nuovo);
+                    db.ref('menuApp/dispensa').set(lista);
+                }
+            });
+            input.value = "";
         }
     }
 
-    function salvaTutto(mostraAlert = true) {
-        const archivio = JSON.parse(localStorage.getItem('archivioMenuAnnuale')) || {};
-        document.querySelectorAll('textarea').forEach(t => {
-            if(t.value.trim() !== "") archivio[t.id] = t.value;
-            else delete archivio[t.id];
+    function rimuoviDaDispensa(idx) {
+        db.ref('menuApp/dispensa').once('value').then(snap => {
+            let lista = snap.val() || [];
+            lista.splice(idx, 1);
+            db.ref('menuApp/dispensa').set(lista);
         });
-        localStorage.setItem('archivioMenuAnnuale', JSON.stringify(archivio));
-        localStorage.setItem('miaDispensa', JSON.stringify(dispensa));
-        if(mostraAlert) alert("✅ Settimana salvata nell'archivio!");
     }
 
-    // Funzioni Dispensa (Invariate)
-    function aggiungiADispensa() {
-        const input = document.getElementById('nuovoCibo');
-        if (input.value) { dispensa.push(input.value); input.value = ""; aggiornaVisualizzazioneDispensa(); }
-    }
-    function rimuoviDaDispensa(index) { dispensa.splice(index, 1); aggiornaVisualizzazioneDispensa(); }
-    function aggiornaVisualizzazioneDispensa() {
-        const container = document.getElementById('listaDispensa');
-        container.innerHTML = dispensa.map((c, i) => `
+    function renderingDispensa(lista) {
+        const cont = document.getElementById('listaDispensa');
+        cont.innerHTML = lista.map((c, i) => `
             <div class="chip">
-                <span onclick="inserisciNelMenu('${c.replace(/'/g, "\\'")}')">${c}</span>
+                <span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span>
                 <span class="delete-sugg" onclick="rimuoviDaDispensa(${i})">×</span>
             </div>`).join("");
     }
-    function inserisciNelMenu(testo) {
-        if (!lastFocusedId) return alert("Seleziona una casella!");
+
+    function inserisci(testo) {
+        if(!lastFocusedId) return alert("Clicca in una casella!");
         const area = document.getElementById(lastFocusedId);
         area.value += (area.value ? ", " : "") + testo;
-        area.focus();
+        autoSalvataggio();
     }
 
     inizializzaApp();
