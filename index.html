@@ -24,7 +24,7 @@
         .main-wrapper { display: flex; flex-direction: column; gap: 15px; padding: 10px; max-width: 1400px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         
-        .day-card { background: white; border-radius: 16px; padding: 15px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
+        .day-card { background: white; border-radius: 16px; padding: 15px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; position: relative; }
         .day-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; text-transform: uppercase; }
         
         .meal-box { margin-bottom: 18px; position: relative; }
@@ -107,18 +107,29 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
-    // LISTA CIBI CON PUNTEGGIO DI RISCHIO
     const cibiRischio = {
-        "burro": 2, "lardo": 3, "pancetta": 3, "salame": 3, "salsiccia": 3, "panna": 2, 
-        "uova": 1, "formaggio": 1.5, "fritto": 3, "maiale": 2, "carne rossa": 2, 
-        "dolci": 2.5, "zucchero": 2, "alcol": 2, "maionese": 2, "pasticceria": 3
+        "dolci": 3, "torta": 3, "gelato": 3, "brioche": 3, "cornetto": 3, "nutella": 3, "pasticceria": 3,
+        "salame": 3, "mortadella": 3, "wurstel": 3, "pancetta": 3, "salsiccia": 3, "lardo": 3,
+        "fritto": 3, "frittura": 3, "patatine": 3, "patatine fritte": 3,
+        "burro": 2, "panna": 2, "formaggio": 2, "maiale": 2, "carne rossa": 2, "hamburger": 2,
+        "zucchero": 2, "biscotti": 2, "maionese": 2, "alcol": 2, "birra": 2, "vino": 1.5,
+        "uova": 1
     };
 
-    function checkHealth(textarea) {
+    function checkDayHealth(textarea) {
         const text = textarea.value.toLowerCase().trim();
         const parentBox = textarea.closest('.meal-box');
         const statusLabel = parentBox.querySelector('.health-status');
+        const dayCard = textarea.closest('.day-card');
         
+        // Identifica l'utente (m o l)
+        const userSuffix = textarea.id.endsWith("-m") ? "-m" : "-l";
+        const dayPrefix = textarea.id.split('-')[0];
+        
+        // Controlla se l'utente ha fatto allenamento quel giorno
+        const workoutField = document.getElementById(`${dayPrefix}-allenamento${userSuffix}`);
+        const hasWorkout = workoutField && workoutField.value.trim().length > 0;
+
         if (text === "") {
             statusLabel.style.display = "none";
             textarea.classList.remove("field-ko", "field-ok");
@@ -126,13 +137,21 @@
         }
 
         let punteggioPasto = 0;
+        const isCapra = text.includes("capra");
+
         Object.keys(cibiRischio).forEach(cibo => {
-            if (text.includes(cibo)) punteggioPasto += cibiRischio[cibo];
+            if (text.includes(cibo)) {
+                if (cibo === "formaggio" && isCapra) punteggioPasto += 0;
+                else punteggioPasto += cibiRischio[cibo];
+            }
         });
 
+        // REGOLA ALLENAMENTO: Se non c'è allenamento, la soglia KO scende drasticamente a 1.5
+        // Se c'è allenamento, resta a 2.5
+        const sogliaKO = hasWorkout ? 2.5 : 1.5;
+
         statusLabel.style.display = "block";
-        // SOGLIA: Se il punteggio supera 2.5 il pasto è KO
-        if (punteggioPasto >= 2.5) {
+        if (punteggioPasto >= sogliaKO) {
             statusLabel.innerText = "❌ KO";
             statusLabel.className = "health-status status-ko";
             textarea.classList.add("field-ko");
@@ -145,22 +164,30 @@
         }
     }
 
-    // [Resto delle funzioni identico per gestione Firebase e UI]
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
         const nomiGiorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const pasti = [{nome: "Colazione", icona: "☕"}, {nome: "Pranzo", icona: "🍝"}, {nome: "Cena", icona: "🥩"}, {nome: "Allenamento", icona: "💪"}];
+        
         nomiGiorni.forEach((nomeGiorno, index) => {
             const dataGiorno = new Date(dataCorrente);
             dataGiorno.setDate(dataCorrente.getDate() + index);
-            const giornoFormattato = dataGiorno.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }).toUpperCase();
             const card = document.createElement('div');
             card.className = 'day-card';
-            let html = `<div class="day-title">${nomeGiorno} ${giornoFormattato}</div>`;
+            let html = `<div class="day-title">${nomeGiorno} ${dataGiorno.toLocaleDateString('it-IT', {day:'numeric', month:'short'}).toUpperCase()}</div>`;
+            
             pasti.forEach(pasto => {
                 const idBase = `${nomeGiorno}-${pasto.nome}`.toLowerCase().replace("ì", "i");
-                html += `<div class="meal-box"><span class="health-status"></span><span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span><div class="user-input-group"><div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div><div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div></div></div>`;
+                html += `
+                <div class="meal-box">
+                    <span class="health-status"></span>
+                    <span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span>
+                    <div class="user-input-group">
+                        <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="3" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div>
+                        <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="3" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div>
+                    </div>
+                </div>`;
             });
             card.innerHTML = html;
             container.appendChild(card);
@@ -168,7 +195,16 @@
     }
 
     function aggiornaTutto(el) {
-        checkHealth(el);
+        // Se scrivo in allenamento, devo ricalcolare pranzo e cena dello stesso utente
+        if (el.id.includes("allenamento")) {
+            const dayPrefix = el.id.split('-')[0];
+            const suffix = el.id.endsWith("-m") ? "-m" : "-l";
+            checkDayHealth(document.getElementById(`${dayPrefix}-pranzo${suffix}`));
+            checkDayHealth(document.getElementById(`${dayPrefix}-cena${suffix}`));
+        } else {
+            checkDayHealth(el);
+        }
+
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(window.timeoutSalvataggio);
         window.timeoutSalvataggio = setTimeout(() => {
@@ -185,7 +221,12 @@
         window.currentRef = db.ref('settimane/' + weekID);
         window.currentRef.on('value', (snap) => {
             const data = snap.val();
-            document.querySelectorAll('textarea').forEach(t => { if(document.activeElement !== t) { t.value = data && data[t.id] ? data[t.id] : ""; checkHealth(t); } });
+            document.querySelectorAll('textarea').forEach(t => { 
+                if(document.activeElement !== t) { 
+                    t.value = data && data[t.id] ? data[t.id] : ""; 
+                    checkDayHealth(t); 
+                } 
+            });
             document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
