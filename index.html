@@ -32,7 +32,6 @@
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .chip { background: #e1ecf4; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; border: 1px solid #ced4da; }
         #status { font-size: 0.8rem; font-weight: bold; color: #fff; opacity: 0.9; }
-        .btn-notifiche { background: #ff9800; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -45,9 +44,6 @@
 <div class="main-wrapper">
     <div class="menu-section"><div id="grid-container" class="grid"></div></div>
     <div class="dispensa-section">
-        <h3>🔔 Notifiche</h3>
-        <button class="btn-notifiche" onclick="richiediPermessoNotifiche()">Attiva Promemoria Pasti</button>
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
         <h3>🍎 Dispensa</h3>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
             <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
@@ -73,18 +69,8 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
-    // REGISTRAZIONE SERVICE WORKER
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registrato'));
-    }
-
-    function richiediPermessoNotifiche() {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                alert("Notifiche attivate! L'app ti avviserà all'ora dei pasti.");
-                caricaDatiSettimana(); // Ricarica per programmare
-            }
-        });
     }
 
     function getIDSettimana(d) {
@@ -136,41 +122,8 @@
                     const el = document.getElementById(id);
                     if (el && document.activeElement !== el) el.value = data[id];
                 });
-                programmaNotifiche(data);
             }
             document.getElementById('status').innerText = "✅ Sincronizzato";
-        });
-    }
-
-    function programmaNotifiche(data) {
-        if (!("Notification" in window) || Notification.permission !== "granted") return;
-        
-        const oggi = new Date();
-        const giorniSemplici = ["domenica", "lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato"];
-        const nomeGiorno = giorniSemplici[oggi.getDay()];
-        
-        const orari = { "colazione": 8, "pranzo": 12, "cena": 19 };
-
-        Object.keys(orari).forEach(pasto => {
-            const oraNotifica = new Date();
-            oraNotifica.setHours(orari[pasto], 0, 0);
-
-            if (oggi < oraNotifica) {
-                const m = (data && data[`${nomeGiorno}-${pasto}-m`]) || "Non segnato";
-                const l = (data && data[`${nomeGiorno}-${pasto}-l`]) || "Non segnato";
-                const tempoMancante = oraNotifica.getTime() - oggi.getTime();
-                
-                setTimeout(() => {
-                    navigator.serviceWorker.ready.then(registration => {
-                        registration.showNotification(`🍴 Menù ${pasto} di Oggi`, {
-                            body: `Massimo: ${m}\nLiliana: ${l}`,
-                            icon: 'icona.png',
-                            badge: 'icona.png',
-                            vibrate: [200, 100, 200]
-                        });
-                    });
-                }, tempoMancante);
-            }
         });
     }
 
@@ -207,35 +160,3 @@
                 db.ref('dispensa').set(l);
                 input.value = "";
             });
-        }
-    }
-
-    function rimuoviDaDispensa(i) {
-        if(confirm("Rimuovere?")) {
-            db.ref('dispensa').once('value').then(snap => {
-                let l = snap.val() || [];
-                l.splice(i, 1);
-                db.ref('dispensa').set(l);
-            });
-        }
-    }
-
-    function inserisci(t) {
-        if(!window.lastFocusedId) return;
-        const a = document.getElementById(window.lastFocusedId);
-        a.value += (a.value ? ", " : "") + t;
-        autoSalvataggio();
-    }
-
-    function svuotaSettimana() {
-        if(confirm("Svuotare questa settimana?")) {
-            db.ref('settimane/' + getIDSettimana(dataCorrente)).remove();
-        }
-    }
-
-    creaGriglia();
-    aggiornaLabelSettimana();
-    caricaDatiSettimana();
-</script>
-</body>
-</html>
