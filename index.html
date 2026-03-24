@@ -103,6 +103,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
@@ -119,15 +120,15 @@
         if (!textarea) return;
         const text = textarea.value.toLowerCase().trim();
         const row = textarea.closest('.user-row');
+        if (!row) return;
         const badge = row.querySelector('.health-badge');
         
         const isMassimo = textarea.id.endsWith("-m");
         const suffix = isMassimo ? "-m" : "-l";
         const dayPrefix = textarea.id.split('-')[0];
         
-        // Cerca l'allenamento dello SPECIFICO utente
-        const workoutVal = document.getElementById(`${dayPrefix}-allenamento${suffix}`).value.trim();
-        const hasWorkout = workoutVal.length > 0;
+        const workoutEl = document.getElementById(`${dayPrefix}-allenamento${suffix}`);
+        const hasWorkout = workoutEl && workoutEl.value.trim().length > 0;
 
         if (text === "" || textarea.id.includes("allenamento")) {
             badge.style.display = "none";
@@ -177,12 +178,12 @@
                     <div class="user-row">
                         <span class="health-badge"></span>
                         <span class="user-tag">♂ Massimo</span>
-                        <textarea id="${idB}-m" class="user-field user-massimo" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                        <textarea id="${idB}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                     <div class="user-row">
                         <span class="health-badge"></span>
                         <span class="user-tag">♀ Liliana</span>
-                        <textarea id="${idB}-l" class="user-field user-liliana" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                        <textarea id="${idB}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                 </div>`;
             });
@@ -195,7 +196,6 @@
         const suffix = el.id.endsWith("-m") ? "-m" : "-l";
         const day = el.id.split('-')[0];
         
-        // Se cambio l'allenamento, devo ricalcolare TUTTI i pasti di quel giorno per quell'utente
         if (el.id.includes("allenamento")) {
             checkHealth(document.getElementById(`${day}-colazione${suffix}`));
             checkHealth(document.getElementById(`${day}-pranzo${suffix}`));
@@ -219,10 +219,10 @@
         if(window.cR) window.cR.off();
         window.cR = db.ref('settimane/' + weekID);
         window.cR.on('value', (s) => {
-            const dat = s.val();
+            const dat = s.val() || {};
             document.querySelectorAll('textarea').forEach(t => { 
                 if(document.activeElement !== t) { 
-                    t.value = dat && dat[t.id] ? dat[t.id] : ""; 
+                    t.value = dat[t.id] || ""; 
                     checkHealth(t); 
                 } 
             });
@@ -244,9 +244,11 @@
     function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
     function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
 
-    creaGriglia();
-    aggiornaLabelSettimana();
-    caricaDatiSettimana();
+    window.onload = () => {
+        creaGriglia();
+        aggiornaLabelSettimana();
+        caricaDatiSettimana();
+    };
 </script>
 </body>
 </html>
