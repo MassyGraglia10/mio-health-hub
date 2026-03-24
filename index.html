@@ -41,9 +41,9 @@
         .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
         
-        /* Caselle di testo più alte */
         .user-input-group { display: flex; flex-direction: column; gap: 10px; }
-        .user-field { border-radius: 12px; padding: 12px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; }
+        /* Caselle impostate a 3 righe */
+        .user-field { border-radius: 12px; padding: 10px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; }
         .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.1); background-color: #fff !important; }
         
         .user-massimo { background-color: #e3f2fd; border-left: 5px solid #2196f3; }
@@ -67,7 +67,7 @@
 <body>
 
 <div class="header">
-    <h1>🍱 Menu Massimo & Liliana</h1>
+    <h1>🍱 Menu Cloud Massimo & Liliana</h1>
     <div id="status">Connessione...</div>
 </div>
 
@@ -132,7 +132,6 @@
         ];
 
         nomiGiorni.forEach((nomeGiorno, index) => {
-            // Calcola la data specifica per ogni giorno della settimana
             const dataGiorno = new Date(dataCorrente);
             dataGiorno.setDate(dataCorrente.getDate() + index);
             const giornoFormattato = dataGiorno.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }).toUpperCase();
@@ -148,8 +147,8 @@
                     <div class="meal-box">
                         <span class="${labelClass}">${pasto.icona} ${pasto.nome}</span>
                         <div class="user-input-group">
-                            <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="5" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
-                            <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="5" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
+                            <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="3" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
+                            <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="3" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
                         </div>
                     </div>`;
             });
@@ -158,6 +157,7 @@
         });
     }
 
+    // [Resto delle funzioni identico...]
     function caricaDatiSettimana() {
         const weekID = getIDSettimana(dataCorrente);
         if(window.currentRef) window.currentRef.off();
