@@ -9,7 +9,7 @@
     <style>
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
-            --danger: #ef5350; --workout: #ba68c8; --warning: #ff9800; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --danger: #ef5350; --workout: #ba68c8; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
@@ -24,42 +24,41 @@
         .main-wrapper { display: flex; flex-direction: column; gap: 15px; padding: 10px; max-width: 1400px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         
-        .day-card { background: white; border-radius: 16px; padding: 15px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; position: relative; }
+        .day-card { background: white; border-radius: 16px; padding: 15px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
         .day-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; text-transform: uppercase; }
         
-        .meal-box { margin-bottom: 18px; position: relative; }
-        .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
+        .meal-box { margin-bottom: 20px; }
+        .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
         
-        .health-status { 
-            display: none; font-size: 0.75rem; color: #fff; font-weight: 900; 
-            position: absolute; right: 0; top: 0; 
-            padding: 2px 10px; border-radius: 10px; z-index: 5;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .user-row { position: relative; margin-bottom: 12px; }
+        .health-badge { 
+            display: none; font-size: 0.65rem; color: #fff; font-weight: 900; 
+            position: absolute; right: 5px; top: -12px; 
+            padding: 2px 8px; border-radius: 8px; z-index: 10;
         }
         .status-ok { background: var(--success); }
         .status-ko { background: var(--danger); }
         
-        .user-field { border-radius: 12px; padding: 10px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; }
-        .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.1); }
+        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; transition: all 0.2s; }
+        .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1); }
         
-        .field-ko { border-color: var(--danger) !important; background-color: #fff0f0 !important; }
-        .field-ok { border-color: var(--success) !important; background-color: #f1f8e9 !important; }
+        .field-ko { border-color: var(--danger) !important; background-color: #fffafa !important; }
+        .field-ok { border-color: var(--success) !important; background-color: #f7fff7 !important; }
         
         .user-massimo { border-left: 5px solid #2196f3; }
         .user-liliana { border-left: 5px solid #e91e63; }
-        .user-tag { font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; display: block; text-transform: uppercase; color: #555; }
+        .user-tag { font-size: 0.7rem; font-weight: bold; margin-bottom: 3px; display: block; text-transform: uppercase; color: #666; }
         
         .dispensa-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
-        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .chip { background: #e0f2f1; padding: 8px 14px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; border: 1px solid #b2dfdb; }
+        .chip { background: #e0f2f1; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #b2dfdb; display: inline-flex; align-items: center; margin: 4px; }
         
-        .btn-clear { background: var(--danger); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+        .btn-clear { background: var(--danger); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
             .menu-section { flex: 4; }
-            .dispensa-section { flex: 1; min-width: 300px; position: sticky; top: 120px; }
+            .dispensa-section { flex: 1; min-width: 280px; position: sticky; top: 120px; }
         }
     </style>
 </head>
@@ -72,7 +71,7 @@
 
 <div class="nav-weeks">
     <button class="btn-nav" onclick="cambiaSettimana(-1)">◀ SETT.</button>
-    <div id="current-week-display">Caricamento...</div>
+    <div id="current-week-display">...</div>
     <button class="btn-nav" onclick="cambiaSettimana(1)">SUCC. ▶</button>
 </div>
 
@@ -83,12 +82,12 @@
     
     <div class="dispensa-section">
         <h3>🍎 Dispensa Rapida</h3>
-        <div style="display:flex; gap:8px;">
-            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:10px; border-radius:10px; border:1px solid #ddd;">
-            <button onclick="aggiungiADispensa()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:10px; font-weight:bold;">+</button>
+        <div style="display:flex; gap:5px; margin-bottom:15px;">
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
+            <button onclick="aggiungiADispensa()" style="background:var(--primary); color:white; border:none; padding:0 12px; border-radius:8px;">+</button>
         </div>
-        <div id="listaDispensa" class="chip-container"></div>
-        <button onclick="svuotaSettimana()" class="btn-clear">🗑️ Svuota questa Settimana</button>
+        <div id="listaDispensa"></div>
+        <button onclick="svuotaSettimana()" class="btn-clear">🗑️ Svuota Settimana</button>
     </div>
 </div>
 
@@ -110,55 +109,48 @@
     const cibiRischio = {
         "dolci": 3, "torta": 3, "gelato": 3, "brioche": 3, "cornetto": 3, "nutella": 3, "pasticceria": 3,
         "salame": 3, "mortadella": 3, "wurstel": 3, "pancetta": 3, "salsiccia": 3, "lardo": 3,
-        "fritto": 3, "frittura": 3, "patatine": 3, "patatine fritte": 3,
-        "burro": 2, "panna": 2, "formaggio": 2, "maiale": 2, "carne rossa": 2, "hamburger": 2,
-        "zucchero": 2, "biscotti": 2, "maionese": 2, "alcol": 2, "birra": 2, "vino": 1.5,
-        "uova": 1
+        "fritto": 3, "frittura": 3, "patatine": 3, "burro": 2, "panna": 2, "formaggio": 2, 
+        "maiale": 2, "carne rossa": 2, "hamburger": 2, "zucchero": 2, "biscotti": 2, 
+        "maionese": 2, "alcol": 2, "birra": 2, "vino": 1.5, "uova": 1
     };
 
-    function checkDayHealth(textarea) {
+    function checkHealth(textarea) {
+        if (!textarea) return;
         const text = textarea.value.toLowerCase().trim();
-        const parentBox = textarea.closest('.meal-box');
-        const statusLabel = parentBox.querySelector('.health-status');
-        const dayCard = textarea.closest('.day-card');
+        const row = textarea.closest('.user-row');
+        const badge = row.querySelector('.health-badge');
         
-        // Identifica l'utente (m o l)
-        const userSuffix = textarea.id.endsWith("-m") ? "-m" : "-l";
+        const isMassimo = textarea.id.endsWith("-m");
+        const suffix = isMassimo ? "-m" : "-l";
         const dayPrefix = textarea.id.split('-')[0];
         
-        // Controlla se l'utente ha fatto allenamento quel giorno
-        const workoutField = document.getElementById(`${dayPrefix}-allenamento${userSuffix}`);
-        const hasWorkout = workoutField && workoutField.value.trim().length > 0;
+        // Cerca l'allenamento dello SPECIFICO utente
+        const workoutVal = document.getElementById(`${dayPrefix}-allenamento${suffix}`).value.trim();
+        const hasWorkout = workoutVal.length > 0;
 
-        if (text === "") {
-            statusLabel.style.display = "none";
+        if (text === "" || textarea.id.includes("allenamento")) {
+            badge.style.display = "none";
             textarea.classList.remove("field-ko", "field-ok");
             return;
         }
 
-        let punteggioPasto = 0;
+        let punteggio = 0;
         const isCapra = text.includes("capra");
-
-        Object.keys(cibiRischio).forEach(cibo => {
-            if (text.includes(cibo)) {
-                if (cibo === "formaggio" && isCapra) punteggioPasto += 0;
-                else punteggioPasto += cibiRischio[cibo];
-            }
+        Object.keys(cibiRischio).forEach(c => {
+            if (text.includes(c)) punteggio += (c === "formaggio" && isCapra) ? 0 : cibiRischio[c];
         });
 
-        // REGOLA ALLENAMENTO: Se non c'è allenamento, la soglia KO scende drasticamente a 1.5
-        // Se c'è allenamento, resta a 2.5
-        const sogliaKO = hasWorkout ? 2.5 : 1.5;
+        const soglia = hasWorkout ? 2.5 : 1.5;
+        badge.style.display = "block";
 
-        statusLabel.style.display = "block";
-        if (punteggioPasto >= sogliaKO) {
-            statusLabel.innerText = "❌ KO";
-            statusLabel.className = "health-status status-ko";
+        if (punteggio >= soglia) {
+            badge.innerText = "❌ KO";
+            badge.className = "health-badge status-ko";
             textarea.classList.add("field-ko");
             textarea.classList.remove("field-ok");
         } else {
-            statusLabel.innerText = "✅ OK";
-            statusLabel.className = "health-status status-ok";
+            badge.innerText = "✅ OK";
+            badge.className = "health-badge status-ok";
             textarea.classList.add("field-ok");
             textarea.classList.remove("field-ko");
         }
@@ -167,83 +159,89 @@
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
-        const nomiGiorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
-        const pasti = [{nome: "Colazione", icona: "☕"}, {nome: "Pranzo", icona: "🍝"}, {nome: "Cena", icona: "🥩"}, {nome: "Allenamento", icona: "💪"}];
+        const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+        const pasti = [{n: "Colazione", i: "☕"}, {n: "Pranzo", i: "🍝"}, {n: "Cena", i: "🥩"}, {n: "Allenamento", i: "💪"}];
         
-        nomiGiorni.forEach((nomeGiorno, index) => {
-            const dataGiorno = new Date(dataCorrente);
-            dataGiorno.setDate(dataCorrente.getDate() + index);
+        giorni.forEach((g, idx) => {
+            const dG = new Date(dataCorrente); dG.setDate(dataCorrente.getDate() + idx);
             const card = document.createElement('div');
             card.className = 'day-card';
-            let html = `<div class="day-title">${nomeGiorno} ${dataGiorno.toLocaleDateString('it-IT', {day:'numeric', month:'short'}).toUpperCase()}</div>`;
+            let h = `<div class="day-title">${g} ${dG.toLocaleDateString('it-IT',{day:'numeric',month:'short'}).toUpperCase()}</div>`;
             
-            pasti.forEach(pasto => {
-                const idBase = `${nomeGiorno}-${pasto.nome}`.toLowerCase().replace("ì", "i");
-                html += `
+            pasti.forEach(p => {
+                const idB = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
+                h += `
                 <div class="meal-box">
-                    <span class="health-status"></span>
-                    <span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span>
-                    <div class="user-input-group">
-                        <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="3" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div>
-                        <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="3" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div>
+                    <span class="${p.n==='Allenamento'?'meal-label workout':'meal-label'}">${p.i} ${p.n}</span>
+                    <div class="user-row">
+                        <span class="health-badge"></span>
+                        <span class="user-tag">♂ Massimo</span>
+                        <textarea id="${idB}-m" class="user-field user-massimo" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                    </div>
+                    <div class="user-row">
+                        <span class="health-badge"></span>
+                        <span class="user-tag">♀ Liliana</span>
+                        <textarea id="${idB}-l" class="user-field user-liliana" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                 </div>`;
             });
-            card.innerHTML = html;
+            card.innerHTML = h;
             container.appendChild(card);
         });
     }
 
     function aggiornaTutto(el) {
-        // Se scrivo in allenamento, devo ricalcolare pranzo e cena dello stesso utente
+        const suffix = el.id.endsWith("-m") ? "-m" : "-l";
+        const day = el.id.split('-')[0];
+        
+        // Se cambio l'allenamento, devo ricalcolare TUTTI i pasti di quel giorno per quell'utente
         if (el.id.includes("allenamento")) {
-            const dayPrefix = el.id.split('-')[0];
-            const suffix = el.id.endsWith("-m") ? "-m" : "-l";
-            checkDayHealth(document.getElementById(`${dayPrefix}-pranzo${suffix}`));
-            checkDayHealth(document.getElementById(`${dayPrefix}-cena${suffix}`));
+            checkHealth(document.getElementById(`${day}-colazione${suffix}`));
+            checkHealth(document.getElementById(`${day}-pranzo${suffix}`));
+            checkHealth(document.getElementById(`${day}-cena${suffix}`));
         } else {
-            checkDayHealth(el);
+            checkHealth(el);
         }
 
         document.getElementById('status').innerText = "☁️ Salvataggio...";
-        clearTimeout(window.timeoutSalvataggio);
-        window.timeoutSalvataggio = setTimeout(() => {
+        clearTimeout(window.tS);
+        window.tS = setTimeout(() => {
             const weekID = getIDSettimana(dataCorrente);
-            const dati = {};
-            document.querySelectorAll('textarea').forEach(t => dati[t.id] = t.value);
-            db.ref('settimane/' + weekID).update(dati);
+            const d = {};
+            document.querySelectorAll('textarea').forEach(t => d[t.id] = t.value);
+            db.ref('settimane/' + weekID).update(d);
         }, 800);
     }
 
     function caricaDatiSettimana() {
         const weekID = getIDSettimana(dataCorrente);
-        if(window.currentRef) window.currentRef.off();
-        window.currentRef = db.ref('settimane/' + weekID);
-        window.currentRef.on('value', (snap) => {
-            const data = snap.val();
+        if(window.cR) window.cR.off();
+        window.cR = db.ref('settimane/' + weekID);
+        window.cR.on('value', (s) => {
+            const dat = s.val();
             document.querySelectorAll('textarea').forEach(t => { 
                 if(document.activeElement !== t) { 
-                    t.value = data && data[t.id] ? data[t.id] : ""; 
-                    checkDayHealth(t); 
+                    t.value = dat && dat[t.id] ? dat[t.id] : ""; 
+                    checkHealth(t); 
                 } 
             });
             document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
 
-    function getIDSettimana(d) { const lun = new Date(d); return lun.getFullYear() + "-" + (lun.getMonth() + 1).toString().padStart(2, '0') + "-" + lun.getDate().toString().padStart(2, '0'); }
-    function aggiornaLabelSettimana() { const fineSett = new Date(dataCorrente); fineSett.setDate(fineSett.getDate() + 6); document.getElementById('current-week-display').innerText = "Settimana: " + dataCorrente.toLocaleDateString('it-IT') + " - " + fineSett.toLocaleDateString('it-IT'); }
+    function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
+    function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " - " + fS.toLocaleDateString('it-IT'); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
-    let tuttiICibi = [];
-    db.ref('dispensa').on('value', snap => { tuttiICibi = snap.val() || []; aggiornaVisualizzazioneDispensa(tuttiICibi); });
-    function aggiornaVisualizzazioneDispensa(lista) {
-        const cont = document.getElementById('listaDispensa');
-        cont.innerHTML = lista.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red;font-weight:bold" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
-    }
-    function aggiungiADispensa() { const input = document.getElementById('nuovoCibo'); if (input.value.trim()) { db.ref('dispensa').once('value').then(snap => { let l = snap.val() || []; l.push(input.value.trim()); db.ref('dispensa').set(l); input.value = ""; }); } }
-    function rimuoviDaDispensa(i) { if(confirm("Rimuovere dalla dispensa?")) { db.ref('dispensa').once('value').then(snap => { let l = snap.val() || []; l.splice(i, 1); db.ref('dispensa').set(l); }); } }
+    
+    db.ref('dispensa').on('value', s => { 
+        const l = s.val() || [];
+        document.getElementById('listaDispensa').innerHTML = l.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
+    });
+    
+    function aggiungiADispensa() { const i = document.getElementById('nuovoCibo'); if (i.value.trim()) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.push(i.value.trim()); db.ref('dispensa').set(l); i.value = ""; }); } }
+    function rimuoviDaDispensa(i) { if(confirm("Rimuovere?")) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.splice(i, 1); db.ref('dispensa').set(l); }); } }
     function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
-    function svuotaSettimana() { if(confirm("Svuotare questa settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
+    function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
 
     creaGriglia();
     aggiornaLabelSettimana();
