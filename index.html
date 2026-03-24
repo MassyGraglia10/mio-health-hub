@@ -160,3 +160,35 @@
                 db.ref('dispensa').set(l);
                 input.value = "";
             });
+        }
+    }
+
+    function rimuoviDaDispensa(i) {
+        if(confirm("Rimuovere?")) {
+            db.ref('dispensa').once('value').then(snap => {
+                let l = snap.val() || [];
+                l.splice(i, 1);
+                db.ref('dispensa').set(l);
+            });
+        }
+    }
+
+    function inserisci(t) {
+        if(!window.lastFocusedId) return;
+        const a = document.getElementById(window.lastFocusedId);
+        a.value += (a.value ? ", " : "") + t;
+        autoSalvataggio();
+    }
+
+    function svuotaSettimana() {
+        if(confirm("Svuotare questa settimana?")) {
+            db.ref('settimane/' + getIDSettimana(dataCorrente)).remove();
+        }
+    }
+
+    creaGriglia();
+    aggiornaLabelSettimana();
+    caricaDatiSettimana();
+</script>
+</body>
+</html>
