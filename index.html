@@ -9,7 +9,7 @@
     <style>
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
-            --danger: #ef5350; --workout: #ba68c8; --warning: #ff9800; --shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --danger: #ef5350; --workout: #ba68c8; --warning: #ff9800; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
@@ -31,25 +31,26 @@
         .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
         
-        .health-alert { 
-            display: none; font-size: 0.65rem; color: #fff; font-weight: bold; 
-            position: absolute; right: 0; top: 0; background: var(--warning); 
-            padding: 2px 8px; border-radius: 10px; z-index: 5;
+        .health-status { 
+            display: none; font-size: 0.75rem; color: #fff; font-weight: 900; 
+            position: absolute; right: 0; top: 0; 
+            padding: 2px 10px; border-radius: 10px; z-index: 5;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        .status-ok { background: var(--success); }
+        .status-ko { background: var(--danger); }
         
-        .user-input-group { display: flex; flex-direction: column; gap: 10px; }
-        .user-field { border-radius: 12px; padding: 10px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; position: relative; }
+        .user-field { border-radius: 12px; padding: 10px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; }
         .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.1); }
         
-        .user-field.unhealthy-foc { border-color: var(--warning) !important; background-color: #fff9f0 !important; }
+        .field-ko { border-color: var(--danger) !important; background-color: #fff0f0 !important; }
+        .field-ok { border-color: var(--success) !important; background-color: #f1f8e9 !important; }
         
-        .user-massimo { background-color: #e3f2fd; border-left: 5px solid #2196f3; }
-        .user-liliana { background-color: #fce4ec; border-left: 5px solid #e91e63; }
+        .user-massimo { border-left: 5px solid #2196f3; }
+        .user-liliana { border-left: 5px solid #e91e63; }
         .user-tag { font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; display: block; text-transform: uppercase; color: #555; }
         
         .dispensa-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
-        .search-dispensa { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; margin: 10px 0; font-size: 0.9rem; }
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .chip { background: #e0f2f1; padding: 8px 14px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; border: 1px solid #b2dfdb; }
         
@@ -86,7 +87,6 @@
             <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:10px; border-radius:10px; border:1px solid #ddd;">
             <button onclick="aggiungiADispensa()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:10px; font-weight:bold;">+</button>
         </div>
-        <input type="text" id="searchDispensa" class="search-dispensa" placeholder="🔍 Filtra cibi..." oninput="filtraDispensa()">
         <div id="listaDispensa" class="chip-container"></div>
         <button onclick="svuotaSettimana()" class="btn-clear">🗑️ Svuota questa Settimana</button>
     </div>
@@ -107,22 +107,45 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
-    const cibiNo = ["burro", "lardo", "pancetta", "salame", "salsiccia", "panna", "mortadella", "coppa", "wurstel", "fritto", "frittura", "strutto", "maiale", "carne rossa", "hamburger", "maionese", "ketchup", "patatine", "dolci", "biscotti", "zucchero", "nutella", "merendine", "cornetto", "pasticceria", "gelato", "bibita", "cola", "alcol", "birra"];
+    // LISTA CIBI CON PUNTEGGIO DI RISCHIO
+    const cibiRischio = {
+        "burro": 2, "lardo": 3, "pancetta": 3, "salame": 3, "salsiccia": 3, "panna": 2, 
+        "uova": 1, "formaggio": 1.5, "fritto": 3, "maiale": 2, "carne rossa": 2, 
+        "dolci": 2.5, "zucchero": 2, "alcol": 2, "maionese": 2, "pasticceria": 3
+    };
 
     function checkHealth(textarea) {
-        const text = textarea.value.toLowerCase();
+        const text = textarea.value.toLowerCase().trim();
         const parentBox = textarea.closest('.meal-box');
-        const alertBox = parentBox.querySelector('.health-alert');
-        const isUnhealthy = cibiNo.some(cibo => text.includes(cibo));
-        if (isUnhealthy && text.trim() !== "") {
-            alertBox.style.display = "block";
-            textarea.classList.add("unhealthy-foc");
+        const statusLabel = parentBox.querySelector('.health-status');
+        
+        if (text === "") {
+            statusLabel.style.display = "none";
+            textarea.classList.remove("field-ko", "field-ok");
+            return;
+        }
+
+        let punteggioPasto = 0;
+        Object.keys(cibiRischio).forEach(cibo => {
+            if (text.includes(cibo)) punteggioPasto += cibiRischio[cibo];
+        });
+
+        statusLabel.style.display = "block";
+        // SOGLIA: Se il punteggio supera 2.5 il pasto è KO
+        if (punteggioPasto >= 2.5) {
+            statusLabel.innerText = "❌ KO";
+            statusLabel.className = "health-status status-ko";
+            textarea.classList.add("field-ko");
+            textarea.classList.remove("field-ok");
         } else {
-            alertBox.style.display = "none";
-            textarea.classList.remove("unhealthy-foc");
+            statusLabel.innerText = "✅ OK";
+            statusLabel.className = "health-status status-ok";
+            textarea.classList.add("field-ok");
+            textarea.classList.remove("field-ko");
         }
     }
 
+    // [Resto delle funzioni identico per gestione Firebase e UI]
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
@@ -137,7 +160,7 @@
             let html = `<div class="day-title">${nomeGiorno} ${giornoFormattato}</div>`;
             pasti.forEach(pasto => {
                 const idBase = `${nomeGiorno}-${pasto.nome}`.toLowerCase().replace("ì", "i");
-                html += `<div class="meal-box"><span class="health-alert">⚠️ Cibo non salutare</span><span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span><div class="user-input-group"><div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div><div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div></div></div>`;
+                html += `<div class="meal-box"><span class="health-status"></span><span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span><div class="user-input-group"><div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div><div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div></div></div>`;
             });
             card.innerHTML = html;
             container.appendChild(card);
@@ -176,7 +199,6 @@
         const cont = document.getElementById('listaDispensa');
         cont.innerHTML = lista.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red;font-weight:bold" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
     }
-    function filtraDispensa() { const query = document.getElementById('searchDispensa').value.toLowerCase(); aggiornaVisualizzazioneDispensa(tuttiICibi.filter(c => c.toLowerCase().includes(query))); }
     function aggiungiADispensa() { const input = document.getElementById('nuovoCibo'); if (input.value.trim()) { db.ref('dispensa').once('value').then(snap => { let l = snap.val() || []; l.push(input.value.trim()); db.ref('dispensa').set(l); input.value = ""; }); } }
     function rimuoviDaDispensa(i) { if(confirm("Rimuovere dalla dispensa?")) { db.ref('dispensa').once('value').then(snap => { let l = snap.val() || []; l.splice(i, 1); db.ref('dispensa').set(l); }); } }
     function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
