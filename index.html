@@ -42,7 +42,7 @@
         .meal-label.workout { background: var(--workout) !important; }
         
         .user-input-group { display: flex; flex-direction: column; gap: 10px; }
-        /* Caselle impostate a 3 righe */
+        /* Caselle impostate a 4 righe per un equilibrio ottimale */
         .user-field { border-radius: 12px; padding: 10px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; }
         .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.1); background-color: #fff !important; }
         
@@ -147,8 +147,8 @@
                     <div class="meal-box">
                         <span class="${labelClass}">${pasto.icona} ${pasto.nome}</span>
                         <div class="user-input-group">
-                            <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="3" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
-                            <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="3" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
+                            <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
+                            <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
                         </div>
                     </div>`;
             });
@@ -157,7 +157,6 @@
         });
     }
 
-    // [Resto delle funzioni identico...]
     function caricaDatiSettimana() {
         const weekID = getIDSettimana(dataCorrente);
         if(window.currentRef) window.currentRef.off();
