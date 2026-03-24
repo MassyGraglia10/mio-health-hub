@@ -31,7 +31,6 @@
         .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
         
-        /* Alert Colesterolo e Salute */
         .health-alert { 
             display: none; font-size: 0.65rem; color: #fff; font-weight: bold; 
             position: absolute; right: 0; top: 0; background: var(--warning); 
@@ -43,7 +42,6 @@
         .user-field { border-radius: 12px; padding: 10px; font-size: 1rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; transition: all 0.2s; position: relative; }
         .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(38, 166, 154, 0.1); }
         
-        /* Stile quando il cibo non è salutare */
         .user-field.unhealthy-foc { border-color: var(--warning) !important; background-color: #fff9f0 !important; }
         
         .user-massimo { background-color: #e3f2fd; border-left: 5px solid #2196f3; }
@@ -109,21 +107,13 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
-    // LISTA CIBI NON SALUTARI (Colesterolo, Grassi Saturi, Zuccheri)
-    const cibiNo = [
-        "burro", "lardo", "pancetta", "salame", "salsiccia", "panna", "mortadella", "coppa", 
-        "wurstel", "fritto", "frittura", "strutto", "maiale", "carne rossa", "hamburger", 
-        "maionese", "ketchup", "patatine", "dolci", "biscotti", "zucchero", "nutella", 
-        "merendine", "cornetto", "pasticceria", "gelato", "bibita", "cola", "alcol", "birra"
-    ];
+    const cibiNo = ["burro", "lardo", "pancetta", "salame", "salsiccia", "panna", "mortadella", "coppa", "wurstel", "fritto", "frittura", "strutto", "maiale", "carne rossa", "hamburger", "maionese", "ketchup", "patatine", "dolci", "biscotti", "zucchero", "nutella", "merendine", "cornetto", "pasticceria", "gelato", "bibita", "cola", "alcol", "birra"];
 
     function checkHealth(textarea) {
         const text = textarea.value.toLowerCase();
         const parentBox = textarea.closest('.meal-box');
         const alertBox = parentBox.querySelector('.health-alert');
-        
         const isUnhealthy = cibiNo.some(cibo => text.includes(cibo));
-        
         if (isUnhealthy && text.trim() !== "") {
             alertBox.style.display = "block";
             textarea.classList.add("unhealthy-foc");
@@ -138,27 +128,16 @@
         container.innerHTML = "";
         const nomiGiorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const pasti = [{nome: "Colazione", icona: "☕"}, {nome: "Pranzo", icona: "🍝"}, {nome: "Cena", icona: "🥩"}, {nome: "Allenamento", icona: "💪"}];
-
         nomiGiorni.forEach((nomeGiorno, index) => {
             const dataGiorno = new Date(dataCorrente);
             dataGiorno.setDate(dataCorrente.getDate() + index);
             const giornoFormattato = dataGiorno.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }).toUpperCase();
-
             const card = document.createElement('div');
             card.className = 'day-card';
             let html = `<div class="day-title">${nomeGiorno} ${giornoFormattato}</div>`;
-            
             pasti.forEach(pasto => {
                 const idBase = `${nomeGiorno}-${pasto.nome}`.toLowerCase().replace("ì", "i");
-                html += `
-                    <div class="meal-box">
-                        <span class="health-alert">⚠️ Cibo non salutare</span>
-                        <span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span>
-                        <div class="user-input-group">
-                            <div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div>
-                            <div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div>
-                        </div>
-                    </div>`;
+                html += `<div class="meal-box"><span class="health-alert">⚠️ Cibo non salutare</span><span class="${pasto.nome === 'Allenamento' ? 'meal-label workout' : 'meal-label'}">${pasto.icona} ${pasto.nome}</span><div class="user-input-group"><div><span class="user-tag">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div><div><span class="user-tag">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="aggiornaTutto(this)"></textarea></div></div></div>`;
             });
             card.innerHTML = html;
             container.appendChild(card);
@@ -166,7 +145,7 @@
     }
 
     function aggiornaTutto(el) {
-        checkHealth(el); // Controllo immediato salute
+        checkHealth(el);
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(window.timeoutSalvataggio);
         window.timeoutSalvataggio = setTimeout(() => {
@@ -183,21 +162,14 @@
         window.currentRef = db.ref('settimane/' + weekID);
         window.currentRef.on('value', (snap) => {
             const data = snap.val();
-            document.querySelectorAll('textarea').forEach(t => { 
-                if(document.activeElement !== t) {
-                    t.value = data && data[t.id] ? data[t.id] : "";
-                    checkHealth(t); // Check salute al caricamento
-                }
-            });
+            document.querySelectorAll('textarea').forEach(t => { if(document.activeElement !== t) { t.value = data && data[t.id] ? data[t.id] : ""; checkHealth(t); } });
             document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
 
-    // [Funzioni Navigazione e Dispensa standard]
     function getIDSettimana(d) { const lun = new Date(d); return lun.getFullYear() + "-" + (lun.getMonth() + 1).toString().padStart(2, '0') + "-" + lun.getDate().toString().padStart(2, '0'); }
     function aggiornaLabelSettimana() { const fineSett = new Date(dataCorrente); fineSett.setDate(fineSett.getDate() + 6); document.getElementById('current-week-display').innerText = "Settimana: " + dataCorrente.toLocaleDateString('it-IT') + " - " + fineSett.toLocaleDateString('it-IT'); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
-    
     let tuttiICibi = [];
     db.ref('dispensa').on('value', snap => { tuttiICibi = snap.val() || []; aggiornaVisualizzazioneDispensa(tuttiICibi); });
     function aggiornaVisualizzazioneDispensa(lista) {
