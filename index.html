@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Menu Cloud Massimo & Liliana</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icona.png">
@@ -10,47 +10,127 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #2a9d8f; --bg: #f8f9fa; --accent: #e9c46a; --text: #264653; --secondary: #457b9d; --danger: #e76f51; --workout: #9b59b6; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
-        .header { text-align: center; background: var(--primary); color: white; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top:0; z-index:100; }
-        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 10px; border-bottom: 2px solid #ddd; position: sticky; top: 60px; z-index: 99; }
-        .btn-nav { background: var(--secondary); color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
-        #current-week-display { font-weight: bold; color: var(--text); font-size: 0.85rem; text-align: center; flex: 1; }
-        .main-wrapper { display: flex; flex-wrap: wrap; gap: 15px; padding: 10px; max-width: 100%; margin: auto; }
-        .menu-section { flex: 3; min-width: 320px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
-        .day-card { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 6px solid var(--accent); }
-        .day-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: var(--primary); text-align: center; border-bottom: 1px solid #eee; text-transform: uppercase; }
-        .meal-box { margin-bottom: 15px; padding: 5px; border-radius: 10px; background: #fafafa; border: 1px solid #eee; }
-        .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 8px; text-align: center; display: block; background: var(--secondary); border-radius: 4px; padding: 2px; }
-        .workout-label { background: var(--workout) !important; }
-        .user-field { border-radius: 8px; padding: 10px; font-size: 1rem; border: 1px solid #ccc; resize: vertical; width: 100%; box-sizing: border-box; line-height: 1.4; }
-        .user-massimo { background-color: #e3f2fd; border-left: 5px solid #2196f3; margin-bottom: 10px; }
-        .user-liliana { background-color: #fce4ec; border-left: 5px solid #e91e63; }
-        .user-tag { font-size: 0.75rem; font-weight: bold; margin-bottom: 3px; display: block; text-transform: uppercase; }
-        .dispensa-section { flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: fit-content; }
-        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .chip { background: #e1ecf4; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; cursor: pointer; border: 1px solid #ced4da; }
-        #status { font-size: 0.8rem; font-weight: bold; color: #fff; opacity: 0.9; }
+        :root { 
+            --primary: #26a69a; /* Un verde acqua più fresco */
+            --bg: #fdfdfd; 
+            --accent: #ffb74d; /* Un arancione più morbido */
+            --text: #2c3e50; 
+            --secondary: #546e7a; 
+            --danger: #ef5350; 
+            --workout: #ba68c8;
+            --shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --focus-border: #81d4fa;
+        }
+        
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+        
+        /* Header più compatto */
+        .header { text-align: center; background: var(--primary); color: white; padding: 6px 10px; box-shadow: var(--shadow); position: sticky; top:0; z-index:100; }
+        .header h1 { font-size: 1.1rem; margin: 0 0 3px 0; }
+        
+        #status { font-size: 0.7rem; font-weight: bold; color: #fff; opacity: 0.8; }
+        
+        /* Navigazione settimana ottimizzata */
+        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 8px; background: #fff; padding: 8px; border-bottom: 1px solid #eee; position: sticky; top: 46px; z-index: 99; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .btn-nav { background: var(--secondary); color: white; border: none; padding: 6px 10px; border-radius: 16px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: opacity 0.2s; }
+        .btn-nav:active { opacity: 0.7; }
+        #current-week-display { font-weight: bold; color: var(--text); font-size: 0.8rem; text-align: center; flex: 1; }
+        
+        .main-wrapper { display: flex; flex-direction: column; gap: 10px; padding: 10px; max-width: 1200px; margin: auto; }
+        
+        /* Griglia dei giorni più pulita */
+        .menu-section { width: 100%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+        
+        /* Card del giorno moderna */
+        .day-card { background: white; border-radius: 16px; padding: 10px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; transition: transform 0.2s; }
+        .day-card:hover { transform: translateY(-2px); }
+        
+        .day-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; color: var(--primary); text-align: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Meal box modernizzato */
+        .meal-box { margin-bottom: 12px; padding: 0; border-radius: 10px; background: transparent; border: none; }
+        
+        /* Etichette con icone */
+        .meal-label { font-weight: bold; font-size: 0.8rem; color: #fff; margin-bottom: 6px; text-align: left; display: flex; align-items: center; gap: 5px; background: var(--secondary); border-radius: 6px; padding: 4px 8px; width: fit-content; }
+        .meal-label.workout { background: var(--workout) !important; }
+        
+        .user-input-group { display: flex; flex-direction: column; gap: 6px; }
+        
+        /* Textarea più morbida con effetto focus */
+        .user-field { border-radius: 10px; padding: 8px; font-size: 0.9rem; border: 1px solid #e0e0e0; resize: none; width: 100%; box-sizing: border-box; line-height: 1.3; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; -webkit-appearance: none; }
+        .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1); background-color: #fff !important; }
+        
+        .user-massimo { background-color: #f1f8e9; border-left: 4px solid #8bc34a; }
+        .user-liliana { background-color: #fce4ec; border-left: 4px solid #f06292; }
+        
+        .user-tag { font-size: 0.7rem; font-weight: bold; margin-bottom: 2px; display: flex; align-items: center; gap: 3px; text-transform: uppercase; color: #757575; }
+        
+        /* Sezione Dispensa rivista */
+        .dispensa-section { width: 100%; background: white; padding: 15px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; margin-top: 10px; box-sizing: border-box; }
+        .dispensa-section h3 { font-size: 1rem; margin-top: 0; color: var(--secondary); display: flex; align-items: center; gap: 6px; }
+        
+        /* Input per la ricerca nella dispensa */
+        .search-dispensa { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px; box-sizing: border-box; font-size: 0.85rem; }
+        
+        .chip-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 200px; overflow-y: auto; padding: 2px; }
+        
+        /* Chip più moderni */
+        .chip { background: #e0f2f1; padding: 6px 10px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; border: 1px solid #b2dfdb; color: #00695c; display: flex; align-items: center; gap: 4px; transition: background-color 0.2s; }
+        .chip:hover { background-color: #b2dfdb; }
+        .chip:active { background-color: #80cbc4; }
+        
+        /* Pulsanti d'azione più compatti */
+        .action-btn { color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: opacity 0.2s; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .action-btn:active { opacity: 0.8; }
+        .btn-shop { background: var(--accent); color: #855e2a; margin-top: 15px; }
+        .btn-clear { background: var(--danger); margin-top: 10px; }
+
+        /* Media queries per desktop */
+        @media (min-width: 768px) {
+            .main-wrapper { flex-direction: row; align-items: flex-start; }
+            .menu-section { flex: 3; }
+            .dispensa-section { flex: 1; min-width: 280px; position: sticky; top: 110px; }
+            .header h1 { font-size: 1.4rem; }
+            .header { padding: 10px; }
+            .nav-weeks { top: 62px; }
+            .day-card { padding: 12px; }
+        }
     </style>
 </head>
 <body>
-<div class="header"><h1>🍱 Menu Massimo & Liliana</h1><div id="status">Connessione...</div></div>
+<div class="header">
+    <h1>🍱 Menu Cloud Massimo & Liliana</h1>
+    <div id="status">Connessione...</div>
+</div>
+
 <div class="nav-weeks">
     <button class="btn-nav" onclick="cambiaSettimana(-1)">◀ SETT.</button>
     <div id="current-week-display">Caricamento...</div>
     <button class="btn-nav" onclick="cambiaSettimana(1)">SUCC. ▶</button>
 </div>
+
 <div class="main-wrapper">
-    <div class="menu-section"><div id="grid-container" class="grid"></div></div>
+    <div class="menu-section">
+        <div id="grid-container" class="grid"></div>
+    </div>
+    
     <div class="dispensa-section">
         <h3>🍎 Dispensa</h3>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:10px; border-radius:6px; border:1px solid #ddd;">
-            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:10px 15px; border-radius:6px;">+</button>
+        <div style="display:flex; gap:5px; margin-bottom:10px;">
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi nuovo..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd; font-size: 0.85rem;">
+            <button onclick="aggiungiADispensa()" style="background:var(--secondary); color:white; border:none; padding:0 12px; border-radius:8px; font-size:1.1rem; font-weight:bold;">+</button>
         </div>
+        
+        <input type="text" id="searchDispensa" class="search-dispensa" placeholder="🔍 Cerca cibo..." oninput="filtraDispensa()">
+        
         <div id="listaDispensa" class="chip-container"></div>
-        <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-top:25px; font-weight:bold;">🗑️ SVUOTA SETTIMANA</button>
+        
+        <button onclick="generaListaSpesa()" class="action-btn btn-shop">📋 Genera Lista Spesa</button>
+        
+        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <button onclick="svuotaSettimana()" class="action-btn btn-clear">🗑️ SVUOTA SETTIMANA</button>
     </div>
 </div>
 
@@ -81,27 +161,32 @@
     function aggiornaLabelSettimana() {
         const fineSett = new Date(dataCorrente);
         fineSett.setDate(fineSett.getDate() + 6);
-        document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " al " + fineSett.toLocaleDateString('it-IT');
+        document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT', {day: 'numeric', month: 'short'}) + " al " + fineSett.toLocaleDateString('it-IT', {day: 'numeric', month: 'short'});
     }
 
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
         const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
-        const pasti = ["Colazione", "Pranzo", "Cena", "Allenamento"];
+        const pasti = [
+            {nome: "Colazione", icona: "☕"}, 
+            {nome: "Pranzo", icona: "🍝"}, 
+            {nome: "Cena", icona: "🥩"}, 
+            {nome: "Allenamento", icona: "💪"}
+        ];
         giorni.forEach(giorno => {
             const card = document.createElement('div');
             card.className = 'day-card';
             let html = `<div class="day-title">${giorno}</div>`;
             pasti.forEach(pasto => {
-                const idBase = `${giorno}-${pasto}`.toLowerCase().replace("ì", "i");
-                const labelClass = pasto === "Allenamento" ? "meal-label workout-label" : "meal-label";
+                const idBase = `${giorno}-${pasto.nome}`.toLowerCase().replace("ì", "i");
+                const labelClass = pasto.nome === "Allenamento" ? "meal-label workout" : "meal-label";
                 html += `
                     <div class="meal-box">
-                        <span class="${labelClass}">${pasto}</span>
+                        <span class="${labelClass}">${pasto.icona} ${pasto.nome}</span>
                         <div class="user-input-group">
-                            <div><span class="user-tag" style="color:#1565c0">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
-                            <div><span class="user-tag" style="color:#c2185b">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
+                            <div><span class="user-tag" style="color:#689f38">♂ Massimo</span><textarea id="${idBase}-m" class="user-field user-massimo" rows="2" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
+                            <div><span class="user-tag" style="color:#d81b60">♀ Liliana</span><textarea id="${idBase}-l" class="user-field user-liliana" rows="2" onfocus="window.lastFocusedId = this.id" oninput="autoSalvataggio()"></textarea></div>
                         </div>
                     </div>`;
             });
@@ -116,6 +201,8 @@
         window.currentRef = db.ref('settimane/' + weekID);
         window.currentRef.on('value', (snap) => {
             const data = snap.val();
+            // Salva i dati correnti globalmente per la generazione della lista spesa
+            window.currentWeekData = data; 
             document.querySelectorAll('textarea').forEach(t => { if(document.activeElement !== t) t.value = ""; });
             if (data) {
                 Object.keys(data).forEach(id => {
@@ -127,11 +214,61 @@
         });
     }
 
+    // Caricamento dispensa modificato per la ricerca
+    let tuttiICibi = [];
     db.ref('dispensa').on('value', snap => {
-        const lista = snap.val() || [];
-        const cont = document.getElementById('listaDispensa');
-        cont.innerHTML = lista.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red;font-weight:bold" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
+        tuttiICibi = snap.val() || [];
+        aggiornaVisualizzazioneDispensa(tuttiICibi);
     });
+
+    function aggiornaVisualizzazioneDispensa(lista) {
+        const cont = document.getElementById('listaDispensa');
+        cont.innerHTML = lista.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:6px;color:red;font-weight:bold;font-size:1.1rem" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
+    }
+
+    // Funzione per filtrare la dispensa
+    function filtraDispensa() {
+        const testoRicerca = document.getElementById('searchDispensa').value.toLowerCase();
+        if(!testoRicerca) {
+            aggiornaVisualizzazioneDispensa(tuttiICibi);
+            return;
+        }
+        const cibiFiltrati = tuttiICibi.filter(cibo => cibo.toLowerCase().includes(testoRicerca));
+        aggiornaVisualizzazioneDispensa(cibiFiltrati);
+    }
+
+    // Nuova funzione per generare la lista della spesa
+    function generaListaSpesa() {
+        if(!window.currentWeekData) {
+            alert("Nessun dato inserito questa settimana!");
+            return;
+        }
+        
+        const tuttiITesti = Object.values(window.currentWeekData).join(", ");
+        
+        // Estrai parole o frasi separate da virgole, pulisci spazi, rimuovi duplicati e vuoti
+        const ingredientiGrezzi = tuttiITesti.split(',').map(item => item.trim()).filter(item => item.length > 1);
+        
+        // Rimuovi duplicati (case insensitive)
+        const uniciMap = new Map();
+        ingredientiGrezzi.forEach(item => uniciMap.set(item.toLowerCase(), item));
+        const ingredientiUnici = Array.from(uniciMap.values()).sort();
+
+        if(ingredientiUnici.length === 0) {
+            alert("Non ci sono ingredienti scritti nel menù!");
+            return;
+        }
+
+        const listaFinale = ingredientiUnici.join("\n");
+        
+        // Copia negli appunti
+        navigator.clipboard.writeText(listaFinale).then(() => {
+            alert(`✅ Lista della spesa creata (${ingredientiUnici.length} articoli) e copiata negli appunti! Puoi incollarda dove vuoi.`);
+        }).catch(err => {
+            // Fallback se la copia fallisce (es: su alcuni browser mobili vecchi)
+            alert("Ecco la tua lista spesa:\n\n" + listaFinale);
+        });
+    }
 
     function cambiaSettimana(diff) {
         dataCorrente.setDate(dataCorrente.getDate() + (diff * 7));
@@ -159,29 +296,36 @@
                 l.push(input.value.trim());
                 db.ref('dispensa').set(l);
                 input.value = "";
+                document.getElementById('searchDispensa').value = ""; // Pulisci ricerca
             });
         }
     }
 
     function rimuoviDaDispensa(i) {
-        if(confirm("Rimuovere?")) {
+        if(confirm("Rimuovere questo cibo dalla dispensa permanente?")) {
             db.ref('dispensa').once('value').then(snap => {
                 let l = snap.val() || [];
                 l.splice(i, 1);
                 db.ref('dispensa').set(l);
+                document.getElementById('searchDispensa').value = ""; // Pulisci ricerca
             });
         }
     }
 
     function inserisci(t) {
-        if(!window.lastFocusedId) return;
+        if(!window.lastFocusedId) {
+            alert("⚠️ Clicca prima su una casella di testo del menù per dirmi dove inserire il cibo!");
+            return;
+        }
         const a = document.getElementById(window.lastFocusedId);
         a.value += (a.value ? ", " : "") + t;
         autoSalvataggio();
+        // Feedback visivo sull'inserimento
+        a.focus();
     }
 
     function svuotaSettimana() {
-        if(confirm("Svuotare questa settimana?")) {
+        if(confirm("⚠️ Sei sicuro? Questo cancellerà tutti i pasti inseriti per la settimana attuale.")) {
             db.ref('settimane/' + getIDSettimana(dataCorrente)).remove();
         }
     }
