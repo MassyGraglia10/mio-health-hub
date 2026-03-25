@@ -56,16 +56,14 @@
         
         .btn-clear { background: var(--danger); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
 
-        /* Stili Extra per Schede e YouTube */
         .workout-footer { background: #f8f9fa; padding: 20px; border-radius: 20px; border: 1px solid #dee2e6; margin-top: 20px; }
         .btn-scheda { flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: opacity 0.2s; }
         .btn-tutorial { padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--secondary); transition: all 0.2s; }
-        .btn-tutorial:hover { border-color: var(--tutorial); color: var(--tutorial); }
+        .btn-tutorial:hover { border-color: var(--tutorial); color: var(--tutorial); background: #fffcf5; }
         .yt-link { flex: 1; min-width: 120px; padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; color: white; font-weight: 600; font-size: 0.85rem; }
 
-        /* Modal Immagine */
         #modalScheda { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); cursor: zoom-out; }
-        #imgScheda { margin: auto; display: block; max-width: 95%; max-height: 95%; padding-top: 20px; border-radius: 10px; }
+        #imgScheda { margin: auto; display: block; max-width: 95%; max-height: 85%; padding-top: 20px; border-radius: 10px; }
 
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
@@ -98,14 +96,16 @@
                 <button class="btn-scheda" style="background: #2196f3;" onclick="apriScheda('https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true')">♂ SCHEDA MASSIMO</button>
             </div>
 
-            <h3 style="color: var(--tutorial); margin-top: 0; border-bottom: 2px solid var(--tutorial); padding-bottom: 10px;">🎥 Tutorial Esercizi (GIF)</h3>
+            <h3 style="color: var(--tutorial); margin-top: 0; border-bottom: 2px solid var(--tutorial); padding-bottom: 10px;">🎥 Esecuzione Esercizi</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 25px;">
-                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">1. CRUNCH</button>
-                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/l3q2XhfQ8oCkm1Ts4/giphy.gif')">2. PRESSA 45°</button>
-                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">3. LEG EXTENSION</button>
-                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">4. SQUAT GOBLET</button>
-                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">CHEST PRESS</button>
-                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">LAT MACHINE</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/05/Crunch.gif')">1. CRUNCH</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/02/LEG-PRESS.gif')">2. PRESSA</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Extension.gif')">3. LEG EXTENSION</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/05/Dumbbell-Goblet-Squat.gif')">4. SQUAT GOBLET</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/02/Chest-Press.gif')">CHEST PRESS</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif')">LAT MACHINE</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/02/Shoulder-Press.gif')">SHOULDER PRESS</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://fitnessprogramer.com/wp-content/uploads/2021/06/Dumbbell-Bicep-Curl.gif')">CURL MANUBRI</button>
             </div>
             
             <h3 style="color: var(--secondary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🧘 Video Workout</h3>
@@ -129,8 +129,10 @@
 </div>
 
 <div id="modalScheda" onclick="this.style.display='none'">
-    <img id="imgScheda">
-    <div style="color: white; text-align: center; padding: 10px; font-weight: bold;">Clicca ovunque per chiudere</div>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%; flex-direction: column;">
+        <img id="imgScheda">
+        <div style="color: white; text-align: center; padding: 20px; font-weight: bold; background: rgba(0,0,0,0.5); width: 100%;">Clicca ovunque per chiudere</div>
+    </div>
 </div>
 
 <script>
@@ -159,7 +161,9 @@
     };
 
     function apriScheda(url) {
-        document.getElementById('imgScheda').src = url;
+        const img = document.getElementById('imgScheda');
+        img.src = ""; // Reset per evitare di vedere la vecchia immagine mentre carica
+        img.src = url;
         document.getElementById('modalScheda').style.display = "block";
     }
 
@@ -169,29 +173,23 @@
         const row = textarea.closest('.user-row');
         if (!row) return;
         const badge = row.querySelector('.health-badge');
-        
         const isMassimo = textarea.id.endsWith("-m");
         const suffix = isMassimo ? "-m" : "-l";
         const dayPrefix = textarea.id.split('-')[0];
-        
         const workoutEl = document.getElementById(`${dayPrefix}-allenamento${suffix}`);
         const hasWorkout = workoutEl && workoutEl.value.trim().length > 0;
-
         if (text === "" || textarea.id.includes("allenamento")) {
             badge.style.display = "none";
             textarea.classList.remove("field-ko", "field-ok");
             return;
         }
-
         let punteggio = 0;
         const isCapra = text.includes("capra");
         Object.keys(cibiRischio).forEach(c => {
             if (text.includes(c)) punteggio += (c === "formaggio" && isCapra) ? 0 : cibiRischio[c];
         });
-
         const soglia = hasWorkout ? 2.5 : 1.5;
         badge.style.display = "block";
-
         if (punteggio >= soglia) {
             badge.innerText = "❌ KO";
             badge.className = "health-badge status-ko";
@@ -210,13 +208,11 @@
         container.innerHTML = "";
         const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const pasti = [{n: "Colazione", i: "☕"}, {n: "Pranzo", i: "🍝"}, {n: "Cena", i: "🥩"}, {n: "Allenamento", i: "💪"}];
-        
         giorni.forEach((g, idx) => {
             const dG = new Date(dataCorrente); dG.setDate(dataCorrente.getDate() + idx);
             const card = document.createElement('div');
             card.className = 'day-card';
             let h = `<div class="day-title">${g} ${dG.toLocaleDateString('it-IT',{day:'numeric',month:'short'}).toUpperCase()}</div>`;
-            
             pasti.forEach(p => {
                 const idB = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
                 h += `
@@ -242,7 +238,6 @@
     function aggiornaTutto(el) {
         const suffix = el.id.endsWith("-m") ? "-m" : "-l";
         const day = el.id.split('-')[0];
-        
         if (el.id.includes("allenamento")) {
             checkHealth(document.getElementById(`${day}-colazione${suffix}`));
             checkHealth(document.getElementById(`${day}-pranzo${suffix}`));
@@ -250,7 +245,6 @@
         } else {
             checkHealth(el);
         }
-
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(window.tS);
         window.tS = setTimeout(() => {
