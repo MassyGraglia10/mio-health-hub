@@ -7,36 +7,29 @@
     <style>
         :root { --bg: #121212; --card: #1e1e1e; --primary-max: #2196f3; --primary-lili: #e91e63; --text: #ffffff; --tutorial: #ff9800; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .header { text-align: center; padding: 10px; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .header { text-align: center; border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
         .user-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-user { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-max { background: var(--primary-max); color: white; }
-        .btn-lili { background: var(--primary-lili); color: white; }
-        
+        .btn-user { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; opacity: 0.4; transition: 0.3s; color: white; }
+        .btn-max { background: var(--primary-max); }
+        .btn-lili { background: var(--primary-lili); }
+        .active-btn { opacity: 1; transform: scale(1.05); border: 2px solid white; }
         .workout-section { display: none; }
-        .active { display: block; }
-        
+        .active-section { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .scheda-img { width: 100%; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .grid-tutorial { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .btn-video { 
-            background: var(--card); border: 1px solid #444; color: white; padding: 12px; 
-            border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.8rem; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-video:hover { border-color: var(--tutorial); }
+        .btn-video { background: var(--card); border: 1px solid #444; color: white; padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.8rem; font-weight: bold; }
         .section-title { color: var(--tutorial); border-left: 4px solid var(--tutorial); padding-left: 10px; margin: 25px 0 15px; }
+        .back-link { display: block; text-align: center; margin-top: 40px; color: #888; text-decoration: none; font-size: 0.9rem; border: 1px solid #444; padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>💪 Workout Hub</h1>
-    <p style="font-size: 0.8rem; color: #aaa;">Seleziona chi si allena oggi</p>
-</div>
+<div class="header"><h1>💪 Workout Hub</h1><p id="info" style="color:#888;">Seleziona chi si allena</p></div>
 
 <div class="user-selector">
-    <button class="btn-user btn-max" onclick="showWorkout('max')">♂ Massimo</button>
-    <button class="btn-user btn-lili" onclick="showWorkout('lili')">♀ Liliana</button>
+    <button id="btn-max" class="btn-user btn-max" onclick="showWorkout('max')">♂ Massimo</button>
+    <button id="btn-lili" class="btn-user btn-lili" onclick="showWorkout('lili')">♀ Liliana</button>
 </div>
 
 <div id="workout-max" class="workout-section">
@@ -64,17 +57,25 @@
         <a href="https://www.youtube.com/results?search_query=goblet+squat" target="_blank" class="btn-video">SQUAT GOBLET</a>
         <a href="https://www.youtube.com/results?search_query=chest+press" target="_blank" class="btn-video">CHEST PRESS</a>
         <a href="https://www.youtube.com/results?search_query=lat+machine" target="_blank" class="btn-video">LAT MACHINE</a>
-        <a href="https://www.youtube.com/results?search_query=shoulder+press" target="_blank" class="btn-video">SHOULDER PRESS</a>
-        <a href="https://www.youtube.com/results?search_query=bicep+curl" target="_blank" class="btn-video">CURL MANUBRI</a>
     </div>
 </div>
 
+<a href="index.html" class="back-link">🏠 Torna al Menu Cibo</a>
+
 <script>
     function showWorkout(user) {
-        document.querySelectorAll('.workout-section').forEach(s => s.classList.remove('active'));
-        document.getElementById('workout-' + user).classList.add('active');
+        document.querySelectorAll('.workout-section').forEach(s => s.classList.remove('active-section'));
+        document.querySelectorAll('.btn-user').forEach(b => b.classList.remove('active-btn'));
+        document.getElementById('workout-' + user).classList.add('active-section');
+        document.getElementById('btn-' + user).classList.add('active-btn');
+        document.getElementById('info').innerText = "Visualizzando: " + (user==='max'?'Massimo':'Liliana');
     }
-</script>
 
+    window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        const user = params.get('user');
+        if (user) showWorkout(user);
+    };
+</script>
 </body>
 </html>
