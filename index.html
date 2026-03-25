@@ -9,102 +9,246 @@
     <style>
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
-            --danger: #ef5350; --workout: #ba68c8; --shadow: 0 4px 12px rgba(0,0,0,0.06);
-            --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085;
+            --danger: #ef5350; --workout: #ba68c8; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
-        .header { text-align: center; background: var(--primary); color: white; padding: 10px; position: sticky; top:0; z-index:100; }
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+        .header { text-align: center; background: var(--primary); color: white; padding: 10px; box-shadow: var(--shadow); position: sticky; top:0; z-index:100; }
+        .header h1 { font-size: 1.2rem; margin: 0; }
+        #status { font-size: 0.7rem; font-weight: bold; opacity: 0.8; }
+        
         .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 10px; border-bottom: 1px solid #eee; position: sticky; top: 48px; z-index: 99; }
-        .btn-nav { background: var(--secondary); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn-nav { background: var(--secondary); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        #current-week-display { font-weight: bold; font-size: 0.9rem; text-align: center; flex: 1; color: var(--primary); }
+        
         .main-wrapper { display: flex; flex-direction: column; gap: 15px; padding: 10px; max-width: 1400px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
+        
         .day-card { background: white; border-radius: 16px; padding: 15px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
-        .day-title { font-weight: 800; color: var(--primary); text-align: center; text-transform: uppercase; margin-bottom: 15px; }
+        .day-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; text-transform: uppercase; }
+        
         .meal-box { margin-bottom: 20px; }
-        .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; display: flex; align-items: center; gap: 6px; }
+        .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
-        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; margin-top: 5px; }
+        
+        .user-row { position: relative; margin-bottom: 12px; }
+        .health-badge { 
+            display: none; font-size: 0.65rem; color: #fff; font-weight: 900; 
+            position: absolute; right: 5px; top: -12px; 
+            padding: 2px 8px; border-radius: 8px; z-index: 10;
+        }
+        .status-ok { background: var(--success); }
+        .status-ko { background: var(--danger); }
+        
+        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; transition: all 0.2s; }
+        .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1); }
+        
+        .field-ko { border-color: var(--danger) !important; background-color: #fffafa !important; }
+        .field-ok { border-color: var(--success) !important; background-color: #f7fff7 !important; }
+        
         .user-massimo { border-left: 5px solid #2196f3; }
         .user-liliana { border-left: 5px solid #e91e63; }
-        .btn-workout-link { display: block; flex: 1; padding: 15px; border-radius: 12px; font-weight: bold; text-decoration: none; text-align: center; color: white; text-transform: uppercase; }
-        @media (min-width: 1024px) { .main-wrapper { flex-direction: row; } .menu-section { flex: 4; } .dispensa-section { flex: 1; position: sticky; top: 120px; } }
+        .user-tag { font-size: 0.7rem; font-weight: bold; margin-bottom: 3px; display: block; text-transform: uppercase; color: #666; }
+        
+        .dispensa-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
+        .chip { background: #e0f2f1; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #b2dfdb; display: inline-flex; align-items: center; margin: 4px; }
+        
+        .btn-clear { background: var(--danger); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
+        @media (min-width: 1024px) {
+            .main-wrapper { flex-direction: row; align-items: flex-start; }
+            .menu-section { flex: 4; }
+            .dispensa-section { flex: 1; min-width: 280px; position: sticky; top: 120px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="header"><h1>🍱 Menu Cloud Max & Lili</h1><div id="status" style="font-size:0.7rem;">Connessione...</div></div>
+<div class="header">
+    <h1>🍱 Menu Cloud Massimo & Liliana</h1>
+    <div id="status">Connessione...</div>
+</div>
 
 <div class="nav-weeks">
     <button class="btn-nav" onclick="cambiaSettimana(-1)">◀ SETT.</button>
-    <div id="current-week-display" style="font-weight:bold; color:var(--primary);">...</div>
+    <div id="current-week-display">...</div>
     <button class="btn-nav" onclick="cambiaSettimana(1)">SUCC. ▶</button>
 </div>
 
 <div class="main-wrapper">
     <div class="menu-section">
         <div id="grid-container" class="grid"></div>
-        <div class="workout-footer" style="background:#f8f9fa; padding:20px; border-radius:20px; margin-top:20px; border:1px solid #dee2e6;">
-            <h3 style="color: var(--primary); margin-top:0;">🏋️ Area Allenamento</h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <a href="palestra.html?user=max" class="btn-workout-link" style="background:#2196f3;">♂ Scheda Massimo</a>
-                <a href="palestra.html?user=lili" class="btn-workout-link" style="background:#e91e63;">♀ Scheda Liliana</a>
-            </div>
-        </div>
     </div>
+    
     <div class="dispensa-section">
         <h3>🍎 Dispensa Rapida</h3>
-        <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="width:70%; padding:10px; border-radius:8px; border:1px solid #ddd;">
-        <button onclick="aggiungiADispensa()" style="padding:10px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">+</button>
-        <div id="listaDispensa" style="display:flex; flex-wrap:wrap; gap:5px; margin-top:10px;"></div>
-        <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:15px; border-radius:12px; width:100%; font-weight:bold; cursor:pointer; margin-top:30px;">🗑️ Svuota Settimana</button>
+        <div style="display:flex; gap:5px; margin-bottom:15px;">
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
+            <button onclick="aggiungiADispensa()" style="background:var(--primary); color:white; border:none; padding:0 12px; border-radius:8px;">+</button>
+        </div>
+        <div id="listaDispensa"></div>
+        <button onclick="svuotaSettimana()" class="btn-clear">🗑️ Svuota Settimana</button>
     </div>
 </div>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
+        authDomain: "miomenu-e2e51.firebaseapp.com",
+        databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", 
+        projectId: "miomenu-e2e51",
+        storageBucket: "miomenu-e2e51.firebasestorage.app",
+        messagingSenderId: "996699369968",
+        appId: "1:996699369968:web:0cbdd7de424b093355ed35"
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
+
+    const cibiRischio = {
+        "dolci": 3, "torta": 3, "gelato": 3, "brioche": 3, "cornetto": 3, "nutella": 3, "pasticceria": 3,
+        "salame": 3, "mortadella": 3, "wurstel": 3, "pancetta": 3, "salsiccia": 3, "lardo": 3,
+        "fritto": 3, "frittura": 3, "patatine fritte": 3, "burro": 2, "panna": 2, "formaggio": 2, 
+        "maiale": 2, "carne rossa": 2, "hamburger": 2, "zucchero": 2, "biscotti": 2, 
+        "maionese": 2, "alcol": 2, "birra": 2, "vino": 1.5, "uova": 0.5,
+        "avocado": 0, "pizza": 2.5, "bresaola": 1
+    };
+
+    function checkHealth(textarea) {
+        if (!textarea) return;
+        const text = textarea.value.toLowerCase().trim();
+        const row = textarea.closest('.user-row');
+        if (!row) return;
+        const badge = row.querySelector('.health-badge');
+        
+        const isMassimo = textarea.id.endsWith("-m");
+        const suffix = isMassimo ? "-m" : "-l";
+        const dayPrefix = textarea.id.split('-')[0];
+        
+        const workoutEl = document.getElementById(`${dayPrefix}-allenamento${suffix}`);
+        const hasWorkout = workoutEl && workoutEl.value.trim().length > 0;
+
+        if (text === "" || textarea.id.includes("allenamento")) {
+            badge.style.display = "none";
+            textarea.classList.remove("field-ko", "field-ok");
+            return;
+        }
+
+        let punteggio = 0;
+        const isCapra = text.includes("capra");
+        Object.keys(cibiRischio).forEach(c => {
+            if (text.includes(c)) punteggio += (c === "formaggio" && isCapra) ? 0 : cibiRischio[c];
+        });
+
+        const soglia = hasWorkout ? 2.5 : 1.5;
+        badge.style.display = "block";
+
+        if (punteggio >= soglia) {
+            badge.innerText = "❌ KO";
+            badge.className = "health-badge status-ko";
+            textarea.classList.add("field-ko");
+            textarea.classList.remove("field-ok");
+        } else {
+            badge.innerText = "✅ OK";
+            badge.className = "health-badge status-ok";
+            textarea.classList.add("field-ok");
+            textarea.classList.remove("field-ko");
+        }
+    }
 
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
         const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const pasti = [{n: "Colazione", i: "☕"}, {n: "Pranzo", i: "🍝"}, {n: "Cena", i: "🥩"}, {n: "Allenamento", i: "💪"}];
+        
         giorni.forEach((g, idx) => {
             const dG = new Date(dataCorrente); dG.setDate(dataCorrente.getDate() + idx);
-            const card = document.createElement('div'); card.className = 'day-card';
-            let h = `<div class="day-title">${g} ${dG.getDate()}/${dG.getMonth()+1}</div>`;
+            const card = document.createElement('div');
+            card.className = 'day-card';
+            let h = `<div class="day-title">${g} ${dG.toLocaleDateString('it-IT',{day:'numeric',month:'short'}).toUpperCase()}</div>`;
+            
             pasti.forEach(p => {
-                const id = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
-                h += `<div class="meal-box"><span class="${p.n==='Allenamento'?'meal-label workout':'meal-label'}">${p.i} ${p.n}</span>
-                <textarea id="${id}-m" class="user-field user-massimo" rows="2" placeholder="Max..." onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto()"></textarea>
-                <textarea id="${id}-l" class="user-field user-liliana" rows="2" placeholder="Lili..." onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto()"></textarea></div>`;
+                const idB = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
+                h += `
+                <div class="meal-box">
+                    <span class="${p.n==='Allenamento'?'meal-label workout':'meal-label'}">${p.i} ${p.n}</span>
+                    <div class="user-row">
+                        <span class="health-badge"></span>
+                        <span class="user-tag">♂ Massimo</span>
+                        <textarea id="${idB}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                    </div>
+                    <div class="user-row">
+                        <span class="health-badge"></span>
+                        <span class="user-tag">♀ Liliana</span>
+                        <textarea id="${idB}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                    </div>
+                </div>`;
             });
-            card.innerHTML = h; container.appendChild(card);
+            card.innerHTML = h;
+            container.appendChild(card);
         });
     }
 
-    function aggiornaTutto() {
+    function aggiornaTutto(el) {
+        const suffix = el.id.endsWith("-m") ? "-m" : "-l";
+        const day = el.id.split('-')[0];
+        
+        if (el.id.includes("allenamento")) {
+            checkHealth(document.getElementById(`${day}-colazione${suffix}`));
+            checkHealth(document.getElementById(`${day}-pranzo${suffix}`));
+            checkHealth(document.getElementById(`${day}-cena${suffix}`));
+        } else {
+            checkHealth(el);
+        }
+
         document.getElementById('status').innerText = "☁️ Salvataggio...";
-        const data = {}; document.querySelectorAll('textarea').forEach(t => data[t.id] = t.value);
-        db.ref('settimane/' + getIDSettimana(dataCorrente)).update(data).then(() => document.getElementById('status').innerText = "✅ Sincronizzato");
+        clearTimeout(window.tS);
+        window.tS = setTimeout(() => {
+            const weekID = getIDSettimana(dataCorrente);
+            const d = {};
+            document.querySelectorAll('textarea').forEach(t => d[t.id] = t.value);
+            db.ref('settimane/' + weekID).update(d);
+        }, 800);
     }
 
     function caricaDatiSettimana() {
-        db.ref('settimane/' + getIDSettimana(dataCorrente)).on('value', (s) => {
+        const weekID = getIDSettimana(dataCorrente);
+        if(window.cR) window.cR.off();
+        window.cR = db.ref('settimane/' + weekID);
+        window.cR.on('value', (s) => {
             const dat = s.val() || {};
-            document.querySelectorAll('textarea').forEach(t => { if(document.activeElement !== t) t.value = dat[t.id] || ""; });
+            document.querySelectorAll('textarea').forEach(t => { 
+                if(document.activeElement !== t) { 
+                    t.value = dat[t.id] || ""; 
+                    checkHealth(t); 
+                } 
+            });
+            document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
 
-    function getIDSettimana(d) { return d.getFullYear() + "-" + (d.getMonth() + 1).toString().padStart(2, '0') + "-" + d.getDate().toString().padStart(2, '0'); }
-    function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); creaGriglia(); caricaDatiSettimana(); aggiornaLabel(); }
-    function aggiornaLabel() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString() + " - " + fS.toLocaleDateString(); }
-    function svuotaSettimana() { if(confirm("Svuotare?")) db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); }
+    function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
+    function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " - " + fS.toLocaleDateString('it-IT'); }
+    function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
+    
+    db.ref('dispensa').on('value', s => { 
+        const l = s.val() || [];
+        document.getElementById('listaDispensa').innerHTML = l.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
+    });
+    
+    function aggiungiADispensa() { const i = document.getElementById('nuovoCibo'); if (i.value.trim()) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.push(i.value.trim()); db.ref('dispensa').set(l); i.value = ""; }); } }
+    function rimuoviDaDispensa(i) { if(confirm("Rimuovere?")) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.splice(i, 1); db.ref('dispensa').set(l); }); } }
+    function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
+    function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
 
-    window.onload = () => { creaGriglia(); caricaDatiSettimana(); aggiornaLabel(); };
+    window.onload = () => {
+        creaGriglia();
+        aggiornaLabelSettimana();
+        caricaDatiSettimana();
+    };
 </script>
 </body>
 </html>
