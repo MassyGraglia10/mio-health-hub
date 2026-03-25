@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Workout Hub - Max & Lili</title>
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --primary-max: #2196f3; --primary-lili: #e91e63; --text: #ffffff; --tutorial: #ff9800; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .header { text-align: center; padding: 10px; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .user-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-user { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-max { background: var(--primary-max); color: white; }
+        .btn-lili { background: var(--primary-lili); color: white; }
+        
+        .workout-section { display: none; }
+        .active { display: block; }
+        
+        .scheda-img { width: 100%; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .grid-tutorial { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .btn-video { 
+            background: var(--card); border: 1px solid #444; color: white; padding: 12px; 
+            border-radius: 10px; text-decoration: none; text-align: center; font-size: 0.8rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-video:hover { border-color: var(--tutorial); }
+        .section-title { color: var(--tutorial); border-left: 4px solid var(--tutorial); padding-left: 10px; margin: 25px 0 15px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>💪 Workout Hub</h1>
+    <p style="font-size: 0.8rem; color: #aaa;">Seleziona chi si allena oggi</p>
+</div>
+
+<div class="user-selector">
+    <button class="btn-user btn-max" onclick="showWorkout('max')">♂ Massimo</button>
+    <button class="btn-user btn-lili" onclick="showWorkout('lili')">♀ Liliana</button>
+</div>
+
+<div id="workout-max" class="workout-section">
+    <h2 style="color: var(--primary-max)">Scheda Massimo</h2>
+    <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/main/Schedamassimo.jpg?raw=true" class="scheda-img">
+    <h3 class="section-title">VIDEO TUTORIAL</h3>
+    <div class="grid-tutorial">
+        <a href="https://www.youtube.com/results?search_query=chest+fly+dumbbells" target="_blank" class="btn-video">CHEST FLY</a>
+        <a href="https://www.youtube.com/results?search_query=squat+bilanciere" target="_blank" class="btn-video">SQUAT</a>
+        <a href="https://www.youtube.com/results?search_query=rematore+manubrio" target="_blank" class="btn-video">REMATORE</a>
+        <a href="https://www.youtube.com/results?search_query=military+press" target="_blank" class="btn-video">MILITARY PRESS</a>
+        <a href="https://www.youtube.com/results?search_query=hammer+curl" target="_blank" class="btn-video">HAMMER CURL</a>
+        <a href="https://www.youtube.com/results?search_query=plank+corretto" target="_blank" class="btn-video">PLANK</a>
+    </div>
+</div>
+
+<div id="workout-lili" class="workout-section">
+    <h2 style="color: var(--primary-lili)">Scheda Liliana</h2>
+    <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true" class="scheda-img">
+    <h3 class="section-title">VIDEO TUTORIAL</h3>
+    <div class="grid-tutorial">
+        <a href="https://www.youtube.com/results?search_query=crunch+addominali" target="_blank" class="btn-video">CRUNCH</a>
+        <a href="https://www.youtube.com/results?search_query=leg+press" target="_blank" class="btn-video">PRESSA</a>
+        <a href="https://www.youtube.com/results?search_query=leg+extension" target="_blank" class="btn-video">LEG EXTENSION</a>
+        <a href="https://www.youtube.com/results?search_query=goblet+squat" target="_blank" class="btn-video">SQUAT GOBLET</a>
+        <a href="https://www.youtube.com/results?search_query=chest+press" target="_blank" class="btn-video">CHEST PRESS</a>
+        <a href="https://www.youtube.com/results?search_query=lat+machine" target="_blank" class="btn-video">LAT MACHINE</a>
+        <a href="https://www.youtube.com/results?search_query=shoulder+press" target="_blank" class="btn-video">SHOULDER PRESS</a>
+        <a href="https://www.youtube.com/results?search_query=bicep+curl" target="_blank" class="btn-video">CURL MANUBRI</a>
+    </div>
+</div>
+
+<script>
+    function showWorkout(user) {
+        document.querySelectorAll('.workout-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('workout-' + user).classList.add('active');
+    }
+</script>
+
+</body>
+</html>
