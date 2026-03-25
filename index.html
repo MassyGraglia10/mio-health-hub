@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Club Adriano - M&L App</title>
+    <title>Club Adriano - M&L Smart Menu</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -11,29 +11,37 @@
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; --secondary: #546e7a; 
             --danger: #ef5350; --workout: #ba68c8; --weight: #ffa726; --spotify: #1DB954; 
             --massimo: #2196f3; --liliana: #e91e63; --shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --gym-bg: #f0f4f8;
         }
         
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; box-shadow: var(--shadow); position: sticky; top:0; z-index:100; }
         .header h1 { font-size: 1.2rem; margin: 0; }
 
-        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 12px; border-bottom: 1px solid #eee; position: sticky; top: 50px; z-index: 99; }
+        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 12px; border-bottom: 1px solid #eee; position: sticky; top: 48px; z-index: 99; }
         .btn-nav { background: var(--secondary); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; font-weight: bold; }
         #current-week-display { font-weight: bold; color: var(--primary); flex: 1; text-align: center; }
 
         .main-wrapper { display: flex; flex-direction: column; gap: 20px; padding: 15px; max-width: 1600px; margin: auto; }
         
-        @media (min-width: 1100px) { .content-layout { display: grid; grid-template-columns: 3fr 1.2fr; gap: 20px; } }
+        @media (min-width: 1100px) { .content-layout { display: grid; grid-template-columns: 4fr 1fr; gap: 20px; } }
 
         /* Card Menu */
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .day-card { background: white; border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border-top: 6px solid var(--primary); position: relative; }
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .day-card { background: white; border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border-top: 6px solid var(--primary); }
         .day-title { font-weight: 900; font-size: 1.2rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; }
         
+        /* Sezione Corsi dentro la Card */
+        .day-gym-box { background: var(--gym-bg); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #d1d9e6; }
+        .day-gym-title { font-size: 0.75rem; font-weight: 800; color: var(--secondary); text-transform: uppercase; margin-bottom: 8px; display: block; text-align: center; }
+        .gym-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .gym-row:last-child { border: none; }
+        .gym-time { font-weight: bold; color: var(--workout); min-width: 50px; }
+
         /* Sezione Peso */
         .weight-section { display: flex; gap: 10px; background: #fff9f0; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #ffe0b2; }
         .weight-input { width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .weight-field { width: 90%; border: 1px solid #ccc; border-radius: 8px; padding: 6px; text-align: center; font-weight: bold; font-size: 1rem; color: var(--text); }
+        .weight-field { width: 90%; border: 1px solid #ccc; border-radius: 8px; padding: 6px; text-align: center; font-weight: bold; font-size: 1rem; }
         .user-tag-small { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
 
         /* Pasti */
@@ -41,20 +49,14 @@
         .meal-header { font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; color: var(--secondary); }
         .meal-header.workout { color: var(--workout); }
 
-        .user-field { border-radius: 10px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; margin-top: 5px; font-family: inherit; }
+        .user-field { border-radius: 10px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; margin-top: 5px; }
         .field-m { border-left: 5px solid var(--massimo); }
         .field-l { border-left: 5px solid var(--liliana); }
         .name-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-top: 8px; display: block; }
 
-        /* Sidebar */
+        /* Musica Sidebar */
         .sidebar { display: flex; flex-direction: column; gap: 20px; }
         .side-card { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow); }
-        .gym-scroll { max-height: 500px; overflow-y: auto; padding-right: 5px; }
-        .gym-day { margin-bottom: 15px; border-left: 3px solid var(--primary); padding-left: 10px; }
-        .gym-day-name { font-weight: bold; color: var(--primary); font-size: 0.85rem; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        .gym-course { font-size: 0.75rem; display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f9f9f9; align-items: center; }
-        
-        /* Musica */
         .music-item { background: #333; color: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
         .music-item a { color: var(--spotify); text-decoration: none; font-weight: bold; }
     </style>
@@ -62,8 +64,8 @@
 <body>
 
 <div class="header">
-    <h1>🏋️ Club Adriano: M&L Cloud</h1>
-    <div id="status" style="font-size: 0.7rem; opacity: 0.8;">Inizializzazione...</div>
+    <h1>🏋️ Club Adriano: M&L Smart Menu</h1>
+    <div id="status" style="font-size: 0.7rem; opacity: 0.8;">Sincronizzazione...</div>
 </div>
 
 <div class="nav-weeks">
@@ -74,15 +76,9 @@
 
 <div class="main-wrapper">
     <div class="content-layout">
-        
         <div id="grid-container" class="grid-menu"></div>
 
         <div class="sidebar">
-            <div class="side-card">
-                <h3 style="margin-top:0">🗓️ Orario Club Adriano</h3>
-                <div class="gym-scroll" id="calendario-palestra"></div>
-            </div>
-
             <div class="side-card" style="background: #191414; color: white;">
                 <h3 style="color: var(--spotify); margin-top:0">🎵 Musica</h3>
                 <div style="display:flex; gap:5px; margin-bottom:10px;">
@@ -91,8 +87,7 @@
                 </div>
                 <div id="music-list"></div>
             </div>
-            
-            <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:15px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">🗑️ Svuota Settimana</button>
+            <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:15px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">🗑️ Reset Settimana</button>
         </div>
     </div>
 </div>
@@ -113,8 +108,8 @@
     const orarioPalestra = {
         "Lunedì": [
             {c: "Tone Up (Beppe)", t: "09:00"}, {c: "Acqua Fit (Francy)", t: "10:15"},
-            {c: "Power & Funct (Giorgio)", t: "12:00"}, {c: "Acqua Gym (Francesca)", t: "12:00"},
-            {c: "Fat Burns (Giorgio)", t: "13:00"}, {c: "Acqua Bike (Francesca)", t: "13:00"},
+            {c: "Power & Funct (Giorgio)", t: "12:00"}, {c: "Acqua Gym (Franci)", t: "12:00"},
+            {c: "Fat Burns (Giorgio)", t: "13:00"}, {c: "Acqua Bike (Franci)", t: "13:00"},
             {c: "Body Fit (Gianni)", t: "16:00"}, {c: "Pilates (Duilio)", t: "17:00"},
             {c: "Aero Dance (Nicola)", t: "18:00"}, {c: "Acqua Gym (Francy)", t: "18:00"},
             {c: "Tone Up (Nicola)", t: "19:00"}, {c: "Spinning (Marco)", t: "19:00"},
@@ -132,23 +127,23 @@
         "Mercoledì": [
             {c: "Posturale (Roby)", t: "09:00"}, {c: "Tonificazione (Roby)", t: "10:00"},
             {c: "Acqua Strong (Francy)", t: "10:15"}, {c: "Total Body (Franklin)", t: "12:00"},
-            {c: "Acqua Gym (Super Simo)", t: "12:00"}, {c: "Total Body (Simone L.)", t: "13:00"},
-            {c: "Acqua Bike (Super Simo)", t: "13:00"}, {c: "Yoga (Riccardo)", t: "15:00"},
+            {c: "Acqua Gym (Simo)", t: "12:00"}, {c: "Total Body (Simone L.)", t: "13:00"},
+            {c: "Acqua Bike (Simo)", t: "13:00"}, {c: "Yoga (Riccardo)", t: "15:00"},
             {c: "Tone Up (Gianni)", t: "16:00"}, {c: "Body Sculp. (Duilio)", t: "17:00"},
-            {c: "Mobility (Simona B.)", t: "18:00"}, {c: "Tone Up (Nicola)", t: "19:00"},
-            {c: "Acqua Circuit (Giovanni)", t: "19:30"}, {c: "Pump (Nicola)", t: "20:00"}
+            {c: "Mobility (Simona)", t: "18:00"}, {c: "Tone Up (Nicola)", t: "19:00"},
+            {c: "Acqua Circuit (Gio)", t: "19:30"}, {c: "Pump (Nicola)", t: "20:00"}
         ],
         "Giovedì": [
             {c: "Tone Up (Duilio)", t: "09:00"}, {c: "Pilates (Giuseppe)", t: "10:00"},
             {c: "Tone Up (Giuseppe)", t: "11:00"}, {c: "Aero Dance (Nicola)", t: "12:00"},
-            {c: "Power Yoga (Domenico)", t: "13:00"}, {c: "Acqua Gym (Giulia)", t: "13:00"},
-            {c: "Fit Boxe (Giancarlo)", t: "13:30"}, {c: "Pilates (Manuela)", t: "17:00"},
+            {c: "Power Yoga (Domenico)", t: "13:00"}, {c: "Fit Boxe (Gianca)", t: "13:30"},
+            {c: "Acqua Gym (Giulia)", t: "13:00"}, {c: "Pilates (Manuela)", t: "17:00"},
             {c: "Total Body (Manuela)", t: "18:00"}, {c: "Acqua Bike (Fabio)", t: "18:15"},
             {c: "Latin Moove (Osvaldo)", t: "19:00"}, {c: "Acqua Gym (Manuela)", t: "19:15"},
             {c: "Body Condit (Beppe)", t: "20:00"}
         ],
         "Venerdì": [
-            {c: "G.A.G (Super Simo)", t: "09:00"}, {c: "Circuit Training (Simo)", t: "10:00"},
+            {c: "G.A.G (Simo)", t: "09:00"}, {c: "Circuit Train (Simo)", t: "10:00"},
             {c: "Acqua Fit (Francy)", t: "10:15"}, {c: "Total Body (Franklin)", t: "12:00"},
             {c: "Latin Moove (Osvaldo)", t: "13:00"}, {c: "Acqua Gym (Francy)", t: "13:00"},
             {c: "Spinning (Michela)", t: "13:00"}, {c: "Yoga (Riccardo)", t: "17:00"},
@@ -166,16 +161,6 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
-    function inizializzaPalestra() {
-        const container = document.getElementById('calendario-palestra');
-        container.innerHTML = Object.keys(orarioPalestra).map(giorno => `
-            <div class="gym-day">
-                <span class="gym-day-name">${giorno}</span>
-                ${orarioPalestra[giorno].map(corso => `<div class="gym-course"><span>${corso.c}</span><span style="color:var(--workout); font-weight:800;">${corso.t}</span></div>`).join("")}
-            </div>
-        `).join("");
-    }
-
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
@@ -188,8 +173,23 @@
             const card = document.createElement('div');
             card.className = 'day-card';
             
+            // Genera lista corsi per questo giorno
+            const corsiOggi = orarioPalestra[g] || [];
+            let corsiHtml = corsiOggi.map(c => `
+                <div class="gym-row">
+                    <span>${c.c}</span>
+                    <span class="gym-time">${c.t}</span>
+                </div>
+            `).join("");
+
             let html = `
                 <div class="day-title">${g} ${dG.getDate()}/${dG.getMonth()+1}</div>
+                
+                <div class="day-gym-box">
+                    <span class="day-gym-title">🏋️ Corsi Club Adriano</span>
+                    ${corsiHtml || '<div style="font-size:0.8rem; text-align:center;">Nessun corso</div>'}
+                </div>
+
                 <div class="weight-section">
                     <div class="weight-input">
                         <span class="user-tag-small" style="color:var(--massimo)">Massimo (kg)</span>
@@ -245,7 +245,7 @@
         const container = document.getElementById('music-list');
         container.innerHTML = Object.keys(list).map(id => `
             <div class="music-item">
-                <a href="${list[id]}" target="_blank">🔗 Playlist ${id.substring(1,5)}</a>
+                <a href="${list[id]}" target="_blank">🎵 Link Music</a>
                 <span style="color:red; cursor:pointer; font-weight:bold" onclick="db.ref('musica/${id}').remove()">×</span>
             </div>
         `).join("");
@@ -254,9 +254,9 @@
     function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
     function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " - " + fS.toLocaleDateString('it-IT'); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDati(); }
-    function svuotaSettimana() { if(confirm("Cancellare tutti i dati della settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
+    function svuotaSettimana() { if(confirm("Resettare tutta la settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
 
-    window.onload = () => { inizializzaPalestra(); creaGriglia(); aggiornaLabelSettimana(); caricaDati(); };
+    window.onload = () => { creaGriglia(); aggiornaLabelSettimana(); caricaDati(); };
 </script>
 </body>
 </html>
