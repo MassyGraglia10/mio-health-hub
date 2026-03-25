@@ -10,7 +10,7 @@
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
             --danger: #ef5350; --workout: #ba68c8; --shadow: 0 4px 12px rgba(0,0,0,0.06);
-            --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085; --tutorial: #ff9800;
+            --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085;
         }
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
@@ -31,7 +31,7 @@
         .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
         
-        .user-row { relative; margin-bottom: 12px; }
+        .user-row { margin-bottom: 12px; }
         .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; resize: vertical; }
         .user-massimo { border-left: 5px solid #2196f3; }
         .user-liliana { border-left: 5px solid #e91e63; }
@@ -45,13 +45,11 @@
         .input-group input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
         .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* Popup Stili Comuni */
-        .modal-scheda { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: white; border-radius: 16px; max-width: 800px; margin: 20px auto; padding: 20px; position: relative; }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #333; }
-        
-        .popup-tutorial-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px; }
-        .btn-popup-tutorial { display: flex; align-items: center; justify-content: center; text-decoration: none; text-align: center; padding: 10px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; color: var(--text); font-size: 0.7rem; font-weight: bold; }
+        .btn-workout-link { 
+            display: block; width: 100%; padding: 15px; border-radius: 12px; border: none; 
+            font-weight: bold; cursor: pointer; text-transform: uppercase; text-decoration: none; 
+            text-align: center; margin-bottom: 10px; color: white; font-size: 0.9rem;
+        }
 
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
@@ -78,17 +76,18 @@
         <div id="grid-container" class="grid"></div>
 
         <div class="workout-footer" style="background:#f8f9fa; padding:20px; border-radius:20px; margin-top:20px; border:1px solid #dee2e6;">
-            <h3 style="color: var(--primary); margin-top:0;">📋 Schede Palestra</h3>
-            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Clicca per aprire la tua scheda completa di foto e video tutorial specifici.</p>
+            <h3 style="color: var(--primary); margin-top:0;">🏋️ Area Allenamento</h3>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Seleziona il profilo per aprire l'app dedicata con schede e tutorial video.</p>
+            
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                <button onclick="apriSchedaUnificataLiliana()" style="flex:1; background:#e91e63; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; text-transform:uppercase;">♀ Scheda Liliana</button>
-                <button onclick="apriSchedaUnificataMassimo()" style="flex:1; background:#2196f3; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; text-transform:uppercase;">♂ Scheda Massimo</button>
+                <a href="palestra.html" class="btn-workout-link" style="flex:1; background:#2196f3;">♂ Scheda Massimo</a>
+                <a href="palestra.html" class="btn-workout-link" style="flex:1; background:#e91e63;">♀ Scheda Liliana</a>
             </div>
             
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="https://www.youtube.com/results?search_query=yoga+italiano" target="_blank" style="flex:1; background:var(--yoga); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold; font-size:0.8rem;">YOGA</a>
-                <a href="https://www.youtube.com/results?search_query=pilates+italiano" target="_blank" style="flex:1; background:var(--pilates); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold; font-size:0.8rem;">PILATES</a>
-                <a href="https://www.youtube.com/results?search_query=meditazione+guidata" target="_blank" style="flex:1; background:var(--mind); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold; font-size:0.8rem;">MINDFULNESS</a>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="https://www.youtube.com/results?search_query=yoga+italiano" target="_blank" style="flex:1; background:var(--yoga); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold; font-size:0.75rem;">YOGA</a>
+                <a href="https://www.youtube.com/results?search_query=pilates+italiano" target="_blank" style="flex:1; background:var(--pilates); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold; font-size:0.75rem;">PILATES</a>
+                <a href="https://www.youtube.com/results?search_query=meditazione+guidata" target="_blank" style="flex:1; background:var(--mind); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold; font-size:0.75rem;">MINDFULNESS</a>
             </div>
         </div>
     </div>
@@ -101,44 +100,6 @@
         </div>
         <div id="listaDispensa" class="chip-container"></div>
         <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:15px; border-radius:12px; width:100%; font-weight:bold; cursor:pointer; margin-top:30px;">🗑️ Svuota Settimana</button>
-    </div>
-</div>
-
-<div id="modalSchedaUnificataLiliana" class="modal-scheda">
-    <div class="modal-content">
-        <span class="close-modal" onclick="chiudiModalUnificataLiliana()">&times;</span>
-        <h2 style="color:#e91e63; margin-top:0;">♀ Scheda Liliana</h2>
-        <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true" style="width:100%; border-radius:8px;">
-        <div class="popup-tutorial-grid">
-            <a href="https://www.youtube.com/results?search_query=crunch+addominali+corretto" target="_blank" class="btn-popup-tutorial">1. CRUNCH</a>
-            <a href="https://www.youtube.com/results?search_query=leg+press+form" target="_blank" class="btn-popup-tutorial">2. PRESSA</a>
-            <a href="https://www.youtube.com/results?search_query=leg+extension+form" target="_blank" class="btn-popup-tutorial">3. LEG EXTENSION</a>
-            <a href="https://www.youtube.com/results?search_query=goblet+squat+form" target="_blank" class="btn-popup-tutorial">4. SQUAT GOBLET</a>
-            <a href="https://www.youtube.com/results?search_query=chest+press+form" target="_blank" class="btn-popup-tutorial">CHEST PRESS</a>
-            <a href="https://www.youtube.com/results?search_query=lat+machine+form" target="_blank" class="btn-popup-tutorial">LAT MACHINE</a>
-            <a href="https://www.youtube.com/results?search_query=shoulder+press+dumbbells+form" target="_blank" class="btn-popup-tutorial">SHOULDER PRESS</a>
-            <a href="https://www.youtube.com/results?search_query=bicep+curl+manubri+form" target="_blank" class="btn-popup-tutorial">CURL MANUBRI</a>
-        </div>
-    </div>
-</div>
-
-<div id="modalSchedaUnificataMassimo" class="modal-scheda">
-    <div class="modal-content">
-        <span class="close-modal" onclick="chiudiModalUnificataMassimo()">&times;</span>
-        <h2 style="color:#2196f3; margin-top:0;">♂ Scheda Massimo</h2>
-        <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/main/Schedamassimo.jpg?raw=true" style="width:100%; border-radius:8px;">
-        
-        <h3 style="color:var(--tutorial); font-size:1.1rem; margin-top:20px; border-top:2px solid #eee; padding-top:15px;">🎥 Video Tutorial Esercizi (Massimo)</h3>
-        <div class="popup-tutorial-grid">
-            <a href="https://www.youtube.com/results?search_query=chest+fly+dumbbells+form" target="_blank" class="btn-popup-tutorial">1. CHEST FLY</a>
-            <a href="https://www.youtube.com/results?search_query=squat+bilanciere+corretto" target="_blank" class="btn-popup-tutorial">2. SQUAT</a>
-            <a href="https://www.youtube.com/results?search_query=rematore+manubrio+form" target="_blank" class="btn-popup-tutorial">3. REMATORE</a>
-            <a href="https://www.youtube.com/results?search_query=military+press+dumbbells+form" target="_blank" class="btn-popup-tutorial">4. MILITARY PRESS</a>
-            <a href="https://www.youtube.com/results?search_query=pull+up+assistance+form" target="_blank" class="btn-popup-tutorial">TRAZIONI (Facil.)</a>
-            <a href="https://www.youtube.com/results?search_query=hip+thrust+bilanciere+form" target="_blank" class="btn-popup-tutorial">HIP THRUST</a>
-            <a href="https://www.youtube.com/results?search_query=hammer+curl+form" target="_blank" class="btn-popup-tutorial">HAMMER CURL</a>
-            <a href="https://www.youtube.com/results?search_query=plank+addominali+corretto" target="_blank" class="btn-popup-tutorial">PLANK</a>
-        </div>
     </div>
 </div>
 
@@ -241,11 +202,6 @@
     function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString() + " - " + fS.toLocaleDateString(); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
     function svuotaSettimana() { if(confirm("Svuotare settimana?")) db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); }
-    
-    function apriSchedaUnificataLiliana() { document.getElementById('modalSchedaUnificataLiliana').style.display = "block"; }
-    function chiudiModalUnificataLiliana() { document.getElementById('modalSchedaUnificataLiliana').style.display = "none"; }
-    function apriSchedaUnificataMassimo() { document.getElementById('modalSchedaUnificataMassimo').style.display = "block"; }
-    function chiudiModalUnificataMassimo() { document.getElementById('modalSchedaUnificataMassimo').style.display = "none"; }
 
     window.onload = () => { creaGriglia(); aggiornaLabelSettimana(); caricaDatiSettimana(); };
 </script>
