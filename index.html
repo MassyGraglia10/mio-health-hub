@@ -9,108 +9,105 @@
     <style>
         :root { 
             --primary: #26a69a; --bg: #f8f9fa; --text: #2c3e50; --secondary: #546e7a; 
-            --danger: #ef5350; --workout: #ba68c8; --weight: #ffa726; 
+            --danger: #ef5350; --workout: #ba68c8; --weight: #ffa726; --spotify: #1DB954;
             --massimo: #2196f3; --liliana: #e91e63; --shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
-        
-        /* Header & Nav */
-        .header { text-align: center; background: var(--primary); color: white; padding: 20px; box-shadow: var(--shadow); }
-        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 20px; background: white; margin-bottom: 10px; }
-        .btn-nav { background: #eee; border: none; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; }
-        #current-week-display { font-weight: 800; color: var(--primary); font-size: 1.1rem; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+        .header { text-align: center; background: var(--primary); color: white; padding: 20px; box-shadow: var(--shadow); position: sticky; top:0; z-index:100; }
+        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 20px; background: white; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-nav { background: #eee; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        #current-week-display { font-weight: 800; color: var(--primary); font-size: 1.1rem; flex:1; text-align: center; }
 
-        /* Griglia Calendario */
-        .calendar-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
-            gap: 15px; padding: 20px; max-width: 800px; margin: auto; 
-        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; padding: 20px; max-width: 900px; margin: auto; }
         .day-dot { 
-            background: white; aspect-ratio: 1/1; border-radius: 20px; 
+            background: white; border-radius: 25px; padding: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; border: 2px solid transparent;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; border: 2px solid transparent;
         }
-        .day-dot:active { transform: scale(0.9); }
+        .day-dot:active { transform: scale(0.95); background: #f0f0f0; }
         .day-dot.today { border-color: var(--primary); background: #e0f2f1; }
-        .day-dot .num { font-size: 1.5rem; font-weight: 900; }
-        .day-dot .name { font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); }
+        .day-dot .num { font-size: 1.8rem; font-weight: 900; color: var(--primary); }
+        .day-dot .name { font-size: 0.8rem; text-transform: uppercase; font-weight: bold; color: var(--secondary); }
 
-        /* Modal (La finestra che si apre) */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); display: none; z-index: 1000; 
-            backdrop-filter: blur(5px); justify-content: center; align-items: flex-end;
-        }
-        .modal-content { 
-            background: white; width: 100%; max-width: 600px; height: 90vh; 
-            border-top-left-radius: 30px; border-top-right-radius: 30px; 
-            padding: 25px; box-sizing: border-box; overflow-y: auto; position: relative;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-        }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #ccc; }
+        /* Modal / Popup */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1000; backdrop-filter: blur(8px); justify-content: center; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; max-width: 600px; height: 85vh; border-top-left-radius: 30px; border-top-right-radius: 30px; padding: 25px; box-sizing: border-box; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2.5rem; cursor: pointer; color: #ddd; line-height: 1; }
 
-        /* Contenuto Modal */
-        .section-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+        .section-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin: 25px 0 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         
-        .gym-list { background: #f0f4f8; padding: 15px; border-radius: 15px; }
-        .gym-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        
-        .weight-row { display: flex; gap: 10px; margin-bottom: 20px; }
-        .weight-box { flex: 1; background: #fff9f0; padding: 10px; border-radius: 12px; text-align: center; }
-        .weight-field { width: 80%; border: 1px solid #ddd; border-radius: 8px; padding: 8px; text-align: center; font-weight: bold; margin-top: 5px; }
+        /* Liste Palestra */
+        .gym-list { background: #f0f4f8; padding: 15px; border-radius: 15px; margin-bottom: 10px; }
+        .gym-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .gym-time { font-weight: 900; color: var(--workout); }
 
-        .meal-card { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        textarea { width: 100%; border: 1px solid #eee; border-radius: 10px; padding: 10px; margin-top: 8px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; }
-        .area-m { border-left: 5px solid var(--massimo); }
-        .area-l { border-left: 5px solid var(--liliana); }
+        /* Peso */
+        .weight-row { display: flex; gap: 15px; }
+        .weight-box { flex: 1; background: #fff9f0; padding: 12px; border-radius: 15px; text-align: center; border: 1px solid #ffe0b2; }
+        .weight-field { width: 90%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 8px; }
 
-        .footer-tools { padding: 20px; text-align: center; }
+        /* Pasti */
+        .meal-card { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 12px; padding: 12px; margin-top: 10px; font-family: inherit; font-size: 1rem; box-sizing: border-box; background: #fafafa; }
+        .area-m { border-left: 6px solid var(--massimo); }
+        .area-l { border-left: 6px solid var(--liliana); }
+        .user-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; margin-top: 10px; display: block; }
+
+        /* Musica */
+        .music-box { background: #191414; color: white; padding: 15px; border-radius: 15px; margin-top: 10px; }
+        .music-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
+        .music-link { color: var(--spotify); text-decoration: none; font-weight: bold; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1 id="month-name">Calendario M&L</h1>
-    <div id="status" style="font-size: 0.7rem; opacity: 0.7;">Pronto</div>
+    <h1>🍱 M&L Smart Planner</h1>
+    <div id="status" style="font-size: 0.7rem; font-weight: bold;">Sincronizzato</div>
 </div>
 
 <div class="nav-weeks">
     <button class="btn-nav" onclick="cambiaSettimana(-7)">◀</button>
-    <div id="current-week-display">Settimana Corrente</div>
+    <div id="current-week-display">...</div>
     <button class="btn-nav" onclick="cambiaSettimana(7)">▶</button>
 </div>
 
-<div class="calendar-grid" id="calendar-grid">
-    </div>
-
-<div class="footer-tools">
-    <button onclick="svuotaSettimana()" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer;">🗑️ Reset Dati Settimana</button>
-</div>
+<div class="calendar-grid" id="calendar-grid"></div>
 
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="chiudiModal()">&times;</span>
-        <h2 id="modal-date-title" style="color:var(--primary); margin-top:0;">Lunedì 24</h2>
+        <h2 id="modal-date-title" style="color:var(--primary); margin:0 0 20px 0; font-size: 1.8rem;"></h2>
         
-        <div class="section-title">⚖️ Peso del mattino</div>
+        <div class="section-title">⚖️ Monitoraggio Peso</div>
         <div class="weight-row">
             <div class="weight-box">
-                <span style="font-size:0.7rem; font-weight:bold; color:var(--massimo)">MASSIMO</span>
-                <input type="number" id="modal-peso-m" class="weight-field" step="0.1" oninput="salvaDatoLocale(this)">
+                <span class="user-label" style="color:var(--massimo)">Massimo</span>
+                <input type="number" id="peso-m-input" class="weight-field" step="0.1" placeholder="0.0">
             </div>
             <div class="weight-box">
-                <span style="font-size:0.7rem; font-weight:bold; color:var(--liliana)">LILIANA</span>
-                <input type="number" id="modal-peso-l" class="weight-field" step="0.1" oninput="salvaDatoLocale(this)">
+                <span class="user-label" style="color:var(--liliana)">Liliana</span>
+                <input type="number" id="peso-l-input" class="weight-field" step="0.1" placeholder="0.0">
             </div>
         </div>
 
         <div class="section-title">🏋️ Corsi Club Adriano</div>
         <div class="gym-list" id="modal-gym-list"></div>
 
-        <div id="modal-meals-container">
+        <div class="section-title">🎵 Playlist del Giorno</div>
+        <div class="music-box">
+            <div id="modal-music-list"></div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <input type="text" id="new-music-url" placeholder="Incolla link Spotify/YT..." style="flex:1; padding:8px; border-radius:8px; border:none;">
+                <button onclick="aggiungiMusica()" style="background:var(--spotify); color:white; border:none; border-radius:8px; padding:0 15px; font-weight:bold;">+</button>
             </div>
+        </div>
+
+        <div class="section-title">🍴 Menu Giornaliero</div>
+        <div id="modal-meals-container"></div>
+        
+        <div style="height: 50px;"></div>
     </div>
 </div>
 
@@ -119,10 +116,7 @@
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
         authDomain: "miomenu-e2e51.firebaseapp.com",
         databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", 
-        projectId: "miomenu-e2e51",
-        storageBucket: "miomenu-e2e51.firebasestorage.app",
-        messagingSenderId: "996699369968",
-        appId: "1:996699369968:web:0cbdd7de424b093355ed35"
+        projectId: "miomenu-e2e51"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -139,82 +133,99 @@
 
     let dataInizioSettimana = new Date();
     dataInizioSettimana.setDate(dataInizioSettimana.getDate() - (dataInizioSettimana.getDay() === 0 ? 6 : dataInizioSettimana.getDay() - 1));
-    let giornoSelezionatoID = "";
+    let giornoAttivoInglese = ""; 
 
     function renderCalendar() {
         const grid = document.getElementById('calendar-grid');
         grid.innerHTML = "";
-        const display = document.getElementById('current-week-display');
-        
         const fineSettimana = new Date(dataInizioSettimana);
         fineSettimana.setDate(dataInizioSettimana.getDate() + 6);
-        display.innerText = dataInizioSettimana.toLocaleDateString('it-IT', {day:'2-digit', month:'short'}) + " - " + fineSettimana.toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
+        document.getElementById('current-week-display').innerText = dataInizioSettimana.toLocaleDateString('it-IT', {day:'2-digit', month:'short'}) + " - " + fineSettimana.toLocaleDateString('it-IT', {day:'2-digit', month:'short'});
 
         for(let i=0; i<7; i++) {
             const d = new Date(dataInizioSettimana);
             d.setDate(dataInizioSettimana.getDate() + i);
-            const isToday = d.toDateString() === new Date().toDateString();
-            
             const dot = document.createElement('div');
-            dot.className = `day-dot ${isToday ? 'today' : ''}`;
-            dot.onclick = () => apriModal(d);
-            dot.innerHTML = `
-                <span class="name">${d.toLocaleDateString('it-IT', {weekday:'short'})}</span>
-                <span class="num">${d.getDate()}</span>
-            `;
+            dot.className = `day-dot ${d.toDateString() === new Date().toDateString() ? 'today' : ''}`;
+            dot.onclick = () => apriModal(new Date(d));
+            dot.innerHTML = `<span class="name">${d.toLocaleDateString('it-IT', {weekday:'short'})}</span><span class="num">${d.getDate()}</span>`;
             grid.appendChild(dot);
         }
     }
 
     function apriModal(data) {
-        giornoSelezionatoID = data.toLocaleDateString('it-IT', {weekday:'long'});
+        const nomeGiorno = data.toLocaleDateString('it-IT', {weekday:'long'});
+        const nomeGiornoPulito = nomeGiorno.charAt(0).toUpperCase() + nomeGiorno.slice(1).toLowerCase();
+        const dayID = nomeGiornoPulito.toLowerCase().replace("ì", "i");
         const weekKey = getWeekKey(dataInizioSettimana);
-        const dayKey = giornoSelezionatoID.toLowerCase().replace("ì", "i");
         
-        document.getElementById('modal-date-title').innerText = giornoSelezionatoID + " " + data.getDate();
+        document.getElementById('modal-date-title').innerText = nomeGiornoPulito + " " + data.getDate();
         document.getElementById('modal-overlay').style.display = 'flex';
 
-        // Carica Corsi
-        const corsi = orarioPalestra[giornoSelezionatoID] || [];
-        document.getElementById('modal-gym-list').innerHTML = corsi.map(c => `<div class="gym-row"><span>${c.c}</span><span style="color:var(--workout); font-weight:bold;">${c.t}</span></div>`).join("");
+        // 1. Carica Corsi (Usa nomeGiornoPulito per match orarioPalestra)
+        const corsi = orarioPalestra[nomeGiornoPulito] || [];
+        document.getElementById('modal-gym-list').innerHTML = corsi.map(c => `<div class="gym-row"><span>${c.c}</span><span class="gym-time">${c.t}</span></div>`).join("") || "Nessun corso oggi";
 
-        // Genera Campi Pasti
+        // 2. Genera HTML Pasti con ID fissi
         const pasti = [{id:"colazione",n:"Colazione",i:"☕"}, {id:"pranzo",n:"Pranzo",i:"🍝"}, {id:"cena",n:"Cena",i:"🥩"}, {id:"allenamento",n:"Allenamento",i:"💪"}];
         let mealsHtml = "";
         pasti.forEach(p => {
+            const base = `${dayID}-${p.id}`;
             mealsHtml += `
                 <div class="meal-card">
                     <div style="font-weight:bold; color:var(--secondary)">${p.i} ${p.n}</div>
-                    <textarea id="${dayKey}-${p.id}-m" class="area-m" placeholder="Massimo..." oninput="salvaDatoLocale(this)"></textarea>
-                    <textarea id="${dayKey}-${p.id}-l" class="area-l" placeholder="Liliana..." oninput="salvaDatoLocale(this)"></textarea>
+                    <textarea id="${base}-m" class="area-m" placeholder="Massimo..." oninput="salva(this)"></textarea>
+                    <textarea id="${base}-l" class="area-l" placeholder="Liliana..." oninput="salva(this)"></textarea>
                 </div>`;
         });
         document.getElementById('modal-meals-container').innerHTML = mealsHtml;
+        
+        // 3. Collega campi peso
+        const pM = document.getElementById('peso-m-input');
+        const pL = document.getElementById('peso-l-input');
+        pM.id = `${dayID}-peso-m`; pM.oninput = function() { salva(this); };
+        pL.id = `${dayID}-peso-l`; pL.oninput = function() { salva(this); };
 
-        // Associa ID ai campi peso
-        document.getElementById('modal-peso-m').id = `${dayKey}-peso-m`;
-        document.getElementById('modal-peso-l').id = `${dayKey}-peso-l`;
-
-        // Recupera dati da Firebase
+        // 4. RECUPERO DATI REALE DA FIREBASE
         db.ref('settimane/' + weekKey).once('value', s => {
-            const d = s.val() || {};
-            document.querySelectorAll('.modal-content textarea, .modal-content input').forEach(el => {
-                el.value = d[el.id] || "";
+            const dataSaved = s.val() || {};
+            // Troviamo tutti gli input e textarea del modal e popoliamoli
+            document.querySelectorAll('.modal-content textarea, .modal-content input[type="number"]').forEach(field => {
+                field.value = dataSaved[field.id] || "";
             });
+        });
+
+        caricaMusica();
+    }
+
+    function salva(el) {
+        const weekKey = getWeekKey(dataInizioSettimana);
+        db.ref('settimane/' + weekKey).child(el.id).set(el.value);
+        document.getElementById('status').innerText = "☁️ Salvataggio...";
+        setTimeout(() => document.getElementById('status').innerText = "✅ Sincronizzato", 800);
+    }
+
+    function caricaMusica() {
+        db.ref('musica').once('value', s => {
+            const list = s.val() || {};
+            document.getElementById('modal-music-list').innerHTML = Object.keys(list).map(id => `
+                <div class="music-item">
+                    <a href="${list[id]}" target="_blank" class="music-link">🔗 Vai alla Playlist</a>
+                    <span style="color:red; cursor:pointer; font-weight:bold; padding:5px;" onclick="eliminaMusica('${id}')">×</span>
+                </div>
+            `).join("") || "Nessun link salvato";
         });
     }
 
-    function salvaDatoLocale(el) {
-        document.getElementById('status').innerText = "☁️ Salvataggio...";
-        const weekKey = getWeekKey(dataInizioSettimana);
-        db.ref('settimane/' + weekKey).child(el.id).set(el.value);
-        setTimeout(() => document.getElementById('status').innerText = "✅ Salvato", 1000);
+    function aggiungiMusica() {
+        const url = document.getElementById('new-music-url');
+        if(url.value) { db.ref('musica').push(url.value); url.value = ""; caricaMusica(); }
     }
 
+    function eliminaMusica(id) { db.ref('musica/' + id).remove(); caricaMusica(); }
     function chiudiModal() { document.getElementById('modal-overlay').style.display = 'none'; }
-    function cambiaSettimana(giorni) { dataInizioSettimana.setDate(dataInizioSettimana.getDate() + giorni); renderCalendar(); }
-    function getWeekKey(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
-    function svuotaSettimana() { if(confirm("Resettare i dati di questa settimana?")) { db.ref('settimane/' + getWeekKey(dataInizioSettimana)).remove(); renderCalendar(); } }
+    function cambiaSettimana(g) { dataInizioSettimana.setDate(dataInizioSettimana.getDate() + g); renderCalendar(); }
+    function getWeekKey(d) { return d.getFullYear() + "-" + (d.getMonth() + 1).toString().padStart(2, '0') + "-" + d.getDate().toString().padStart(2, '0'); }
 
     window.onload = renderCalendar;
 </script>
