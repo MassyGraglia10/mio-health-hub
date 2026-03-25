@@ -10,7 +10,7 @@
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
             --danger: #ef5350; --workout: #ba68c8; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
-            --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085;
+            --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085; --tutorial: #ff9800;
         }
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
@@ -59,11 +59,13 @@
         /* Stili Extra per Schede e YouTube */
         .workout-footer { background: #f8f9fa; padding: 20px; border-radius: 20px; border: 1px solid #dee2e6; margin-top: 20px; }
         .btn-scheda { flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: opacity 0.2s; }
+        .btn-tutorial { padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--secondary); transition: all 0.2s; }
+        .btn-tutorial:hover { border-color: var(--tutorial); color: var(--tutorial); }
         .yt-link { flex: 1; min-width: 120px; padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; color: white; font-weight: 600; font-size: 0.85rem; }
 
         /* Modal Immagine */
         #modalScheda { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); cursor: zoom-out; }
-        #imgScheda { margin: auto; display: block; max-width: 95%; max-height: 95%; padding-top: 20px; }
+        #imgScheda { margin: auto; display: block; max-width: 95%; max-height: 95%; padding-top: 20px; border-radius: 10px; }
 
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
@@ -91,9 +93,19 @@
 
         <div class="workout-footer">
             <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📋 Schede Palestra</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px;">
                 <button class="btn-scheda" style="background: #e91e63;" onclick="apriScheda('https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true')">♀ SCHEDA LILIANA</button>
                 <button class="btn-scheda" style="background: #2196f3;" onclick="apriScheda('https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true')">♂ SCHEDA MASSIMO</button>
+            </div>
+
+            <h3 style="color: var(--tutorial); margin-top: 0; border-bottom: 2px solid var(--tutorial); padding-bottom: 10px;">🎥 Tutorial Esercizi (GIF)</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 25px;">
+                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">1. CRUNCH</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/l3q2XhfQ8oCkm1Ts4/giphy.gif')">2. PRESSA 45°</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">3. LEG EXTENSION</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">4. SQUAT GOBLET</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">CHEST PRESS</button>
+                <button class="btn-tutorial" onclick="apriScheda('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6eXJueXF6JnB0PWEmZXA9djFfaW50ZXJuYWxfZ2lmX2J5X2lkJmN0PWc/3o7TKMGpxxcaNisD6w/giphy.gif')">LAT MACHINE</button>
             </div>
             
             <h3 style="color: var(--secondary); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">🧘 Video Workout</h3>
@@ -118,7 +130,7 @@
 
 <div id="modalScheda" onclick="this.style.display='none'">
     <img id="imgScheda">
-    <div style="color: white; text-align: center; padding: 10px;">Clicca ovunque per chiudere</div>
+    <div style="color: white; text-align: center; padding: 10px; font-weight: bold;">Clicca ovunque per chiudere</div>
 </div>
 
 <script>
