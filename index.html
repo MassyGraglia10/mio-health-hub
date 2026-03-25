@@ -9,7 +9,7 @@
     <style>
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
-            --danger: #ef5350; --workout: #ba68c8; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --danger: #ef5350; --workout: #ba68c8; --shadow: 0 4px 12px rgba(0,0,0,0.06);
             --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085; --tutorial: #ff9800;
         }
         
@@ -31,40 +31,34 @@
         .meal-label { font-weight: bold; font-size: 0.85rem; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; background: var(--secondary); border-radius: 6px; padding: 5px 10px; width: fit-content; }
         .meal-label.workout { background: var(--workout) !important; }
         
-        .user-row { relative; margin-bottom: 12px; }
-        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; }
+        .user-row { margin-bottom: 12px; }
+        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; resize: vertical; }
         .user-massimo { border-left: 5px solid #2196f3; }
         .user-liliana { border-left: 5px solid #e91e63; }
         .user-tag { font-size: 0.7rem; font-weight: bold; margin-bottom: 3px; display: block; text-transform: uppercase; color: #666; }
         
-        /* Sezione Schede e Popup Unificato */
-        .workout-footer { background: #f8f9fa; padding: 20px; border-radius: 20px; border: 1px solid #dee2e6; margin-top: 20px; }
-        .btn-scheda { flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; }
-        
-        .extra-links { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-        .btn-extra { flex: 1; min-width: 100px; padding: 12px; border-radius: 10px; color: white; text-decoration: none; text-align: center; font-weight: bold; font-size: 0.8rem; }
-
-        /* Nuovi stili Popup Unificato per Liliana */
-        #modalSchedaUnificata { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: white; border-radius: 16px; max-width: 800px; margin: 20px auto; padding: 20px; position: relative; }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #333; font-weight: bold; }
-        
-        #imgSchedaUnificata { display: block; max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 20px; }
-        
-        .popup-tutorial-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; border-top: 2px solid #eee; padding-top: 15px; }
-        .btn-popup-tutorial { 
-            display: flex; align-items: center; justify-content: center; text-decoration: none; text-align: center; padding: 10px; 
-            background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; 
-            color: var(--text); font-size: 0.7rem; font-weight: bold; transition: 0.2s;
-        }
-        .btn-popup-tutorial:hover { border-color: var(--tutorial); background: #fffcf5; }
-
+        /* Dispensa e Chip */
         .dispensa-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
-        
+        .chip-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
+        .chip { background: #f1f3f4; padding: 6px 12px; border-radius: 16px; font-size: 0.85rem; cursor: pointer; border: 1px solid #dee2e6; transition: 0.2s; }
+        .chip:hover { background: #e8eaed; border-color: var(--primary); }
+
+        .input-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .input-group input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Popup Stili */
+        #modalSchedaUnificata { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); overflow-y: auto; padding: 20px; }
+        .modal-content { background: white; border-radius: 16px; max-width: 800px; margin: 20px auto; padding: 20px; position: relative; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; }
+        .btn-scheda { flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; }
+        .popup-tutorial-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px; }
+        .btn-popup-tutorial { text-decoration: none; text-align: center; padding: 10px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; color: var(--text); font-size: 0.7rem; font-weight: bold; }
+
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
             .menu-section { flex: 4; }
-            .dispensa-section { flex: 1; min-width: 280px; position: sticky; top: 120px; }
+            .dispensa-section { flex: 1; min-width: 300px; position: sticky; top: 120px; }
         }
     </style>
 </head>
@@ -85,58 +79,50 @@
     <div class="menu-section">
         <div id="grid-container" class="grid"></div>
 
-        <div class="workout-footer">
+        <div class="workout-footer" style="background:#f8f9fa; padding:20px; border-radius:20px; margin-top:20px; border:1px solid #dee2e6;">
             <h3 style="color: var(--primary); margin-top:0;">📋 Schede Palestra</h3>
-            <p style="font-size: 0.8rem; color: #666;">Clicca per aprire la scheda completa di foto e video tutorial.</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                 <button class="btn-scheda" style="background: #e91e63;" onclick="apriSchedaUnificataLiliana()">♀ SCHEDA LILIANA</button>
-                <button class="btn-scheda" style="background: #2196f3;" onclick="apriSchedaSemplice('https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true')">♂ SCHEDA MASSIMO</button>
+                <button class="btn-scheda" style="background: #2196f3;" onclick="apriSchedaSemplice()">♂ SCHEDA MASSIMO</button>
             </div>
             
-            <div class="extra-links">
-                <a href="https://www.youtube.com/results?search_query=yoga+italiano+15+minuti" target="_blank" class="btn-extra" style="background: var(--yoga);">YOGA</a>
-                <a href="https://www.youtube.com/results?search_query=pilates+principianti+italiano" target="_blank" class="btn-extra" style="background: var(--pilates);">PILATES</a>
-                <a href="https://www.youtube.com/results?search_query=meditazione+guidata+respiro" target="_blank" class="btn-extra" style="background: var(--mind);">MINDFULNESS</a>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="https://www.youtube.com/results?search_query=yoga+italiano+15+minuti" target="_blank" style="flex:1; background:var(--yoga); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold;">YOGA</a>
+                <a href="https://www.youtube.com/results?search_query=pilates+principianti+italiano" target="_blank" style="flex:1; background:var(--pilates); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold;">PILATES</a>
+                <a href="https://www.youtube.com/results?search_query=meditazione+guidata+respiro" target="_blank" style="flex:1; background:var(--mind); color:white; padding:12px; border-radius:10px; text-decoration:none; text-align:center; font-weight:bold;">MINDFULNESS</a>
             </div>
         </div>
     </div>
     
     <div class="dispensa-section">
         <h3>🍎 Dispensa Rapida</h3>
-        <div id="listaDispensa"></div>
-        <button onclick="svuotaSettimana()" style="background: var(--danger); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px;">🗑️ Svuota Settimana</button>
+        <div class="input-group">
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi cibo...">
+            <button class="btn-add" onclick="aggiungiADispensa()">+</button>
+        </div>
+        <div id="listaDispensa" class="chip-container"></div>
+        
+        <button onclick="svuotaSettimana()" style="background: var(--danger); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 30px;">🗑️ Svuota Settimana</button>
     </div>
 </div>
 
 <div id="modalSchedaUnificata">
     <div class="modal-content">
         <span class="close-modal" onclick="chiudiModalUnificata()">&times;</span>
-        <h2 style="color: #e91e63; margin-top: 0;">♀ Scheda Allenamento Liliana</h2>
-        
-        <img id="imgSchedaUnificata" src="https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true" alt="Scheda Liliana">
-        
-        <h3 style="color: var(--tutorial); font-size: 1.1rem; margin-bottom: 10px;">🎥 Video Tutorial Esercizi</h3>
+        <h2 style="color: #e91e63; margin-top: 0;">♀ Scheda Liliana</h2>
+        <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true" style="width:100%; border-radius:8px;">
         <div class="popup-tutorial-grid">
             <a href="https://www.youtube.com/results?search_query=crunch+addominali+corretto" target="_blank" class="btn-popup-tutorial">1. CRUNCH</a>
-            <a href="https://www.youtube.com/results?search_query=leg+press+correct+form" target="_blank" class="btn-popup-tutorial">2. PRESSA</a>
+            <a href="https://www.youtube.com/results?search_query=leg+press+form" target="_blank" class="btn-popup-tutorial">2. PRESSA</a>
             <a href="https://www.youtube.com/results?search_query=leg+extension+form" target="_blank" class="btn-popup-tutorial">3. LEG EXTENSION</a>
             <a href="https://www.youtube.com/results?search_query=goblet+squat+form" target="_blank" class="btn-popup-tutorial">4. SQUAT GOBLET</a>
-            <a href="https://www.youtube.com/results?search_query=chest+press+machine+form" target="_blank" class="btn-popup-tutorial">CHEST PRESS</a>
-            <a href="https://www.youtube.com/results?search_query=lat+machine+corretto" target="_blank" class="btn-popup-tutorial">LAT MACHINE</a>
-            <a href="https://www.youtube.com/results?search_query=shoulder+press+dumbbell+form" target="_blank" class="btn-popup-tutorial">SHOULDER PRESS</a>
-            <a href="https://www.youtube.com/results?search_query=bicep+curls+form" target="_blank" class="btn-popup-tutorial">CURL MANUBRI</a>
+            <a href="https://www.youtube.com/results?search_query=chest+press+form" target="_blank" class="btn-popup-tutorial">CHEST PRESS</a>
+            <a href="https://www.youtube.com/results?search_query=lat+machine+form" target="_blank" class="btn-popup-tutorial">LAT MACHINE</a>
         </div>
-        <p style="text-align: center; color: #666; font-size: 0.8rem; margin-top: 20px;">I video si aprono in una nuova scheda.</p>
     </div>
 </div>
 
-<div id="modalSchedaSemplice" onclick="this.style.display='none'" style="display:none; position: fixed; z-index: 9998; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);">
-    <img id="imgSchedaSemplice" style="margin: auto; display: block; max-width: 95%; max-height: 85%; padding-top: 20px;">
-    <div style="color: white; text-align: center; padding: 10px;">Clicca per chiudere</div>
-</div>
-
 <script>
-    // Configurazione Firebase (mantenuta originale)
     const firebaseConfig = {
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
         authDomain: "miomenu-e2e51.firebaseapp.com",
@@ -151,42 +137,62 @@
     
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
+    window.lastFocusedId = null;
 
-    // Funzioni Popup Unificato Liliana
-    function apriSchedaUnificataLiliana() { document.getElementById('modalSchedaUnificata').style.display = "block"; bodyScroll(false); }
-    function chiudiModalUnificata() { document.getElementById('modalSchedaUnificata').style.display = "none"; bodyScroll(true); }
+    // --- GESTIONE DISPENSA ---
+    function aggiungiADispensa() {
+        const input = document.getElementById('nuovoCibo');
+        const valore = input.value.trim();
+        if (valore) {
+            db.ref('dispensa').once('value').then(s => {
+                let lista = s.val() || [];
+                lista.push(valore);
+                db.ref('dispensa').set(lista);
+                input.value = "";
+            });
+        }
+    }
 
-    // Funzioni Popup Semplice Massimo
-    function apriSchedaSemplice(url) { document.getElementById('imgSchedaSemplice').src = url; document.getElementById('modalSchedaSemplice').style.display = "block"; bodyScroll(false); }
-    // Il popup semplice si chiude cliccando ovunque tramite HTML (onclick)
-    document.getElementById('modalSchedaSemplice').addEventListener('click', function() { bodyScroll(true); });
+    db.ref('dispensa').on('value', s => {
+        const lista = s.val() || [];
+        const container = document.getElementById('listaDispensa');
+        container.innerHTML = lista.map(cibo => 
+            `<div class="chip" onclick="inserisciCibo('${cibo.replace(/'/g, "\\'")}')">${cibo}</div>`
+        ).join("");
+    });
 
-    // Utility per bloccare lo scroll dello sfondo
-    function bodyScroll(allow) { document.body.style.overflow = allow ? "auto" : "hidden"; }
+    function inserisciCibo(cibo) {
+        if (!window.lastFocusedId) return;
+        const area = document.getElementById(window.lastFocusedId);
+        const separatore = area.value ? ", " : "";
+        area.value += separatore + cibo;
+        aggiornaTutto(area);
+    }
 
-    // Logica Griglia e Firebase (mantenuta originale)
+    // --- LOGICA CORE ---
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
         const giorni = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
         const pasti = [{n: "Colazione", i: "☕"}, {n: "Pranzo", i: "🍝"}, {n: "Cena", i: "🥩"}, {n: "Allenamento", i: "💪"}];
+        
         giorni.forEach((g, idx) => {
             const dG = new Date(dataCorrente); dG.setDate(dataCorrente.getDate() + idx);
             const card = document.createElement('div');
             card.className = 'day-card';
             let h = `<div class="day-title">${g} ${dG.getDate()}/${dG.getMonth()+1}</div>`;
             pasti.forEach(p => {
-                const idB = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
+                const idBase = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
                 h += `
                 <div class="meal-box">
                     <span class="${p.n==='Allenamento'?'meal-label workout':'meal-label'}">${p.i} ${p.n}</span>
                     <div class="user-row">
                         <span class="user-tag">♂ Max</span>
-                        <textarea id="${idB}-m" class="user-field user-massimo" rows="2" oninput="aggiornaTutto(this)"></textarea>
+                        <textarea id="${idBase}-m" class="user-field user-massimo" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                     <div class="user-row">
                         <span class="user-tag">♀ Lili</span>
-                        <textarea id="${idB}-l" class="user-field user-liliana" rows="2" oninput="aggiornaTutto(this)"></textarea>
+                        <textarea id="${idBase}-l" class="user-field user-liliana" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                 </div>`;
             });
@@ -198,9 +204,9 @@
     function aggiornaTutto(el) {
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         const weekID = getIDSettimana(dataCorrente);
-        const d = {};
-        document.querySelectorAll('textarea').forEach(t => d[t.id] = t.value);
-        db.ref('settimane/' + weekID).update(d).then(() => {
+        const data = {};
+        document.querySelectorAll('textarea').forEach(t => data[t.id] = t.value);
+        db.ref('settimane/' + weekID).update(data).then(() => {
             document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
@@ -210,22 +216,19 @@
         db.ref('settimane/' + weekID).on('value', (s) => {
             const dat = s.val() || {};
             document.querySelectorAll('textarea').forEach(t => { 
-                if(document.activeElement !== t) { t.value = dat[t.id] || ""; } 
+                if(document.activeElement !== t) t.value = dat[t.id] || ""; 
             });
-            document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
 
-    function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
+    function getIDSettimana(d) { return d.getFullYear() + "-" + (d.getMonth() + 1).toString().padStart(2, '0') + "-" + d.getDate().toString().padStart(2, '0'); }
     function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString() + " - " + fS.toLocaleDateString(); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
-    function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
-
-    db.ref('dispensa').on('value', s => { 
-        const l = s.val() || [];
-        document.getElementById('listaDispensa').innerHTML = l.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span></div>`).join("");
-    });
-    function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
+    function svuotaSettimana() { if(confirm("Svuotare settimana?")) db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); }
+    
+    function apriSchedaUnificataLiliana() { document.getElementById('modalSchedaUnificata').style.display = "block"; }
+    function chiudiModalUnificata() { document.getElementById('modalSchedaUnificata').style.display = "none"; }
+    function apriSchedaSemplice() { window.open('https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true', '_blank'); }
 
     window.onload = () => { creaGriglia(); aggiornaLabelSettimana(); caricaDatiSettimana(); };
 </script>
