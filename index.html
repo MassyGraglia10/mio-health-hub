@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gym, Weight & Diet - M&L</title>
+    <title>Club Adriano - M&L App</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -15,8 +15,9 @@
         
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; box-shadow: var(--shadow); position: sticky; top:0; z-index:100; }
-        
-        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 12px; border-bottom: 1px solid #eee; position: sticky; top: 58px; z-index: 99; }
+        .header h1 { font-size: 1.2rem; margin: 0; }
+
+        .nav-weeks { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; padding: 12px; border-bottom: 1px solid #eee; position: sticky; top: 50px; z-index: 99; }
         .btn-nav { background: var(--secondary); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; font-weight: bold; }
         #current-week-display { font-weight: bold; color: var(--primary); flex: 1; text-align: center; }
 
@@ -26,37 +27,43 @@
 
         /* Card Menu */
         .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .day-card { background: white; border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border-top: 6px solid var(--primary); }
-        .day-title { font-weight: 900; font-size: 1.2rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .day-card { background: white; border-radius: 20px; padding: 20px; box-shadow: var(--shadow); border-top: 6px solid var(--primary); position: relative; }
+        .day-title { font-weight: 900; font-size: 1.2rem; margin-bottom: 15px; color: var(--primary); text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; text-transform: uppercase; }
         
         /* Sezione Peso */
-        .weight-section { display: flex; gap: 10px; background: #fff9f0; padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #ffe0b2; }
+        .weight-section { display: flex; gap: 10px; background: #fff9f0; padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #ffe0b2; }
         .weight-input { width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .weight-field { width: 80%; border: 1px solid #ccc; border-radius: 8px; padding: 5px; text-align: center; font-weight: bold; }
+        .weight-field { width: 90%; border: 1px solid #ccc; border-radius: 8px; padding: 6px; text-align: center; font-weight: bold; font-size: 1rem; color: var(--text); }
+        .user-tag-small { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
 
+        /* Pasti */
         .meal-box { margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
         .meal-header { font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; color: var(--secondary); }
         .meal-header.workout { color: var(--workout); }
 
-        .user-field { border-radius: 10px; padding: 10px; font-size: 0.9rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; margin-top: 4px; }
-        .field-m { border-left: 4px solid var(--massimo); }
-        .field-l { border-left: 4px solid var(--liliana); }
-        .user-tag { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-left: 5px; }
+        .user-field { border-radius: 10px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; width: 100%; box-sizing: border-box; margin-top: 5px; font-family: inherit; }
+        .field-m { border-left: 5px solid var(--massimo); }
+        .field-l { border-left: 5px solid var(--liliana); }
+        .name-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-top: 8px; display: block; }
 
-        /* Sidebar Palestra */
+        /* Sidebar */
         .sidebar { display: flex; flex-direction: column; gap: 20px; }
         .side-card { background: white; padding: 20px; border-radius: 20px; box-shadow: var(--shadow); }
         .gym-scroll { max-height: 500px; overflow-y: auto; padding-right: 5px; }
         .gym-day { margin-bottom: 15px; border-left: 3px solid var(--primary); padding-left: 10px; }
-        .gym-day-name { font-weight: bold; color: var(--primary); font-size: 0.9rem; margin-bottom: 5px; display: block; }
-        .gym-course { font-size: 0.8rem; display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f9f9f9; }
+        .gym-day-name { font-weight: bold; color: var(--primary); font-size: 0.85rem; margin-bottom: 5px; display: block; text-transform: uppercase; }
+        .gym-course { font-size: 0.75rem; display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f9f9f9; align-items: center; }
+        
+        /* Musica */
+        .music-item { background: #333; color: white; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .music-item a { color: var(--spotify); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>🍱 Gym & Weight Cloud M&L</h1>
-    <div id="status" style="font-size: 0.7rem;">Connessione...</div>
+    <h1>🏋️ Club Adriano: M&L Cloud</h1>
+    <div id="status" style="font-size: 0.7rem; opacity: 0.8;">Inizializzazione...</div>
 </div>
 
 <div class="nav-weeks">
@@ -72,24 +79,25 @@
 
         <div class="sidebar">
             <div class="side-card">
-                <h3>🏋️ Programma Corsi</h3>
+                <h3 style="margin-top:0">🗓️ Orario Club Adriano</h3>
                 <div class="gym-scroll" id="calendario-palestra"></div>
             </div>
 
             <div class="side-card" style="background: #191414; color: white;">
-                <h3 style="color: var(--spotify); border-bottom: 1px solid #333;">🎵 Music Workout</h3>
-                <input type="text" id="musicUrl" placeholder="Incolla link..." style="width:100%; padding:8px; border-radius:8px; border:none; margin-bottom:10px;">
-                <button onclick="aggiungiMusica()" style="width:100%; background:var(--spotify); color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">Aggiungi Playlist</button>
-                <div id="music-list" style="margin-top:15px;"></div>
+                <h3 style="color: var(--spotify); margin-top:0">🎵 Musica</h3>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <input type="text" id="musicUrl" placeholder="Link playlist..." style="flex:1; padding:8px; border-radius:5px; border:none;">
+                    <button onclick="aggiungiMusica()" style="background:var(--spotify); color:white; border:none; padding:8px; border-radius:5px; font-weight:bold;">+</button>
+                </div>
+                <div id="music-list"></div>
             </div>
             
-            <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:15px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">🗑️ Reset Settimana</button>
+            <button onclick="svuotaSettimana()" style="background:var(--danger); color:white; border:none; padding:15px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">🗑️ Svuota Settimana</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
         authDomain: "miomenu-e2e51.firebaseapp.com",
@@ -102,15 +110,57 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- ORARIO COMPLETO PALESTRA ---
     const orarioPalestra = {
-        "Lunedì": [{c:"Yoga",t:"09:00"}, {c:"Pilates",t:"10:30"}, {c:"Gag",t:"13:00"}, {c:"Cross Training",t:"18:30"}, {c:"Yoga Advanced",t:"20:00"}],
-        "Martedì": [{c:"Spinning",t:"09:30"}, {c:"Body Pump",t:"11:00"}, {c:"Zumba",t:"17:30"}, {c:"Functional",t:"19:00"}, {c:"Kickboxing",t:"20:30"}],
-        "Mercoledì": [{c:"Posturale",t:"10:00"}, {c:"Gag",t:"13:00"}, {c:"Circuit Training",t:"18:00"}, {c:"Yoga",t:"19:30"}],
-        "Giovedì": [{c:"Pilates",t:"09:00"}, {c:"Body Pump",t:"13:00"}, {c:"Zumba",t:"18:00"}, {c:"Cross Training",t:"19:30"}],
-        "Venerdì": [{c:"Yoga",t:"09:30"}, {c:"Gag",t:"11:00"}, {c:"Circuit",t:"17:30"}, {c:"Functional",t:"18:30"}],
-        "Sabato": [{c:"Total Body",t:"10:30"}, {c:"Spinning",t:"12:00"}],
-        "Domenica": [{c:"Sala Pesi Open",t:"10:00-13:00"}]
+        "Lunedì": [
+            {c: "Tone Up (Beppe)", t: "09:00"}, {c: "Acqua Fit (Francy)", t: "10:15"},
+            {c: "Power & Funct (Giorgio)", t: "12:00"}, {c: "Acqua Gym (Francesca)", t: "12:00"},
+            {c: "Fat Burns (Giorgio)", t: "13:00"}, {c: "Acqua Bike (Francesca)", t: "13:00"},
+            {c: "Body Fit (Gianni)", t: "16:00"}, {c: "Pilates (Duilio)", t: "17:00"},
+            {c: "Aero Dance (Nicola)", t: "18:00"}, {c: "Acqua Gym (Francy)", t: "18:00"},
+            {c: "Tone Up (Nicola)", t: "19:00"}, {c: "Spinning (Marco)", t: "19:00"},
+            {c: "Fit Boxe (Sarah)", t: "20:00"}, {c: "Yoga (Sarah)", t: "21:00"}
+        ],
+        "Martedì": [
+            {c: "Gym Dance (Giuseppe)", t: "09:00"}, {c: "Tone Up (Duilio)", t: "10:00"},
+            {c: "Pilates (Duilio)", t: "11:00"}, {c: "Aero Dance (Nicola)", t: "12:00"},
+            {c: "Tone Up (Nicola)", t: "13:00"}, {c: "Acqua Tone (Fabio)", t: "13:00"},
+            {c: "Latin Moove (Osvaldo)", t: "14:00"}, {c: "Acqua Bike (Fabio)", t: "16:00"},
+            {c: "Pilates (Manuela)", t: "17:00"}, {c: "Tone Up (Manuela)", t: "18:00"},
+            {c: "Acqua Bike (Fabio)", t: "18:15"}, {c: "TRX (Edoardo)", t: "19:00"},
+            {c: "Acqua Gym (Manuela)", t: "19:15"}, {c: "Walking Tone (Duilio)", t: "20:00"}
+        ],
+        "Mercoledì": [
+            {c: "Posturale (Roby)", t: "09:00"}, {c: "Tonificazione (Roby)", t: "10:00"},
+            {c: "Acqua Strong (Francy)", t: "10:15"}, {c: "Total Body (Franklin)", t: "12:00"},
+            {c: "Acqua Gym (Super Simo)", t: "12:00"}, {c: "Total Body (Simone L.)", t: "13:00"},
+            {c: "Acqua Bike (Super Simo)", t: "13:00"}, {c: "Yoga (Riccardo)", t: "15:00"},
+            {c: "Tone Up (Gianni)", t: "16:00"}, {c: "Body Sculp. (Duilio)", t: "17:00"},
+            {c: "Mobility (Simona B.)", t: "18:00"}, {c: "Tone Up (Nicola)", t: "19:00"},
+            {c: "Acqua Circuit (Giovanni)", t: "19:30"}, {c: "Pump (Nicola)", t: "20:00"}
+        ],
+        "Giovedì": [
+            {c: "Tone Up (Duilio)", t: "09:00"}, {c: "Pilates (Giuseppe)", t: "10:00"},
+            {c: "Tone Up (Giuseppe)", t: "11:00"}, {c: "Aero Dance (Nicola)", t: "12:00"},
+            {c: "Power Yoga (Domenico)", t: "13:00"}, {c: "Acqua Gym (Giulia)", t: "13:00"},
+            {c: "Fit Boxe (Giancarlo)", t: "13:30"}, {c: "Pilates (Manuela)", t: "17:00"},
+            {c: "Total Body (Manuela)", t: "18:00"}, {c: "Acqua Bike (Fabio)", t: "18:15"},
+            {c: "Latin Moove (Osvaldo)", t: "19:00"}, {c: "Acqua Gym (Manuela)", t: "19:15"},
+            {c: "Body Condit (Beppe)", t: "20:00"}
+        ],
+        "Venerdì": [
+            {c: "G.A.G (Super Simo)", t: "09:00"}, {c: "Circuit Training (Simo)", t: "10:00"},
+            {c: "Acqua Fit (Francy)", t: "10:15"}, {c: "Total Body (Franklin)", t: "12:00"},
+            {c: "Latin Moove (Osvaldo)", t: "13:00"}, {c: "Acqua Gym (Francy)", t: "13:00"},
+            {c: "Spinning (Michela)", t: "13:00"}, {c: "Yoga (Riccardo)", t: "17:00"},
+            {c: "Fit Dance (Stefano)", t: "18:00"}, {c: "Tone Up (Simone)", t: "19:00"},
+            {c: "Acqua Gym (Nicola)", t: "19:00"}, {c: "Tone Up Light (Beppe)", t: "20:00"}
+        ],
+        "Sabato": [
+            {c: "Yoga (Giancarlo)", t: "09:00"}, {c: "Tone Up (Dario)", t: "10:00"},
+            {c: "Mobility (Simona)", t: "11:00"}, {c: "Acqua Gym (Piky)", t: "11:00"},
+            {c: "Fit Dance (Stefano)", t: "12:00"}, {c: "Latin Moove (Osvaldo)", t: "13:00"}
+        ],
+        "Domenica": [{c: "Sala Pesi Aperta", t: "10:00-13:00"}]
     };
 
     let dataCorrente = new Date();
@@ -121,7 +171,7 @@
         container.innerHTML = Object.keys(orarioPalestra).map(giorno => `
             <div class="gym-day">
                 <span class="gym-day-name">${giorno}</span>
-                ${orarioPalestra[giorno].map(corso => `<div class="gym-course"><span>${corso.c}</span><span style="color:var(--workout); font-weight:bold;">${corso.t}</span></div>`).join("")}
+                ${orarioPalestra[giorno].map(corso => `<div class="gym-course"><span>${corso.c}</span><span style="color:var(--workout); font-weight:800;">${corso.t}</span></div>`).join("")}
             </div>
         `).join("");
     }
@@ -134,7 +184,7 @@
         
         giorni.forEach((g, idx) => {
             const dG = new Date(dataCorrente); dG.setDate(dataCorrente.getDate() + idx);
-            const baseIdDay = `${g}`.toLowerCase().replace("ì", "i");
+            const baseIdDay = g.toLowerCase().replace("ì", "i");
             const card = document.createElement('div');
             card.className = 'day-card';
             
@@ -142,11 +192,11 @@
                 <div class="day-title">${g} ${dG.getDate()}/${dG.getMonth()+1}</div>
                 <div class="weight-section">
                     <div class="weight-input">
-                        <span class="user-tag label-m" style="color:var(--massimo)">KG Massimo</span>
+                        <span class="user-tag-small" style="color:var(--massimo)">Massimo (kg)</span>
                         <input type="number" id="${baseIdDay}-peso-m" class="weight-field" step="0.1" oninput="salvaDato(this)">
                     </div>
                     <div class="weight-input">
-                        <span class="user-tag label-l" style="color:var(--liliana)">KG Liliana</span>
+                        <span class="user-tag-small" style="color:var(--liliana)">Liliana (kg)</span>
                         <input type="number" id="${baseIdDay}-peso-l" class="weight-field" step="0.1" oninput="salvaDato(this)">
                     </div>
                 </div>
@@ -157,8 +207,10 @@
                 html += `
                 <div class="meal-box">
                     <div class="meal-header ${p.id==='allenamento'?'workout':''}"> ${p.i} ${p.n}</div>
-                    <textarea id="${baseId}-m" class="user-field field-m" rows="2" placeholder="Massimo..." oninput="salvaDato(this)"></textarea>
-                    <textarea id="${baseId}-l" class="user-field field-l" rows="2" placeholder="Liliana..." oninput="salvaDato(this)"></textarea>
+                    <span class="name-label" style="color:var(--massimo)">Massimo</span>
+                    <textarea id="${baseId}-m" class="user-field field-m" rows="2" oninput="salvaDato(this)"></textarea>
+                    <span class="name-label" style="color:var(--liliana)">Liliana</span>
+                    <textarea id="${baseId}-l" class="user-field field-l" rows="2" oninput="salvaDato(this)"></textarea>
                 </div>`;
             });
             card.innerHTML = html;
@@ -176,7 +228,7 @@
         const weekID = getIDSettimana(dataCorrente);
         db.ref('settimane/' + weekID).on('value', (s) => {
             const dat = s.val() || {};
-            document.querySelectorAll('textarea, input.weight-field').forEach(t => { 
+            document.querySelectorAll('textarea, .weight-field').forEach(t => { 
                 if(document.activeElement !== t) t.value = dat[t.id] || ""; 
             });
             document.getElementById('status').innerText = "✅ Sincronizzato";
@@ -192,9 +244,9 @@
         const list = s.val() || {};
         const container = document.getElementById('music-list');
         container.innerHTML = Object.keys(list).map(id => `
-            <div style="background:#333; padding:8px; border-radius:8px; margin-bottom:5px; font-size:0.8rem; display:flex; justify-content:space-between;">
-                <a href="${list[id]}" target="_blank" style="color:var(--spotify); text-decoration:none;">🎵 Link Playlist</a>
-                <span style="color:red; cursor:pointer;" onclick="db.ref('musica/${id}').remove()">×</span>
+            <div class="music-item">
+                <a href="${list[id]}" target="_blank">🔗 Playlist ${id.substring(1,5)}</a>
+                <span style="color:red; cursor:pointer; font-weight:bold" onclick="db.ref('musica/${id}').remove()">×</span>
             </div>
         `).join("");
     });
@@ -202,7 +254,7 @@
     function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
     function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " - " + fS.toLocaleDateString('it-IT'); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDati(); }
-    function svuotaSettimana() { if(confirm("Resettare dati della settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
+    function svuotaSettimana() { if(confirm("Cancellare tutti i dati della settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
 
     window.onload = () => { inizializzaPalestra(); creaGriglia(); aggiornaLabelSettimana(); caricaDati(); };
 </script>
