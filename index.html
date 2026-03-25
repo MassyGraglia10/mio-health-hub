@@ -45,7 +45,8 @@
         .input-group input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
         .btn-add { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        #modalSchedaUnificata { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        /* Popup Stili Comuni */
+        .modal-scheda { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; border-radius: 16px; max-width: 800px; margin: 20px auto; padding: 20px; position: relative; }
         .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #333; }
         
@@ -80,7 +81,7 @@
             <h3 style="color: var(--primary); margin-top:0;">📋 Schede Palestra</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                 <button onclick="apriSchedaUnificataLiliana()" style="flex:1; background:#e91e63; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">♀ SCHEDA LILIANA</button>
-                <button onclick="window.open('https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true')" style="flex:1; background:#2196f3; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">♂ SCHEDA MASSIMO</button>
+                <button onclick="apriSchedaUnificataMassimo()" style="flex:1; background:#2196f3; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">♂ SCHEDA MASSIMO</button>
             </div>
             
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -102,11 +103,29 @@
     </div>
 </div>
 
-<div id="modalSchedaUnificata">
+<div id="modalSchedaUnificataLiliana" class="modal-scheda">
     <div class="modal-content">
-        <span class="close-modal" onclick="chiudiModalUnificata()">&times;</span>
+        <span class="close-modal" onclick="chiudiModalUnificataLiliana()">&times;</span>
         <h2 style="color:#e91e63; margin-top:0;">♀ Scheda Liliana</h2>
         <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/dd5a72f80b644d956f67ce817b1ad39efbcde49c/schedaLiliana.jpg?raw=true" style="width:100%; border-radius:8px;">
+        <div class="popup-tutorial-grid">
+            <a href="https://www.youtube.com/results?search_query=crunch+addominali+corretto" target="_blank" class="btn-popup-tutorial">1. CRUNCH</a>
+            <a href="https://www.youtube.com/results?search_query=leg+press+form" target="_blank" class="btn-popup-tutorial">2. PRESSA</a>
+            <a href="https://www.youtube.com/results?search_query=leg+extension+form" target="_blank" class="btn-popup-tutorial">3. LEG EXTENSION</a>
+            <a href="https://www.youtube.com/results?search_query=goblet+squat+form" target="_blank" class="btn-popup-tutorial">4. SQUAT GOBLET</a>
+            <a href="https://www.youtube.com/results?search_query=chest+press+form" target="_blank" class="btn-popup-tutorial">CHEST PRESS</a>
+            <a href="https://www.youtube.com/results?search_query=lat+machine+form" target="_blank" class="btn-popup-tutorial">LAT MACHINE</a>
+            <a href="https://www.youtube.com/results?search_query=shoulder+press+dumbbells+form" target="_blank" class="btn-popup-tutorial">SHOULDER PRESS</a>
+            <a href="https://www.youtube.com/results?search_query=bicep+curl+manubri+form" target="_blank" class="btn-popup-tutorial">CURL MANUBRI</a>
+        </div>
+    </div>
+</div>
+
+<div id="modalSchedaUnificataMassimo" class="modal-scheda">
+    <div class="modal-content">
+        <span class="close-modal" onclick="chiudiModalUnificataMassimo()">&times;</span>
+        <h2 style="color:#2196f3; margin-top:0;">♂ Scheda Massimo</h2>
+        <img src="https://github.com/MassyGraglia10/mio-health-hub/blob/main/Schedamassimo.jpg?raw=true" style="width:100%; border-radius:8px;">
         <div class="popup-tutorial-grid">
             <a href="https://www.youtube.com/results?search_query=crunch+addominali+corretto" target="_blank" class="btn-popup-tutorial">1. CRUNCH</a>
             <a href="https://www.youtube.com/results?search_query=leg+press+form" target="_blank" class="btn-popup-tutorial">2. PRESSA</a>
@@ -219,8 +238,14 @@
     function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString() + " - " + fS.toLocaleDateString(); }
     function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
     function svuotaSettimana() { if(confirm("Svuotare settimana?")) db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); }
-    function apriSchedaUnificataLiliana() { document.getElementById('modalSchedaUnificata').style.display = "block"; }
-    function chiudiModalUnificata() { document.getElementById('modalSchedaUnificata').style.display = "none"; }
+    
+    // Gestione Popup Liliana
+    function apriSchedaUnificataLiliana() { document.getElementById('modalSchedaUnificataLiliana').style.display = "block"; }
+    function chiudiModalUnificataLiliana() { document.getElementById('modalSchedaUnificataLiliana').style.display = "none"; }
+
+    // Gestione Popup Massimo (Nuova)
+    function apriSchedaUnificataMassimo() { document.getElementById('modalSchedaUnificataMassimo').style.display = "block"; }
+    function chiudiModalUnificataMassimo() { document.getElementById('modalSchedaUnificataMassimo').style.display = "none"; }
 
     window.onload = () => { creaGriglia(); aggiornaLabelSettimana(); caricaDatiSettimana(); };
 </script>
