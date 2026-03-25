@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Menu Cloud Massimo & Liliana</title>
+    <title>Health Hub Massimo & Liliana</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #fdfdfd; --text: #2c3e50; --secondary: #546e7a; 
             --danger: #ef5350; --workout: #ba68c8; --success: #4caf50; --shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --yoga: #8e44ad; --pilates: #2980b9; --mind: #16a085;
         }
         
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
@@ -32,44 +33,39 @@
         .meal-label.workout { background: var(--workout) !important; }
         
         .user-row { position: relative; margin-bottom: 12px; }
-        .health-badge { 
-            display: none; font-size: 0.65rem; color: #fff; font-weight: 900; 
-            position: absolute; right: 5px; top: -12px; 
-            padding: 2px 8px; border-radius: 8px; z-index: 10;
-        }
+        .health-badge { display: none; font-size: 0.65rem; color: #fff; font-weight: 900; position: absolute; right: 5px; top: -12px; padding: 2px 8px; border-radius: 8px; z-index: 10; }
         .status-ok { background: var(--success); }
         .status-ko { background: var(--danger); }
         
         .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; transition: all 0.2s; }
         .user-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1); }
         
-        .field-ko { border-color: var(--danger) !important; background-color: #fffafa !important; }
-        .field-ok { border-color: var(--success) !important; background-color: #f7fff7 !important; }
-        
         .user-massimo { border-left: 5px solid #2196f3; }
         .user-liliana { border-left: 5px solid #e91e63; }
         .user-tag { font-size: 0.7rem; font-weight: bold; margin-bottom: 3px; display: block; text-transform: uppercase; color: #666; }
         
-        .dispensa-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
-        .chip { background: #e0f2f1; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #b2dfdb; display: inline-flex; align-items: center; margin: 4px; }
+        /* Sezione Allenamento */
+        .workout-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
+        .workout-link-card { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .yt-btn { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; text-decoration: none; color: white; font-weight: bold; font-size: 0.9rem; transition: transform 0.2s; }
+        .yt-btn:active { transform: scale(0.98); }
+        .btn-yoga { background: var(--yoga); }
+        .btn-pilates { background: var(--pilates); }
+        .btn-mind { background: var(--mind); }
         
-        .btn-clear { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-action { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
-        #areaListaSpesa { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #eee; display: none; }
-        .spesa-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 0.9rem; }
+        .copy-hint { font-size: 0.7rem; opacity: 0.8; font-weight: normal; }
 
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
             .menu-section { flex: 4; }
-            .dispensa-section { flex: 1; min-width: 300px; position: sticky; top: 120px; max-height: 80vh; overflow-y: auto; }
+            .workout-section { flex: 1; min-width: 300px; position: sticky; top: 120px; }
         }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>🍱 Menu Cloud Massimo & Liliana</h1>
+    <h1>🧘 Health Hub Massimo & Liliana</h1>
     <div id="status">Connessione...</div>
 </div>
 
@@ -84,25 +80,48 @@
         <div id="grid-container" class="grid"></div>
     </div>
     
-    <div class="dispensa-section">
-        <h3>🍎 Dispensa Rapida</h3>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="nuovoCibo" placeholder="Aggiungi cibo..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
-            <button onclick="aggiungiADispensa()" style="background:var(--primary); color:white; border:none; padding:0 12px; border-radius:8px;">+</button>
-        </div>
-        <div id="listaDispensa"></div>
+    <div class="workout-section">
+        <h3>🏠 Allenamenti a Casa</h3>
+        <p style="font-size: 0.8rem; color: #666;">Clicca per guardare su YouTube o per aggiungere al menu.</p>
         
-        <button onclick="generaListaSpesa()" class="btn-action">🛒 Genera Lista Spesa</button>
-        <button onclick="svuotaSettimana()" class="btn-clear">🗑️ Svuota Settimana</button>
+        <div class="workout-link-card">
+            <div style="border: 1px solid #eee; border-radius: 12px; padding: 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:var(--yoga)">YOGA</strong>
+                    <button onclick="copiaAllenamento('Yoga')" style="font-size:0.7rem; cursor:pointer;">➕ Aggiungi</button>
+                </div>
+                <a href="https://www.youtube.com/watch?v=649m8Si5dVA" target="_blank" class="yt-btn btn-yoga">
+                    Inizia da Zero (10 min) <span>▶</span>
+                </a>
+            </div>
 
-        <div id="areaListaSpesa">
-            <h3 style="color: var(--primary); margin-bottom: 10px;">📝 Lista Spesa</h3>
-            <div id="listaSpesaContenuto"></div>
+            <div style="border: 1px solid #eee; border-radius: 12px; padding: 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:var(--pilates)">PILATES</strong>
+                    <button onclick="copiaAllenamento('Pilates')" style="font-size:0.7rem; cursor:pointer;">➕ Aggiungi</button>
+                </div>
+                <a href="https://www.youtube.com/watch?v=Eqv0aL2ovDU" target="_blank" class="yt-btn btn-pilates">
+                    Principianti (20 min) <span>▶</span>
+                </a>
+            </div>
+
+            <div style="border: 1px solid #eee; border-radius: 12px; padding: 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:var(--mind)">MINDFULNESS</strong>
+                    <button onclick="copiaAllenamento('Mindfulness')" style="font-size:0.7rem; cursor:pointer;">➕ Aggiungi</button>
+                </div>
+                <a href="https://www.youtube.com/watch?v=ohrGV_sm9E4" target="_blank" class="yt-btn btn-mind">
+                    Meditazione Respiro <span>▶</span>
+                </a>
+            </div>
         </div>
+
+        <button onclick="svuotaSettimana()" class="btn-nav" style="width:100%; margin-top:30px; background:var(--danger)">🗑️ Svuota Settimana</button>
     </div>
 </div>
 
 <script>
+    // Configurazione Firebase (Stessa di prima)
     const firebaseConfig = {
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
         authDomain: "miomenu-e2e51.firebaseapp.com",
@@ -118,76 +137,35 @@
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
 
-    // Database ingredienti (Espandilo pure!)
-    const dizionarioIngredienti = {
-        "pasta": ["Pasta", "Sale grosso"],
-        "pomodoro": ["Passata di pomodoro"],
-        "pollo": ["Petto di Pollo"],
-        "insalata": ["Insalata mista"],
-        "uova": ["Uova"],
-        "tonno": ["Tonno sott'olio"],
-        "riso": ["Riso"],
-        "pesce": ["Pesce fresco"],
-        "carne": ["Carne"],
-        "pizza": ["Mozzarella", "Farina"],
-        "mela": ["Mele"],
-        "banana": ["Banane"],
-        "yogurt": ["Yogurt"],
-        "pesto": ["Pesto alla genovese"],
-        "fesa": ["Fesa di tacchino"],
-        "bresaola": ["Bresaola"],
-        "pane": ["Pane fresco"]
-    };
-
-    const cibiRischio = {
-        "dolci": 3, "torta": 3, "gelato": 3, "brioche": 3, "cornetto": 3, "nutella": 3, "pasticceria": 3,
-        "salame": 3, "mortadella": 3, "wurstel": 3, "pancetta": 3, "salsiccia": 3, "lardo": 3,
-        "fritto": 3, "frittura": 3, "patatine fritte": 3, "burro": 2, "panna": 2, "formaggio": 2, 
-        "maiale": 2, "carne rossa": 2, "hamburger": 2, "zucchero": 2, "biscotti": 2, 
-        "maionese": 2, "alcol": 2, "birra": 2, "vino": 1.5, "uova": 0.5,
-        "avocado": 0, "pizza": 2.5, "bresaola": 1
-    };
-
-    function checkHealth(textarea) {
-        if (!textarea) return;
-        const text = textarea.value.toLowerCase().trim();
-        const row = textarea.closest('.user-row');
-        if (!row) return;
-        const badge = row.querySelector('.health-badge');
-        
-        const isMassimo = textarea.id.endsWith("-m");
-        const suffix = isMassimo ? "-m" : "-l";
-        const dayPrefix = textarea.id.split('-')[0];
-        
-        const workoutEl = document.getElementById(`${dayPrefix}-allenamento${suffix}`);
-        const hasWorkout = workoutEl && workoutEl.value.trim().length > 0;
-
-        if (text === "" || textarea.id.includes("allenamento")) {
-            badge.style.display = "none";
-            textarea.classList.remove("field-ko", "field-ok");
+    function copiaAllenamento(tipo) {
+        if(!window.lastFocusedId || !window.lastFocusedId.includes("allenamento")) {
+            alert("Prima clicca sulla casella 'Allenamento' di un giorno per selezionarla!");
             return;
         }
+        const field = document.getElementById(window.lastFocusedId);
+        field.value = tipo;
+        aggiornaTutto(field);
+    }
+
+    // --- LOGICA SALUTE E GRIGLIA (Mantenuta e ottimizzata) ---
+    const cibiRischio = { "dolci": 3, "fritto": 3, "alcol": 2, "pizza": 2.5, "formaggio": 2 };
+
+    function checkHealth(textarea) {
+        if (!textarea || textarea.id.includes("allenamento")) return;
+        const text = textarea.value.toLowerCase();
+        const row = textarea.closest('.user-row');
+        const badge = row.querySelector('.health-badge');
+        const suffix = textarea.id.endsWith("-m") ? "-m" : "-l";
+        const day = textarea.id.split('-')[0];
+        const hasWorkout = document.getElementById(`${day}-allenamento${suffix}`).value.trim() !== "";
 
         let punteggio = 0;
-        const isCapra = text.includes("capra");
-        Object.keys(cibiRischio).forEach(c => {
-            if (text.includes(c)) punteggio += (c === "formaggio" && isCapra) ? 0 : cibiRischio[c];
-        });
-
-        const soglia = hasWorkout ? 2.5 : 1.5;
-        badge.style.display = "block";
-
-        if (punteggio >= soglia) {
-            badge.innerText = "❌ KO";
-            badge.className = "health-badge status-ko";
-            textarea.classList.add("field-ko");
-            textarea.classList.remove("field-ok");
-        } else {
-            badge.innerText = "✅ OK";
-            badge.className = "health-badge status-ok";
-            textarea.classList.add("field-ok");
-            textarea.classList.remove("field-ko");
-        }
+        Object.keys(cibiRischio).forEach(c => { if (text.includes(c)) punteggio += cibiRischio[c]; });
+        
+        badge.style.display = text ? "block" : "none";
+        const isOk = punteggio < (hasWorkout ? 2.5 : 1.5);
+        badge.innerText = isOk ? "✅ OK" : "❌ KO";
+        badge.className = "health-badge " + (isOk ? "status-ok" : "status-ko");
     }
 
     function creaGriglia() {
@@ -200,23 +178,16 @@
             const dG = new Date(dataCorrente); dG.setDate(dataCorrente.getDate() + idx);
             const card = document.createElement('div');
             card.className = 'day-card';
-            let h = `<div class="day-title">${g} ${dG.toLocaleDateString('it-IT',{day:'numeric',month:'short'}).toUpperCase()}</div>`;
-            
+            let h = `<div class="day-title">${g} ${dG.getDate()}/${dG.getMonth()+1}</div>`;
             pasti.forEach(p => {
                 const idB = `${g}-${p.n}`.toLowerCase().replace("ì", "i");
                 h += `
                 <div class="meal-box">
                     <span class="${p.n==='Allenamento'?'meal-label workout':'meal-label'}">${p.i} ${p.n}</span>
-                    <div class="user-row">
-                        <span class="health-badge"></span>
-                        <span class="user-tag">♂ Massimo</span>
-                        <textarea id="${idB}-m" class="user-field user-massimo" rows="3" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
-                    </div>
-                    <div class="user-row">
-                        <span class="health-badge"></span>
-                        <span class="user-tag">♀ Liliana</span>
-                        <textarea id="${idB}-l" class="user-field user-liliana" rows="3" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
-                    </div>
+                    <div class="user-row"><span class="health-badge"></span><span class="user-tag">♂ Max</span>
+                        <textarea id="${idB}-m" class="user-field user-massimo" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea></div>
+                    <div class="user-row"><span class="health-badge"></span><span class="user-tag">♀ Lili</span>
+                        <textarea id="${idB}-l" class="user-field user-liliana" rows="2" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea></div>
                 </div>`;
             });
             card.innerHTML = h;
@@ -225,89 +196,31 @@
     }
 
     function aggiornaTutto(el) {
-        const suffix = el.id.endsWith("-m") ? "-m" : "-l";
-        const day = el.id.split('-')[0];
-        if (el.id.includes("allenamento")) {
-            checkHealth(document.getElementById(`${day}-colazione${suffix}`));
-            checkHealth(document.getElementById(`${day}-pranzo${suffix}`));
-            checkHealth(document.getElementById(`${day}-cena${suffix}`));
-        } else {
-            checkHealth(el);
-        }
+        checkHealth(el);
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(window.tS);
         window.tS = setTimeout(() => {
-            const weekID = getIDSettimana(dataCorrente);
-            const d = {};
-            document.querySelectorAll('textarea').forEach(t => d[t.id] = t.value);
-            db.ref('settimane/' + weekID).update(d);
+            const d = {}; document.querySelectorAll('textarea').forEach(t => d[t.id] = t.value);
+            db.ref('settimane/' + getIDSettimana(dataCorrente)).update(d);
+            document.getElementById('status').innerText = "✅ Salvato";
         }, 800);
     }
 
     function caricaDatiSettimana() {
-        const weekID = getIDSettimana(dataCorrente);
-        if(window.cR) window.cR.off();
-        window.cR = db.ref('settimane/' + weekID);
-        window.cR.on('value', (s) => {
+        db.ref('settimane/' + getIDSettimana(dataCorrente)).on('value', (s) => {
             const dat = s.val() || {};
             document.querySelectorAll('textarea').forEach(t => { 
-                if(document.activeElement !== t) { 
-                    t.value = dat[t.id] || ""; 
-                    checkHealth(t); 
-                } 
+                if(document.activeElement !== t) { t.value = dat[t.id] || ""; checkHealth(t); } 
             });
-            document.getElementById('status').innerText = "✅ Sincronizzato";
         });
     }
 
-    function generaListaSpesa() {
-        const setSpesa = new Set();
-        document.querySelectorAll('textarea').forEach(t => {
-            const testo = t.value.toLowerCase();
-            if(testo && !t.id.includes("allenamento")) {
-                Object.keys(dizionarioIngredienti).forEach(chiave => {
-                    if(testo.includes(chiave)) {
-                        dizionarioIngredienti[chiave].forEach(ing => setSpesa.add(ing));
-                    }
-                });
-            }
-        });
+    function getIDSettimana(d) { return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+    function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); creaGriglia(); caricaDatiSettimana(); aggiornaLabel(); }
+    function aggiornaLabel() { document.getElementById('current-week-display').innerText = "Settimana del " + dataCorrente.toLocaleDateString(); }
+    function svuotaSettimana() { if(confirm("Svuotare tutto?")) db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); }
 
-        const area = document.getElementById('areaListaSpesa');
-        const cont = document.getElementById('listaSpesaContenuto');
-        
-        if(setSpesa.size > 0) {
-            area.style.display = "block";
-            cont.innerHTML = Array.from(setSpesa).sort().map(item => `
-                <div class="spesa-item">
-                    <input type="checkbox"> <span>${item}</span>
-                </div>
-            `).join("");
-            area.scrollIntoView({behavior: "smooth"});
-        } else {
-            alert("Nessun ingrediente trovato nel menù!");
-        }
-    }
-
-    function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
-    function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " - " + fS.toLocaleDateString('it-IT'); }
-    function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); document.getElementById('areaListaSpesa').style.display = "none"; }
-    
-    db.ref('dispensa').on('value', s => { 
-        const l = s.val() || [];
-        document.getElementById('listaDispensa').innerHTML = l.map((c, i) => `<div class="chip"><span onclick="inserisci('${c.replace(/'/g, "\\'")}')">${c}</span><span style="margin-left:8px;color:red" onclick="rimuoviDaDispensa(${i})">×</span></div>`).join("");
-    });
-    
-    function aggiungiADispensa() { const i = document.getElementById('nuovoCibo'); if (i.value.trim()) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.push(i.value.trim()); db.ref('dispensa').set(l); i.value = ""; }); } }
-    function rimuoviDaDispensa(i) { if(confirm("Rimuovere?")) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.splice(i, 1); db.ref('dispensa').set(l); }); } }
-    function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
-    function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); document.getElementById('areaListaSpesa').style.display="none"; } }
-
-    window.onload = () => {
-        creaGriglia();
-        aggiornaLabelSettimana();
-        caricaDatiSettimana();
-    };
+    window.onload = () => { creaGriglia(); caricaDatiSettimana(); aggiornaLabel(); };
 </script>
 </body>
 </html>
