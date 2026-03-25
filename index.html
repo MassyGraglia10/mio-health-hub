@@ -33,30 +33,25 @@
         .meal-label.workout { background: var(--workout) !important; }
         
         .user-row { position: relative; margin-bottom: 12px; }
-        .health-badge { 
-            display: none; font-size: 0.65rem; color: #fff; font-weight: 900; 
-            position: absolute; right: 5px; top: -12px; 
-            padding: 2px 8px; border-radius: 8px; z-index: 10;
-        }
-        
-        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; transition: all 0.2s; }
+        .user-field { border-radius: 12px; padding: 10px; font-size: 0.95rem; border: 1px solid #ddd; resize: vertical; width: 100%; box-sizing: border-box; }
         .user-massimo { border-left: 5px solid #2196f3; }
         .user-liliana { border-left: 5px solid #e91e63; }
         .user-tag { font-size: 0.7rem; font-weight: bold; margin-bottom: 3px; display: block; text-transform: uppercase; color: #666; }
         
-        /* Sezione Tutorial - Nuovi Tasti */
+        /* Sezione Allenamenti */
         .workout-footer { background: #f8f9fa; padding: 20px; border-radius: 20px; border: 1px solid #dee2e6; margin-top: 20px; }
         .btn-scheda { flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; }
         
         .tutorial-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
         .btn-tutorial-link { 
-            display: block; text-decoration: none; text-align: center; padding: 12px; 
+            display: flex; align-items: center; justify-content: center; text-decoration: none; text-align: center; padding: 12px; 
             background: white; border: 1px solid #ddd; border-radius: 10px; 
             color: var(--text); font-size: 0.75rem; font-weight: bold; transition: all 0.2s;
         }
         .btn-tutorial-link:hover { border-color: var(--tutorial); background: #fff9f0; transform: translateY(-2px); }
 
-        /* Modal per la Scheda JPG (Questa funziona perché è su GitHub) */
+        .yt-link { display: block; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; color: white; font-weight: bold; flex: 1; }
+
         #modalScheda { display:none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
         #imgScheda { margin: auto; display: block; max-width: 95%; max-height: 85%; padding-top: 20px; }
 
@@ -95,7 +90,6 @@
             </div>
 
             <h3 style="color: var(--tutorial); border-bottom: 2px solid var(--tutorial); padding-bottom: 5px;">🎥 Video Tutorial Esercizi</h3>
-            <p style="font-size: 0.75rem; color: #666;">Clicca per aprire il video dell'esecuzione corretta:</p>
             <div class="tutorial-grid">
                 <a href="https://www.youtube.com/results?search_query=crunch+addominali+corretto" target="_blank" class="btn-tutorial-link">1. CRUNCH</a>
                 <a href="https://www.youtube.com/results?search_query=leg+press+correct+form" target="_blank" class="btn-tutorial-link">2. PRESSA</a>
@@ -109,8 +103,9 @@
             
             <h3 style="color: var(--secondary); margin-top: 25px; border-bottom: 2px solid #eee;">🧘 Allenamenti a Casa</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
-                <a href="https://www.youtube.com/results?search_query=yoga+italiano+15+minuti" target="_blank" style="background: var(--yoga); padding: 12px; border-radius: 10px; color: white; text-decoration: none; flex: 1; text-align: center; font-weight: bold;">YOGA</a>
-                <a href="https://www.youtube.com/results?search_query=pilates+principianti+italiano" target="_blank" style="background: var(--pilates); padding: 12px; border-radius: 10px; color: white; text-decoration: none; flex: 1; text-align: center; font-weight: bold;">PILATES</a>
+                <a href="https://www.youtube.com/results?search_query=yoga+italiano+15+minuti" target="_blank" class="yt-link" style="background: var(--yoga);">YOGA</a>
+                <a href="https://www.youtube.com/results?search_query=pilates+principianti+italiano" target="_blank" class="yt-link" style="background: var(--pilates);">PILATES</a>
+                <a href="https://www.youtube.com/results?search_query=meditazione+guidata+respiro" target="_blank" class="yt-link" style="background: var(--mind);">MINDFULNESS</a>
             </div>
         </div>
     </div>
@@ -132,7 +127,6 @@
 </div>
 
 <script>
-    // Configurazione Firebase (mantenuta uguale)
     const firebaseConfig = {
         apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
         authDomain: "miomenu-e2e51.firebaseapp.com",
@@ -153,9 +147,6 @@
         document.getElementById('modalScheda').style.display = "block";
     }
 
-    // Le altre funzioni (creaGriglia, aggiornaTutto, caricaDatiSettimana, ecc.) rimangono identiche a quelle funzionanti nel tuo codice
-    // Per brevità non le riscrivo tutte ma sono incluse nel file finale.
-    
     function creaGriglia() {
         const container = document.getElementById('grid-container');
         container.innerHTML = "";
