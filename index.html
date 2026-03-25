@@ -53,12 +53,16 @@
         .dispensa-section { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid #f0f0f0; }
         .chip { background: #e0f2f1; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid #b2dfdb; display: inline-flex; align-items: center; margin: 4px; }
         
-        .btn-clear { background: var(--danger); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-clear { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        #areaListaSpesa { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #eee; display: none; }
+        .spesa-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 0.9rem; }
 
         @media (min-width: 1024px) {
             .main-wrapper { flex-direction: row; align-items: flex-start; }
             .menu-section { flex: 4; }
-            .dispensa-section { flex: 1; min-width: 280px; position: sticky; top: 120px; }
+            .dispensa-section { flex: 1; min-width: 300px; position: sticky; top: 120px; max-height: 80vh; overflow-y: auto; }
         }
     </style>
 </head>
@@ -83,11 +87,18 @@
     <div class="dispensa-section">
         <h3>🍎 Dispensa Rapida</h3>
         <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="nuovoCibo" placeholder="Aggiungi..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
+            <input type="text" id="nuovoCibo" placeholder="Aggiungi cibo..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #ddd;">
             <button onclick="aggiungiADispensa()" style="background:var(--primary); color:white; border:none; padding:0 12px; border-radius:8px;">+</button>
         </div>
         <div id="listaDispensa"></div>
+        
+        <button onclick="generaListaSpesa()" class="btn-action">🛒 Genera Lista Spesa</button>
         <button onclick="svuotaSettimana()" class="btn-clear">🗑️ Svuota Settimana</button>
+
+        <div id="areaListaSpesa">
+            <h3 style="color: var(--primary); margin-bottom: 10px;">📝 Lista Spesa</h3>
+            <div id="listaSpesaContenuto"></div>
+        </div>
     </div>
 </div>
 
@@ -106,6 +117,27 @@
     
     let dataCorrente = new Date();
     dataCorrente.setDate(dataCorrente.getDate() - (dataCorrente.getDay() === 0 ? 6 : dataCorrente.getDay() - 1));
+
+    // Database ingredienti (Espandilo pure!)
+    const dizionarioIngredienti = {
+        "pasta": ["Pasta", "Sale grosso"],
+        "pomodoro": ["Passata di pomodoro"],
+        "pollo": ["Petto di Pollo"],
+        "insalata": ["Insalata mista"],
+        "uova": ["Uova"],
+        "tonno": ["Tonno sott'olio"],
+        "riso": ["Riso"],
+        "pesce": ["Pesce fresco"],
+        "carne": ["Carne"],
+        "pizza": ["Mozzarella", "Farina"],
+        "mela": ["Mele"],
+        "banana": ["Banane"],
+        "yogurt": ["Yogurt"],
+        "pesto": ["Pesto alla genovese"],
+        "fesa": ["Fesa di tacchino"],
+        "bresaola": ["Bresaola"],
+        "pane": ["Pane fresco"]
+    };
 
     const cibiRischio = {
         "dolci": 3, "torta": 3, "gelato": 3, "brioche": 3, "cornetto": 3, "nutella": 3, "pasticceria": 3,
@@ -178,12 +210,12 @@
                     <div class="user-row">
                         <span class="health-badge"></span>
                         <span class="user-tag">♂ Massimo</span>
-                        <textarea id="${idB}-m" class="user-field user-massimo" rows="4" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                        <textarea id="${idB}-m" class="user-field user-massimo" rows="3" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                     <div class="user-row">
                         <span class="health-badge"></span>
                         <span class="user-tag">♀ Liliana</span>
-                        <textarea id="${idB}-l" class="user-field user-liliana" rows="4" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
+                        <textarea id="${idB}-l" class="user-field user-liliana" rows="3" onfocus="window.lastFocusedId=this.id" oninput="aggiornaTutto(this)"></textarea>
                     </div>
                 </div>`;
             });
@@ -195,7 +227,6 @@
     function aggiornaTutto(el) {
         const suffix = el.id.endsWith("-m") ? "-m" : "-l";
         const day = el.id.split('-')[0];
-        
         if (el.id.includes("allenamento")) {
             checkHealth(document.getElementById(`${day}-colazione${suffix}`));
             checkHealth(document.getElementById(`${day}-pranzo${suffix}`));
@@ -203,7 +234,6 @@
         } else {
             checkHealth(el);
         }
-
         document.getElementById('status').innerText = "☁️ Salvataggio...";
         clearTimeout(window.tS);
         window.tS = setTimeout(() => {
@@ -230,9 +260,38 @@
         });
     }
 
+    function generaListaSpesa() {
+        const setSpesa = new Set();
+        document.querySelectorAll('textarea').forEach(t => {
+            const testo = t.value.toLowerCase();
+            if(testo && !t.id.includes("allenamento")) {
+                Object.keys(dizionarioIngredienti).forEach(chiave => {
+                    if(testo.includes(chiave)) {
+                        dizionarioIngredienti[chiave].forEach(ing => setSpesa.add(ing));
+                    }
+                });
+            }
+        });
+
+        const area = document.getElementById('areaListaSpesa');
+        const cont = document.getElementById('listaSpesaContenuto');
+        
+        if(setSpesa.size > 0) {
+            area.style.display = "block";
+            cont.innerHTML = Array.from(setSpesa).sort().map(item => `
+                <div class="spesa-item">
+                    <input type="checkbox"> <span>${item}</span>
+                </div>
+            `).join("");
+            area.scrollIntoView({behavior: "smooth"});
+        } else {
+            alert("Nessun ingrediente trovato nel menù!");
+        }
+    }
+
     function getIDSettimana(d) { const l = new Date(d); return l.getFullYear() + "-" + (l.getMonth() + 1).toString().padStart(2, '0') + "-" + l.getDate().toString().padStart(2, '0'); }
     function aggiornaLabelSettimana() { const fS = new Date(dataCorrente); fS.setDate(fS.getDate() + 6); document.getElementById('current-week-display').innerText = dataCorrente.toLocaleDateString('it-IT') + " - " + fS.toLocaleDateString('it-IT'); }
-    function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); }
+    function cambiaSettimana(diff) { dataCorrente.setDate(dataCorrente.getDate() + (diff * 7)); aggiornaLabelSettimana(); creaGriglia(); caricaDatiSettimana(); document.getElementById('areaListaSpesa').style.display = "none"; }
     
     db.ref('dispensa').on('value', s => { 
         const l = s.val() || [];
@@ -242,7 +301,7 @@
     function aggiungiADispensa() { const i = document.getElementById('nuovoCibo'); if (i.value.trim()) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.push(i.value.trim()); db.ref('dispensa').set(l); i.value = ""; }); } }
     function rimuoviDaDispensa(i) { if(confirm("Rimuovere?")) { db.ref('dispensa').once('value').then(s => { let l = s.val() || []; l.splice(i, 1); db.ref('dispensa').set(l); }); } }
     function inserisci(t) { if(!window.lastFocusedId) return; const a = document.getElementById(window.lastFocusedId); a.value += (a.value ? ", " : "") + t; aggiornaTutto(a); }
-    function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); } }
+    function svuotaSettimana() { if(confirm("Svuotare settimana?")) { db.ref('settimane/' + getIDSettimana(dataCorrente)).remove(); document.getElementById('areaListaSpesa').style.display="none"; } }
 
     window.onload = () => {
         creaGriglia();
