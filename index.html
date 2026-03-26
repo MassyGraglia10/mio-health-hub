@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v34.1</title>
+    <title>Massy e Lilly v35</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -39,14 +39,9 @@
         .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
         textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
-        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
-        .instr { font-size: 0.65rem; color: #aaa; margin-left: auto; font-style: italic; }
-        
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
-        .btn-link { background: var(--relax); margin-bottom: 8px; }
         .btn-spotify { background: var(--spotify); margin-bottom: 8px; }
-        .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
-        .imc-legend { font-size: 0.65rem; margin-top: 8px; color: #777; line-height: 1.2; }
+        
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
@@ -93,50 +88,36 @@
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
-            </div>
-            <div class="card l-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
-            </div>
-
-            <div class="time-header">📅 CORSI PALINSESTO COMPLETO</div>
+            <div class="card m-border"><label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label></div>
+            <div class="card l-border"><label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label></div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 PLAYLIST SPOTIFY (VISIBILE SEMPRE)</div>
+            <div class="time-header">🎵 PLAYLIST SPOTIFY (GLOBALE)</div>
             <div class="card m-border">
+                <div class="user-title" style="color:var(--massimo)">MASSIMO</div>
                 <input type="text" id="play-m-global" placeholder="Link Spotify Massy..." oninput="salvaGlobal(this)">
                 <button class="btn-view btn-spotify" onclick="apriSpotify('m')">🎧 APRI SPOTIFY MASSY</button>
             </div>
             <div class="card l-border">
-                <input type="text" id="play-l-global" placeholder="Link Spotify Lilly..." oninput="salvaGlobal(this)">
+                <div class="user-title" style="color:var(--liliana)">LILIANA</div>
+                <input type="text" id="play-l-global" value="https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg" oninput="salvaGlobal(this)">
                 <button class="btn-view btn-spotify" onclick="apriSpotify('l')">🎧 APRI SPOTIFY LILLY</button>
-            </div>
-            <div class="time-header">🧘 VIDEO GUIDATI</div>
-            <div class="card" style="border-left: 5px solid var(--relax);">
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 YOGA</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 PILATES</button>
             </div>
         </div>
 
         <div id="tab-report" class="tab-content">
             <div class="time-header">⚖️ DATI FISICI</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border">M: Peso (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)">M: Alt (cm)<input type="number" id="alt-m" oninput="salvaDato(this)"></div>
-                <div class="card l-border">L: Peso (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)">L: Alt (cm)<input type="number" id="alt-l" oninput="salvaDato(this)"></div>
+                <div class="card m-border">M: Peso<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
+                <div class="card l-border">L: Peso<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
             </div>
-            <div id="bmi-display" class="report-summary">Calcolo...</div>
-            <div class="card"><canvas id="weightChart"></canvas></div>
+            <div id="bmi-display" class="card" style="font-size:0.8rem; font-weight:bold; text-align:center;">...</div>
         </div>
     </div>
 </div>
-
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height:80%;"></div>
 
 <script>
     const firebaseConfig = {
@@ -148,20 +129,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"19:00", c:"TRX", i:"Vincenzo"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}],
-        "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
-    };
-
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
-    let myChart = null;
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
@@ -178,41 +148,42 @@
 
     function apriDettaglio(data) {
         curKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + data.getDate();
+        document.getElementById('modal-title').innerText = data.toLocaleDateString('it-IT', {weekday:'long', day:'numeric'});
         document.getElementById('modal').style.display = 'flex';
 
-        // Caricamento Dati Giornalieri
+        // Caricamento dati giorno
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
-            const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l'];
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l'];
             fields.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = v[id] || ""; });
-            const corsi = palinsesto[gL] || [];
-            const createList = (u) => corsi.map((c, i) => `<div class="gym-row"><input type="checkbox" ${v['chk-'+u+'-'+i]?'checked':''} onchange="salvaCheckV3(this,'chk-${u}-${i}')"><b>${c.t}</b> ${c.c}</div>`).join("");
-            document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b>" + (createList('m') || "<br>Nessun corso");
-            document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b>" + (createList('l') || "<br>Nessun corso");
         });
 
-        // Caricamento Spotify Globale (Sempre uguale per ogni giorno)
+        // Caricamento Spotify Globale
         db.ref("settings/spotify").once('value', snapshot => {
             const s = snapshot.val() || {};
-            document.getElementById('play-m-global').value = s.m || "";
-            document.getElementById('play-l-global').value = s.l || "";
+            if(s.m) document.getElementById('play-m-global').value = s.m;
+            // Imposta il link di Lilly se non presente o lo aggiorna se cambiato
+            if(!s.l) { 
+                db.ref("settings/spotify/l").set("https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg");
+                document.getElementById('play-l-global').value = "https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg";
+            } else {
+                document.getElementById('play-l-global').value = s.l;
+            }
         });
     }
 
     function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
-    function salvaCheckV3(el, cid) { db.ref("dailyData/" + curKey + "/" + (cid || el.id)).set(el.checked); statusUpdate(); }
+    function salvaCheckV3(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.checked); statusUpdate(); }
     
-    // Funzioni specifiche per Spotify Globale
     function salvaGlobal(el) {
         const user = el.id.includes('-m-') ? 'm' : 'l';
         db.ref("settings/spotify/" + user).set(el.value);
         statusUpdate();
     }
+
     function apriSpotify(u) {
         const link = document.getElementById('play-' + u + '-global').value;
-        window.open(link || 'spotify:','_blank');
+        window.open(link || 'https://open.spotify.com','_blank');
     }
 
     function openTab(evt, tabId) {
@@ -221,6 +192,7 @@
         document.getElementById(tabId).classList.add("active");
         evt.currentTarget.classList.add("active");
     }
+
     function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
