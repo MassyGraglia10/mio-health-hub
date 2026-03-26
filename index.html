@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v36</title>
+    <title>Massy e Lilly v38</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -39,6 +39,7 @@
         .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
         textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
+        
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
         .instr { font-size: 0.65rem; color: #aaa; margin-left: auto; font-style: italic; }
         
@@ -49,7 +50,6 @@
         .imc-legend { font-size: 0.65rem; margin-top: 8px; color: #777; line-height: 1.2; }
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         
-        /* Stile aggiuntivo per le frecce nel modal */
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 0; }
         .modal-nav { display: flex; align-items: center; gap: 15px; }
         .btn-nav-sm { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
@@ -132,11 +132,11 @@
             <div class="time-header">🎵 PLAYLIST SPOTIFY</div>
             <div class="card m-border">
                 <input type="text" id="play-m" placeholder="Link Spotify Massy..." oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-m').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY MASSY</button>
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-m').value || 'https://spotify.com','_blank')">🎧 APRI SPOTIFY MASSY</button>
             </div>
             <div class="card l-border">
-                <input type="text" id="play-l" oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY LILLY</button>
+                <input type="text" id="play-l" placeholder="Link Spotify Lilly..." oninput="salvaDato(this)">
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 APRI SPOTIFY LILLY</button>
             </div>
             <div class="time-header">🧘 VIDEO GUIDATI</div>
             <div class="card" style="border-left: 5px solid var(--relax);">
@@ -195,7 +195,7 @@
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
-    let dataCorrenteVisualizzata = new Date(); // Supporto navigazione modal
+    let dataCorrenteVisualizzata = new Date();
     let myChart = null;
 
     function openTab(evt, tabId) {
@@ -239,22 +239,22 @@
             const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','altro-m','altro-l','play-m','play-l'];
             fields.forEach(id => { 
                 if(document.getElementById(id)) {
-                    if(id === 'play-l' && !v[id]) {
-                        document.getElementById(id).value = "https://open.spotify.com";
+                    // Logica flessibile: usa il dato salvato, altrimenti metti il link di default se è Lilly
+                    if(id === 'play-l') {
+                        document.getElementById(id).value = v[id] || "https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg";
                     } else {
                         document.getElementById(id).value = v[id] || "";
                     }
                 }
             });
+
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
             
-            // Aggiorna BMI se siamo nel tab report
             if(document.getElementById('tab-report').classList.contains('active')) calcolaBMI();
         });
     }
 
-    // Funzione per navigare nel modal senza chiuderlo
     function navigaGiorno(n) {
         dataCorrenteVisualizzata.setDate(dataCorrenteVisualizzata.getDate() + n);
         apriDettaglio(new Date(dataCorrenteVisualizzata));
