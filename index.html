@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Smart Planner v26</title>
+    <title>M&L Smart Planner v27</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --massimo: #2196f3; --liliana: #e91e63;
+            --relax: #9c27b0;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
@@ -36,11 +37,12 @@
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
         .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
-        textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
+        textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
         .instr { font-size: 0.65rem; color: #aaa; margin-left: auto; font-style: italic; }
         
-        .btn-view { background: #eee; border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
+        .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
+        .btn-link { background: var(--relax); margin-bottom: 8px; }
         .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -48,7 +50,7 @@
 <body>
 
 <div class="header">
-    <h2 style="margin:0; font-size: 1.1rem;">🍱 M&L Smart Planner v26</h2>
+    <h2 style="margin:0; font-size: 1.1rem;">🍱 M&L Smart Planner v27</h2>
     <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO ATTIVA</div>
 </div>
 
@@ -70,7 +72,7 @@
         <div class="tab-bar">
             <button class="tab-btn active" onclick="openTab(event, 'tab-menu')">🍴 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-run')">🏃 ATTIVITÀ</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-report')">📊 REPORT</button>
         </div>
 
@@ -78,43 +80,57 @@
             <div class="time-header">☕ COLAZIONE</div>
             <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="4" oninput="salvaDato(this)"></textarea></div>
             <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="4" oninput="salvaDato(this)"></textarea></div>
-            
             <div class="time-header">🥗 PRANZO</div>
             <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="pra-m" rows="4" oninput="salvaDato(this)"></textarea></div>
             <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="pra-l" rows="4" oninput="salvaDato(this)"></textarea></div>
-
             <div class="time-header">🥩 CENA</div>
             <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="cen-m" rows="4" oninput="salvaDato(this)"></textarea></div>
             <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="cen-l" rows="4" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
-            <div class="time-header">🟦 CORSI MASSIMO</div>
-            <div id="gym-list-m" class="card m-border"></div>
-            
-            <div class="time-header">🟥 CORSI LILIANA</div>
-            <div id="gym-list-l" class="card l-border"></div>
+            <div class="time-header">🏃 CORSA</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="card m-border"><div class="user-title">MASSIMO</div><input type="text" id="run-m" placeholder="Km/min" oninput="salvaDato(this)"></div>
+                <div class="card l-border"><div class="user-title">LILIANA</div><input type="text" id="run-l-corsa" placeholder="Km/min" oninput="salvaDato(this)"></div>
+            </div>
+
+            <div class="time-header">🚴 CARDIO</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="card m-border"><div class="user-title">MASSIMO</div><input type="text" id="cardio-m" placeholder="Tipo/Durata" oninput="salvaDato(this)"></div>
+                <div class="card l-border"><div class="user-title">LILIANA</div><input type="text" id="cardio-l" placeholder="Tipo/Durata" oninput="salvaDato(this)"></div>
+            </div>
+
+            <div class="time-header">🧘 ALTRO ALLENAMENTO</div>
+            <div class="card m-border"><div class="user-title">MASSIMO</div><textarea id="altro-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title">LILIANA</div><textarea id="altro-l" rows="2" oninput="salvaDato(this)"></textarea></div>
 
             <div class="time-header">🏋️ SALA PESI</div>
             <div class="card m-border">
                 <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA MASSIMO</button>
+                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
             </div>
             <div class="card l-border">
                 <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA LILIANA</button>
+                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
             </div>
+
+            <div class="time-header">📅 CORSI PALINSESTO</div>
+            <div id="gym-list-m" class="card m-border"></div>
+            <div id="gym-list-l" class="card l-border"></div>
         </div>
 
-        <div id="tab-run" class="tab-content">
-            <div class="time-header">🏃 CORSA E CARDIO</div>
-            <div class="card m-border">
-                <div class="user-title" style="color:var(--massimo)">MASSIMO (KM O MINUTI)</div>
-                <input type="text" id="run-m" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;" oninput="salvaDato(this)">
-            </div>
-            <div class="card l-border">
-                <div class="user-title" style="color:var(--liliana)">LILIANA (ALTRO ALLENAMENTO)</div>
-                <textarea id="run-l" rows="3" oninput="salvaDato(this)" placeholder="Yoga, camminata, etc..."></textarea>
+        <div id="tab-relax" class="tab-content">
+            <div class="time-header">🎵 PLAYLIST</div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="play-m" rows="2" placeholder="Link o nomi brani..." oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="play-l" rows="2" placeholder="Link o nomi brani..." oninput="salvaDato(this)"></textarea></div>
+
+            <div class="time-header">🧘 LEZIONI E RELAX</div>
+            <div class="card" style="border-left: 5px solid var(--relax);">
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 APRI YOGA</button>
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 APRI PILATES</button>
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+italiano','_blank')">🧠 MINDFULNESS</button>
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=relaxing+sounds+nature','_blank')">🌊 SUONI RILASSANTI</button>
             </div>
         </div>
 
@@ -124,11 +140,9 @@
                 <div class="card m-border" style="text-align:center;">MASSIMO (KG)<br><input type="number" id="peso-m" step="0.1" style="width:80%; margin-top:5px;" oninput="salvaDato(this)"></div>
                 <div class="card l-border" style="text-align:center;">LILIANA (KG)<br><input type="number" id="peso-l" step="0.1" style="width:80%; margin-top:5px;" oninput="salvaDato(this)"></div>
             </div>
-
-            <div class="time-header">📝 NOTE E PLAYLIST</div>
+            <div class="time-header">📝 NOTE</div>
             <div class="card m-border"><textarea id="note-m" rows="2" placeholder="Note Massimo..." oninput="salvaDato(this)"></textarea></div>
             <div class="card l-border"><textarea id="note-l" rows="2" placeholder="Note Liliana..." oninput="salvaDato(this)"></textarea></div>
-
             <div class="time-header">📈 RIEPILOGO SETTIMANALE</div>
             <div id="weekly-sum" class="report-summary">Calcolo...</div>
         </div>
@@ -192,11 +206,11 @@
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
             const createList = (u) => corsi.map((c, i) => `<div class="gym-row"><input type="checkbox" ${v['chk-'+u+'-'+i]?'checked':''} onchange="salvaCheckV3(this,'chk-${u}-${i}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`).join("");
-            document.getElementById('gym-list-m').innerHTML = createList('m') || "Nessun corso";
-            document.getElementById('gym-list-l').innerHTML = createList('l') || "Nessun corso";
+            document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b>" + (createList('m') || "<br>Nessun corso");
+            document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b>" + (createList('l') || "<br>Nessun corso");
 
-            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','run-l'];
-            fields.forEach(id => document.getElementById(id).value = v[id] || "");
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','run-l-corsa','cardio-m','cardio-l','altro-m','altro-l','play-m','play-l'];
+            fields.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = v[id] || ""; });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
