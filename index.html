@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v21</title>
+    <title>M&L Wellness Planner v22</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -13,51 +13,41 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--text); overflow-x: hidden; }
         
-        /* Header & Nav */
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 10px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         #week-label { font-weight: 800; color: var(--primary); }
 
-        /* Calendar */
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; padding: 15px; max-width: 900px; margin: auto; }
         .day-dot { background: white; border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; }
-        .day-dot:active { transform: scale(0.95); }
         .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; transform: scale(1.05); }
         .day-dot .num { font-size: 1.6rem; font-weight: 900; }
 
-        /* Modal & Tabs */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 94vh; border-radius: 30px 30px 0 0; display: flex; flex-direction: column; overflow: hidden; }
         
         .modal-header { padding: 20px 20px 10px; flex-shrink: 0; }
         .tab-bar { display: flex; background: #f0f0f0; margin: 0 20px; border-radius: 15px; padding: 4px; flex-shrink: 0; }
-        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; transition: 0.3s; }
+        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .tab-content { flex-grow: 1; overflow-y: auto; padding: 20px; box-sizing: border-box; display: none; }
         .tab-content.active { display: block; }
 
-        /* Cards & UI Elements */
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.7rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; text-transform: uppercase; }
         .card { background: white; border: 1px solid #eee; border-radius: 18px; padding: 12px; margin-bottom: 10px; }
-        .user-label { font-size: 0.65rem; font-weight: 900; margin-bottom: 4px; margin-top: 8px; }
-        .m-text { color: var(--massimo); } .l-text { color: var(--liliana); }
-        .m-border { border-left: 5px solid var(--massimo) !important; } .l-border { border-left: 5px solid var(--liliana) !important; }
+        .user-label { font-size: 0.65rem; font-weight: 900; margin-bottom: 4px; }
         
         textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .split-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .mini-card { padding: 10px; border-radius: 15px; border: 1px solid #eee; }
         .m-bg { background: #e3f2fd; } .l-bg { background: #fce4ec; }
-        .btn-scheda { width: 100%; padding: 8px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); background: white; font-weight: bold; font-size: 0.7rem; cursor: pointer; margin-top: 5px; }
-        .run-input { width: 100%; padding: 6px; border-radius: 8px; border: 1px solid #ddd; text-align: center; font-size: 0.8rem; box-sizing: border-box; margin-top: 5px; }
         
-        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; gap: 10px; }
+        .gym-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; gap: 10px; }
         .gym-check { width: 22px; height: 22px; accent-color: var(--primary); }
-        .playlist-row { background: #191414; color: white; padding: 12px; border-radius: 15px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid transparent; }
+        .instr { font-size: 0.7rem; color: #888; margin-left: auto; font-style: italic; }
 
-        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #img-viewer img { max-width: 100%; max-height: 85%; object-fit: contain; }
+        .report-box { background: #f8f9fa; border-radius: 15px; padding: 15px; margin-top: 10px; border-left: 4px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -83,90 +73,78 @@
         </div>
 
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-cibo')">🍎 DIETA</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-menu')">🍴 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-stats')">📈 STATS</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-report')">📊 REPORT</button>
         </div>
 
-        <div id="tab-cibo" class="tab-content active">
+        <div id="tab-menu" class="tab-content active">
             <div class="time-header">☕ COLAZIONE</div>
             <div class="card">
-                <div class="user-label m-text">MASSIMO</div>
+                <div class="user-label" style="color:var(--massimo)">MASSIMO</div>
                 <textarea id="col-m" class="m-border" rows="1" oninput="salvaDato(this)"></textarea>
-                <div class="user-label l-text">LILIANA</div>
+                <div class="user-label" style="color:var(--liliana); margin-top:8px;">LILIANA</div>
                 <textarea id="col-l" class="l-border" rows="1" oninput="salvaDato(this)"></textarea>
             </div>
             <div class="time-header">🥗 PRANZO</div>
             <div class="card">
-                <div class="user-label m-text">MASSIMO</div>
-                <textarea id="pra-m" class="m-border" rows="2" oninput="salvaDato(this)"></textarea>
-                <div class="user-label l-text">LILIANA</div>
-                <textarea id="pra-l" class="l-border" rows="2" oninput="salvaDato(this)"></textarea>
+                <div class="user-label" style="color:var(--massimo)">MASSIMO</div>
+                <textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea>
+                <div class="user-label" style="color:var(--liliana); margin-top:8px;">LILIANA</div>
+                <textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea>
             </div>
             <div class="time-header">🥩 CENA</div>
             <div class="card">
-                <div class="user-label m-text">MASSIMO</div>
-                <textarea id="cen-m" class="m-border" rows="2" oninput="salvaDato(this)"></textarea>
-                <div class="user-label l-text">LILIANA</div>
-                <textarea id="cen-l" class="l-border" rows="2" oninput="salvaDato(this)"></textarea>
+                <div class="user-label" style="color:var(--massimo)">MASSIMO</div>
+                <textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea>
+                <div class="user-label" style="color:var(--liliana); margin-top:8px;">LILIANA</div>
+                <textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea>
             </div>
         </div>
 
         <div id="tab-gym" class="tab-content">
-            <div class="time-header">👟 CORSI MATTINA</div>
-            <div id="gym-morning" class="card"></div>
+            <div class="time-header">👟 CORSI DEL GIORNO</div>
+            <div id="gym-list" class="card"></div>
 
             <div class="time-header">🏋️ SALA PESI / CORSA</div>
             <div class="split-box">
                 <div class="mini-card m-bg">
-                    <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-m-1" class="sync-check-m" onchange="syncCheck(this, 'm')"> MASSIMO</label>
-                    <button class="btn-scheda" onclick="apriScheda('m')">📋 SCHEDA</button>
-                    <input type="text" id="run-m-1" class="sync-input-m run-input" placeholder="Km/Min" oninput="syncInput(this, 'm')">
+                    <label style="font-size:0.75rem; font-weight:bold;"><input type="checkbox" id="check-pesi-m" class="gym-check" onchange="salvaCheckV3(this)"> MASSIMO</label>
+                    <input type="text" id="run-m" class="run-input" style="width:100%; margin-top:5px; padding:5px; border-radius:5px; border:1px solid #ccc;" placeholder="Km/Min" oninput="salvaDato(this)">
                 </div>
                 <div class="mini-card l-bg">
-                    <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-l-1" class="sync-check-l" onchange="syncCheck(this, 'l')"> LILIANA</label>
-                    <button class="btn-scheda" onclick="apriScheda('l')">📋 SCHEDA</button>
-                    <input type="text" id="run-l-1" class="sync-input-l run-input" placeholder="Km/Min" oninput="syncInput(this, 'l')">
+                    <label style="font-size:0.75rem; font-weight:bold;"><input type="checkbox" id="check-pesi-l" class="gym-check" onchange="salvaCheckV3(this)"> LILIANA</label>
+                    <input type="text" id="run-l" class="run-input" style="width:100%; margin-top:5px; padding:5px; border-radius:5px; border:1px solid #ccc;" placeholder="Km/Min" oninput="salvaDato(this)">
                 </div>
             </div>
-
-            <div class="time-header">👟 CORSI POMERIGGIO / SERA</div>
-            <div id="gym-afternoon" class="card"></div>
+            <button class="btn-nav" style="width:100%" onclick="apriScheda('m')">📋 VEDI SCHEDE TECNICHE</button>
         </div>
 
-        <div id="tab-stats" class="tab-content">
-            <div class="time-header">⚖️ PESO CORPOREO</div>
+        <div id="tab-report" class="tab-content">
+            <div class="time-header">⚖️ PESO E NOTE</div>
             <div class="split-box">
                 <div class="mini-card m-bg">
-                    <div class="user-label m-text">MASSIMO (KG)</div>
-                    <input type="number" id="peso-m" class="run-input" step="0.1" oninput="salvaDato(this)">
+                    <div class="user-label">PESO M (KG)</div>
+                    <input type="number" id="peso-m" style="width:100%;" step="0.1" oninput="salvaDato(this)">
                 </div>
                 <div class="mini-card l-bg">
-                    <div class="user-label l-text">LILIANA (KG)</div>
-                    <input type="number" id="peso-l" class="run-input" step="0.1" oninput="salvaDato(this)">
+                    <div class="user-label">PESO L (KG)</div>
+                    <input type="number" id="peso-l" style="width:100%;" step="0.1" oninput="salvaDato(this)">
                 </div>
             </div>
-
-            <div class="time-header">📝 NOTE GIORNALIERE</div>
-            <textarea id="note-giorno" rows="3" placeholder="Com'è andata oggi?" oninput="salvaDato(this)"></textarea>
-
-            <div class="time-header">♫ PLAYLISTS</div>
-            <div class="playlist-row" style="border-left-color: var(--massimo);">
-                <input type="text" id="pl-m" placeholder="Link Spotify M..." style="background:#333; border:none; color:white; padding:8px; border-radius:10px; width:70%;" oninput="salvaDato(this)">
-                <a id="link-m" href="#" target="_blank" style="color:#1DB954; font-weight:bold; text-decoration:none;">APRI</a>
-            </div>
-            <div class="playlist-row" style="border-left-color: var(--liliana);">
-                <input type="text" id="pl-l" placeholder="Link Spotify L..." style="background:#333; border:none; color:white; padding:8px; border-radius:10px; width:70%;" oninput="salvaDato(this)">
-                <a id="link-l" href="#" target="_blank" style="color:#1DB954; font-weight:bold; text-decoration:none;">APRI</a>
+            <textarea id="note-giorno" rows="3" placeholder="Note sulla giornata..." oninput="salvaDato(this)"></textarea>
+            
+            <div class="report-box" id="weekly-summary">
+                <strong style="color:var(--primary)">RIEPILOGO SETTIMANALE</strong><br>
+                <span style="font-size:0.8rem; color:#666;">I dati vengono aggregati automaticamente dalla cronologia di Firebase.</span>
             </div>
         </div>
 
-        <div style="height:80px"></div>
+        <div style="height:50px"></div>
     </div>
 </div>
 
-<div id="img-viewer">
-    <div style="color:white; padding:20px; cursor:pointer;" onclick="document.getElementById('img-viewer').style.display='none'">CHIUDI [X]</div>
+<div id="img-viewer" onclick="this.style.display='none'">
     <img id="view-src" src="">
 </div>
 
@@ -181,12 +159,12 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Marianna"}, {t:"12:00", c:"Power Functional", i:"Vincenzo"}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"18:00", c:"Aero Dance", i:"Sonia"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Fit Boxe", i:"Vincenzo"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Sonia"}, {t:"10:00", c:"Tone Up", i:"Beppe"}, {t:"11:00", c:"Pilates", i:"Duilio"}, {t:"13:00", c:"Acqua Tone", i:"Marianna"}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"18:00", c:"Tone Up", i:"Beppe"}, {t:"19:00", c:"TRX", i:"Vincenzo"}, {t:"20:00", c:"Walking Tone", i:"Vincenzo"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Duilio"}, {t:"10:00", c:"Tonificazione", i:"Beppe"}, {t:"12:00", c:"Total Body", i:"Vincenzo"}, {t:"15:00", c:"Yoga", i:"Silvia"}, {t:"17:00", c:"Body Sculpture", i:"Vincenzo"}, {t:"18:00", c:"Mobility", i:"Duilio"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:00", c:"Pilates", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Sonia"}, {t:"13:00", c:"Power Yoga", i:"Silvia"}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"18:00", c:"Total Body", i:"Vincenzo"}, {t:"19:00", c:"Latin Moove", i:"Sonia"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G.", i:"Beppe"}, {t:"10:00", c:"Circuit Training", i:"Vincenzo"}, {t:"13:00", c:"Spinning", i:"Beppe"}, {t:"17:00", c:"Yoga", i:"Silvia"}, {t:"18:00", c:"Fit Dance", i:"Sonia"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Silvia"}, {t:"10:00", c:"Tone Up", i:"Beppe"}, {t:"11:00", c:"Mobility", i:"Duilio"}, {t:"12:00", c:"Fit Dance", i:"Sonia"}],
+        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"18:00", c:"Aero Dance", i:"Sonia"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Fit Boxe", i:"Vincenzo"}],
+        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"11:00", c:"Pilates", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Tone Up", i:"Beppe"}, {t:"19:00", c:"TRX", i:"Vincenzo"}, {t:"20:00", c:"Walking Tone", i:"Vincenzo"}],
+        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:00", c:"Tonificazione", i:"Roby"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"17:00", c:"Body Sculpture", i:"Duilio"}, {t:"18:00", c:"Mobility", i:"Duilio"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
+        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Total Body", i:"Vincenzo"}, {t:"19:00", c:"Latin Moove", i:"Sonia"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:00", c:"Circuit Training", i:"Simo"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Fit Dance", i:"Sonia"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
+        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}],
         "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
     };
 
@@ -227,59 +205,29 @@
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
             
-            const morning = corsi.filter(c => parseInt(c.t.split(":")[0]) <= 13);
-            const afternoon = corsi.filter(c => parseInt(c.t.split(":")[0]) > 13);
+            document.getElementById('gym-list').innerHTML = corsi.map((c, idx) => `
+                <div class="gym-row">
+                    <input type="checkbox" class="gym-check" ${v['chk-'+idx]?'checked':''} onchange="salvaCheckV3(this,'chk-${idx}')">
+                    <b>${c.t}</b> <span>${c.c}</span> <span class="instr">${c.i}</span>
+                </div>`).join("") || "Nessun corso previsto";
 
-            const renderCorsi = (lista) => lista.map((c) => {
-                const originalIndex = corsi.indexOf(c);
-                return `<div class="gym-row"><input type="checkbox" class="gym-check" ${v['chk-'+originalIndex]?'checked':''} onchange="salvaCheckV3(this,'chk-${originalIndex}')"><b>${c.t}</b> <span>${c.c}</span></div>`;
-            }).join("") || "Nessun corso";
-
-            document.getElementById('gym-morning').innerHTML = renderCorsi(morning);
-            document.getElementById('gym-afternoon').innerHTML = renderCorsi(afternoon);
-
-            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-giorno','pl-m','pl-l'];
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                el.value = v[id] || "";
-                if(id === 'pl-m') document.getElementById('link-m').href = el.value || "#";
-                if(id === 'pl-l') document.getElementById('link-l').href = el.value || "#";
-            });
-
-            const runM = v['run-m'] || "";
-            const runL = v['run-l'] || "";
-            document.querySelectorAll('.sync-input-m').forEach(i => i.value = runM);
-            document.querySelectorAll('.sync-input-l').forEach(i => i.value = runL);
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-giorno','run-m','run-l'];
+            fields.forEach(id => document.getElementById(id).value = v[id] || "");
             
-            const chkM = v['check-pesi-m'] || false;
-            const chkL = v['check-pesi-l'] || false;
-            document.querySelectorAll('.sync-check-m').forEach(i => i.checked = chkM);
-            document.querySelectorAll('.sync-check-l').forEach(i => i.checked = chkL);
+            document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
+            document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
-    }
-
-    function syncInput(el, user) {
-        const val = el.value;
-        document.querySelectorAll(`.sync-input-${user}`).forEach(i => i.value = val);
-        db.ref(`dailyData/${curKey}/run-${user}`).set(val);
-        statusUpdate();
-    }
-
-    function syncCheck(el, user) {
-        const val = el.checked;
-        document.querySelectorAll(`.sync-check-${user}`).forEach(i => i.checked = val);
-        db.ref(`dailyData/${curKey}/check-pesi-${user}`).set(val);
-        statusUpdate();
     }
 
     function salvaDato(el) { 
         db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); 
-        if(el.id === 'pl-m') document.getElementById('link-m').href = el.value;
-        if(el.id === 'pl-l') document.getElementById('link-l').href = el.value;
         statusUpdate(); 
     }
 
-    function salvaCheckV3(el, customId) { db.ref("dailyData/" + curKey + "/" + (customId || el.id)).set(el.checked); statusUpdate(); }
+    function salvaCheckV3(el, customId) { 
+        db.ref("dailyData/" + curKey + "/" + (customId || el.id)).set(el.checked); 
+        statusUpdate(); 
+    }
 
     function apriScheda(u) {
         const file = u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg";
