@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v7</title>
+    <title>M&L Wellness Planner v8</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -34,18 +34,23 @@
         /* Sezioni Timeline */
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; }
         .card { background: white; border: 1px solid #eee; border-radius: 18px; padding: 12px; margin-bottom: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .user-label { font-size: 0.65rem; font-weight: 900; margin-bottom: 4px; margin-top: 8px; }
+        .m-text { color: var(--massimo); }
+        .l-text { color: var(--liliana); }
         .m-border { border-left: 5px solid var(--massimo) !important; }
         .l-border { border-left: 5px solid var(--liliana) !important; }
         
-        /* Corsi Palestra */
+        /* Corsi Palestra & Checkbox */
         .gym-card { background: #fdf7ff; border: 1px dashed var(--workout); border-radius: 15px; padding: 12px; }
-        .gym-row { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; gap: 12px; }
         .gym-row:last-child { border-bottom: none; }
-        .gym-time { font-weight: 900; color: var(--workout); width: 55px; }
+        .gym-check { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+        .gym-time { font-weight: 900; color: var(--workout); width: 50px; }
+        .gym-text.done { text-decoration: line-through; color: #aaa; }
         .piscina-icon { color: var(--piscina); margin-left: 5px; font-size: 0.8rem; }
 
         /* Input */
-        textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; margin-top: 5px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
+        textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; margin-top: 2px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .weight-row { display: flex; gap: 10px; margin: 10px 0; }
         .weight-box { flex: 1; background: #fff9f0; padding: 10px; border-radius: 15px; text-align: center; border: 1px solid #ffe0b2; }
         .weight-box input { width: 80%; border: 1px solid #ddd; border-radius: 10px; padding: 8px; text-align: center; font-weight: bold; font-size: 1.2rem; }
@@ -78,35 +83,41 @@
         <div class="time-header">🌅 RISVEGLIO E PESO</div>
         <div class="weight-row">
             <div class="weight-box">
-                <div style="font-size:0.6rem; font-weight:900; color:var(--massimo)">PESO MASSIMO</div>
+                <div class="user-label m-text">PESO MASSIMO</div>
                 <input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)">
             </div>
             <div class="weight-box">
-                <div style="font-size:0.6rem; font-weight:900; color:var(--liliana)">PESO LILIANA</div>
+                <div class="user-label l-text">PESO LILIANA</div>
                 <input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)">
             </div>
         </div>
 
         <div class="time-header">☕ COLAZIONE</div>
         <div class="card">
-            <textarea id="col-m" class="m-border" rows="1" placeholder="Colazione Massimo..." oninput="salvaDato(this)"></textarea>
-            <textarea id="col-l" class="l-border" rows="1" placeholder="Colazione Liliana..." oninput="salvaDato(this)"></textarea>
+            <div class="user-label m-text">MASSIMO</div>
+            <textarea id="col-m" class="m-border" rows="1" placeholder="Cosa mangia Massimo?" oninput="salvaDato(this)"></textarea>
+            <div class="user-label l-text">LILIANA</div>
+            <textarea id="col-l" class="l-border" rows="1" placeholder="Cosa mangia Liliana?" oninput="salvaDato(this)"></textarea>
         </div>
         <div id="gym-morning" class="gym-card" style="margin-top:5px"></div>
 
         <div class="time-header">🥗 ORE 13:00 - PRANZO</div>
         <div class="card">
-            <textarea id="pra-m" class="m-border" rows="2" placeholder="Pranzo Massimo..." oninput="salvaDato(this)"></textarea>
-            <textarea id="pra-l" class="l-border" rows="2" placeholder="Pranzo Liliana..." oninput="salvaDato(this)"></textarea>
+            <div class="user-label m-text">MASSIMO</div>
+            <textarea id="pra-m" class="m-border" rows="2" placeholder="Cosa mangia Massimo?" oninput="salvaDato(this)"></textarea>
+            <div class="user-label l-text">LILIANA</div>
+            <textarea id="pra-l" class="l-border" rows="2" placeholder="Cosa mangia Liliana?" oninput="salvaDato(this)"></textarea>
         </div>
 
-        <div class="time-header">👟 CORSI POMERIGGIO (14-20)</div>
+        <div class="time-header">👟 CORSI POMERIGGIO</div>
         <div id="gym-afternoon" class="gym-card"></div>
 
         <div class="time-header">🥩 ORE 20:00 - CENA</div>
         <div class="card">
-            <textarea id="cen-m" class="m-border" rows="2" placeholder="Cena Massimo..." oninput="salvaDato(this)"></textarea>
-            <textarea id="cen-l" class="l-border" rows="2" placeholder="Cena Liliana..." oninput="salvaDato(this)"></textarea>
+            <div class="user-label m-text">MASSIMO</div>
+            <textarea id="cen-m" class="m-border" rows="2" placeholder="Cosa mangia Massimo?" oninput="salvaDato(this)"></textarea>
+            <div class="user-label l-text">LILIANA</div>
+            <textarea id="cen-l" class="l-border" rows="2" placeholder="Cosa mangia Liliana?" oninput="salvaDato(this)"></textarea>
         </div>
 
         <div class="time-header">🌙 DOPO CENA</div>
@@ -135,45 +146,12 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [
-            {t:"09:00", c:"Tone Up (Beppe)", p:"M"}, {t:"10:15", c:"Acqua Fit", p:"M", s:"P"},
-            {t:"12:00", c:"Power & Functional / Acqua Gym", p:"M"},
-            {t:"17:00", c:"Pilates (Duilio)", p:"P"}, {t:"18:00", c:"Aero Dance / Acqua Gym", p:"P"},
-            {t:"19:00", c:"Tone Up / Spinning", p:"P"}, {t:"20:00", c:"Fit Boxe", p:"P"}, // Spostato in pomeriggio (prima di cena)
-            {t:"21:00", c:"Yoga", p:"S"}
-        ],
-        "Martedì": [
-            {t:"09:00", c:"Gym Dance", p:"M"}, {t:"10:00", c:"Tone Up", p:"M"}, {t:"11:00", c:"Pilates", p:"M"},
-            {t:"13:00", c:"Tone Up / Acqua Tone", p:"M"},
-            {t:"14:00", c:"Latin Moove", p:"P"}, {t:"16:00", c:"Acqua Bike", p:"P", s:"P"}, {t:"17:00", c:"Pilates", p:"P"},
-            {t:"18:00", c:"Tone Up", p:"P"}, {t:"19:00", c:"TRX", p:"P"}, {t:"19:15", c:"Acqua Gym", p:"P", s:"P"},
-            {t:"20:00", c:"Walking Tone", p:"P"} // Spostato in pomeriggio
-        ],
-        "Mercoledì": [
-            {t:"09:00", c:"Posturale", p:"M"}, {t:"10:00", c:"Tonificazione", p:"M"}, {t:"10:15", c:"Acqua Strong", p:"M", s:"P"},
-            {t:"12:00", c:"Total Body / Acqua Gym", p:"M"}, {t:"13:00", c:"Total Body", p:"M"},
-            {t:"15:00", c:"Yoga", p:"P"}, {t:"17:00", c:"Body Sculpture", p:"P"}, {t:"18:00", c:"Mobility", p:"P"},
-            {t:"19:00", c:"Tone Up", p:"P"}, {t:"19:30", c:"Acqua Circuit", p:"P", s:"P"},
-            {t:"20:00", c:"Pump", p:"P"} // Spostato in pomeriggio
-        ],
-        "Giovedì": [
-            {t:"09:00", c:"Tone Up", p:"M"}, {t:"10:00", c:"Pilates", p:"M"}, {t:"12:00", c:"Aero Dance", p:"M"},
-            {t:"13:00", c:"Power Yoga", p:"M"}, {t:"17:00", c:"Pilates", p:"P"}, {t:"18:00", c:"Total Body", p:"P"},
-            {t:"19:00", c:"Latin Moove", p:"P"}, {t:"19:15", c:"Acqua Gym", p:"P", s:"P"},
-            {t:"20:00", c:"Body Conditioning", p:"P"}, // Spostato in pomeriggio
-            {t:"20:30", c:"Cross Training", p:"S"}
-        ],
-        "Venerdì": [
-            {t:"09:00", c:"G.A.G.", p:"M"}, {t:"10:00", c:"Circuit Training", p:"M"}, {t:"10:15", c:"Acqua Fit", p:"M", s:"P"},
-            {t:"13:00", c:"Latin Moove / Spinning", p:"M"}, {t:"17:00", c:"Yoga", p:"P"}, {t:"18:00", c:"Fit Dance", p:"P"},
-            {t:"19:00", c:"Tone Up / Acqua Gym", p:"P"},
-            {t:"20:00", c:"Tone Up Light", p:"P"}, // Spostato in pomeriggio
-            {t:"20:30", c:"Cross Training", p:"S"}
-        ],
-        "Sabato": [
-            {t:"09:00", c:"Yoga", p:"M"}, {t:"10:00", c:"Tone Up", p:"M"}, {t:"11:00", c:"Mobility", p:"M"},
-            {t:"12:00", c:"Fit Dance / Acqua Gym", p:"M"}
-        ],
+        "Lunedì": [{t:"09:00", c:"Tone Up (Beppe)", p:"M"}, {t:"10:15", c:"Acqua Fit", p:"M", s:"P"}, {t:"12:00", c:"Power & Functional", p:"M"}, {t:"17:00", c:"Pilates (Duilio)", p:"P"}, {t:"18:00", c:"Aero Dance", p:"P"}, {t:"19:00", c:"Tone Up / Spinning", p:"P"}, {t:"20:00", c:"Fit Boxe", p:"P"}, {t:"21:00", c:"Yoga", p:"S"}],
+        "Martedì": [{t:"09:00", c:"Gym Dance", p:"M"}, {t:"10:00", c:"Tone Up", p:"M"}, {t:"11:00", c:"Pilates", p:"M"}, {t:"13:00", c:"Tone Up / Acqua Tone", p:"M"}, {t:"14:00", c:"Latin Moove", p:"P"}, {t:"16:00", c:"Acqua Bike", p:"P", s:"P"}, {t:"17:00", c:"Pilates", p:"P"}, {t:"18:00", c:"Tone Up", p:"P"}, {t:"19:00", c:"TRX", p:"P"}, {t:"19:15", c:"Acqua Gym", p:"P", s:"P"}, {t:"20:00", c:"Walking Tone", p:"P"}],
+        "Mercoledì": [{t:"09:00", c:"Posturale", p:"M"}, {t:"10:00", c:"Tonificazione", p:"M"}, {t:"10:15", c:"Acqua Strong", p:"M", s:"P"}, {t:"12:00", c:"Total Body", p:"M"}, {t:"13:00", c:"Total Body", p:"M"}, {t:"15:00", c:"Yoga", p:"P"}, {t:"17:00", c:"Body Sculpture", p:"P"}, {t:"18:00", c:"Mobility", p:"P"}, {t:"19:00", c:"Tone Up", p:"P"}, {t:"19:30", c:"Acqua Circuit", p:"P", s:"P"}, {t:"20:00", c:"Pump", p:"P"}],
+        "Giovedì": [{t:"09:00", c:"Tone Up", p:"M"}, {t:"10:00", c:"Pilates", p:"M"}, {t:"12:00", c:"Aero Dance", p:"M"}, {t:"13:00", c:"Power Yoga", p:"M"}, {t:"17:00", c:"Pilates", p:"P"}, {t:"18:00", c:"Total Body", p:"P"}, {t:"19:00", c:"Latin Moove", p:"P"}, {t:"19:15", c:"Acqua Gym", p:"P", s:"P"}, {t:"20:00", c:"Body Conditioning", p:"P"}, {t:"20:30", c:"Cross Training", p:"S"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G.", p:"M"}, {t:"10:00", c:"Circuit Training", p:"M"}, {t:"10:15", c:"Acqua Fit", p:"M", s:"P"}, {t:"13:00", c:"Latin Moove / Spinning", p:"M"}, {t:"17:00", c:"Yoga", p:"P"}, {t:"18:00", c:"Fit Dance", p:"P"}, {t:"19:00", c:"Tone Up / Acqua Gym", p:"P"}, {t:"20:00", c:"Tone Up Light", p:"P"}, {t:"20:30", c:"Cross Training", p:"S"}],
+        "Sabato": [{t:"09:00", c:"Yoga", p:"M"}, {t:"10:00", c:"Tone Up", p:"M"}, {t:"11:00", c:"Mobility", p:"M"}, {t:"12:00", c:"Fit Dance / Acqua Gym", p:"M"}],
         "Domenica": [{t:"10:00", c:"Sala Pesi Libera (fino 14)", p:"M"}]
     };
 
@@ -194,34 +172,43 @@
     }
 
     function apriDettaglio(data) {
-        let giorno = data.toLocaleDateString('it-IT', {weekday:'long'});
-        giorno = giorno.charAt(0).toUpperCase() + giorno.slice(1);
-        const dayKey = giorno.toLowerCase().replace("ì","i");
-        document.getElementById('modal-title').innerText = giorno + " " + data.getDate();
+        let giornoLong = data.toLocaleDateString('it-IT', {weekday:'long'});
+        giornoLong = giornoLong.charAt(0).toUpperCase() + giornoLong.slice(1);
+        
+        // Chiave univoca basata sulla data reale (es: 2026-3-25)
+        const dateKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
+        
+        document.getElementById('modal-title').innerText = giornoLong + " " + data.getDate();
         document.getElementById('modal').style.display = 'flex';
 
-        // Gestione Corsi
-        const corsi = palinsesto[giorno] || [];
-        const fillGym = (id, part) => {
-            const el = document.getElementById(id);
-            const list = corsi.filter(c => c.p === part);
-            el.innerHTML = list.map(c => `
-                <div class="gym-row">
-                    <span class="gym-time">${c.t}</span>
-                    <span>${c.c} ${c.s?'<span class="piscina-icon">💧</span>':''}</span>
-                </div>`).join("") || "Riposo";
-        };
-        fillGym('gym-morning','M'); fillGym('gym-afternoon','P'); fillGym('gym-evening','S');
-
-        // Sincronizzazione Campi
-        const weekKey = "Sett-" + dataInizio.getFullYear() + "-" + (dataInizio.getMonth()+1) + "-" + dataInizio.getDate();
-        const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l', 'pl-url'];
-        
-        db.ref(weekKey + "/" + dayKey).once('value', snapshot => {
+        db.ref("dailyData/" + dateKey).once('value', snapshot => {
             const vals = snapshot.val() || {};
+            
+            // Gestione Corsi
+            const corsi = palinsesto[giornoLong] || [];
+            const fillGym = (id, part) => {
+                const el = document.getElementById(id);
+                const list = corsi.filter(c => c.p === part);
+                el.innerHTML = list.map((c, idx) => {
+                    const checkId = `check-${part}-${idx}`;
+                    const isChecked = vals[checkId] ? 'checked' : '';
+                    const textClass = vals[checkId] ? 'done' : '';
+                    return `
+                        <div class="gym-row">
+                            <input type="checkbox" class="gym-check" ${isChecked} 
+                                   onchange="salvaCheck('${dateKey}', '${checkId}', this)">
+                            <span class="gym-time">${c.t}</span>
+                            <span class="gym-text ${textClass}">${c.c} ${c.s?'<span class="piscina-icon">💧</span>':''}</span>
+                        </div>`;
+                }).join("") || "Riposo";
+            };
+            fillGym('gym-morning','M'); fillGym('gym-afternoon','P'); fillGym('gym-evening','S');
+
+            // Gestione Campi Testo
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l', 'pl-url'];
             fields.forEach(f => {
                 const el = document.getElementById(f);
-                el.dataset.path = weekKey + "/" + dayKey + "/" + f;
+                el.dataset.datekey = dateKey;
                 el.value = vals[f] || "";
                 if(f === 'pl-url') document.getElementById('pl-link').href = el.value || "#";
             });
@@ -229,8 +216,21 @@
     }
 
     function salvaDato(el) {
-        db.ref(el.dataset.path).set(el.value);
+        const path = "dailyData/" + el.dataset.datekey + "/" + el.id;
+        db.ref(path).set(el.value);
         if(el.id === 'pl-url') document.getElementById('pl-link').href = el.value;
+        statusUpdate();
+    }
+
+    function salvaCheck(dateKey, checkId, checkbox) {
+        const path = "dailyData/" + dateKey + "/" + checkId;
+        db.ref(path).set(checkbox.checked);
+        const text = checkbox.nextElementSibling.nextElementSibling;
+        checkbox.checked ? text.classList.add('done') : text.classList.remove('done');
+        statusUpdate();
+    }
+
+    function statusUpdate() {
         document.getElementById('sync-status').innerText = "☁️ SALVATAGGIO...";
         setTimeout(() => document.getElementById('sync-status').innerText = "✅ SINCRO ATTIVA", 600);
     }
@@ -240,5 +240,6 @@
     
     window.onload = renderCalendar;
 </script>
+
 </body>
 </html>
