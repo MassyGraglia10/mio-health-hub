@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Smart Planner v27</title>
+    <title>M&L Smart Planner v28</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --massimo: #2196f3; --liliana: #e91e63;
-            --relax: #9c27b0;
+            --relax: #9c27b0; --spotify: #1DB954;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
@@ -43,6 +43,7 @@
         
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
         .btn-link { background: var(--relax); margin-bottom: 8px; }
+        .btn-spotify { background: var(--spotify); margin-bottom: 8px; }
         .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
     </style>
@@ -50,7 +51,7 @@
 <body>
 
 <div class="header">
-    <h2 style="margin:0; font-size: 1.1rem;">🍱 M&L Smart Planner v27</h2>
+    <h2 style="margin:0; font-size: 1.1rem;">🍱 M&L Smart Planner v28</h2>
     <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO ATTIVA</div>
 </div>
 
@@ -78,33 +79,17 @@
 
         <div id="tab-menu" class="tab-content active">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="4" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="4" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="3" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="pra-m" rows="4" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="pra-l" rows="4" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="pra-m" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="pra-l" rows="3" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="cen-m" rows="4" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="cen-l" rows="4" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="cen-m" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="cen-l" rows="3" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
-            <div class="time-header">🏃 CORSA</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border"><div class="user-title">MASSIMO</div><input type="text" id="run-m" placeholder="Km/min" oninput="salvaDato(this)"></div>
-                <div class="card l-border"><div class="user-title">LILIANA</div><input type="text" id="run-l-corsa" placeholder="Km/min" oninput="salvaDato(this)"></div>
-            </div>
-
-            <div class="time-header">🚴 CARDIO</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border"><div class="user-title">MASSIMO</div><input type="text" id="cardio-m" placeholder="Tipo/Durata" oninput="salvaDato(this)"></div>
-                <div class="card l-border"><div class="user-title">LILIANA</div><input type="text" id="cardio-l" placeholder="Tipo/Durata" oninput="salvaDato(this)"></div>
-            </div>
-
-            <div class="time-header">🧘 ALTRO ALLENAMENTO</div>
-            <div class="card m-border"><div class="user-title">MASSIMO</div><textarea id="altro-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title">LILIANA</div><textarea id="altro-l" rows="2" oninput="salvaDato(this)"></textarea></div>
-
             <div class="time-header">🏋️ SALA PESI</div>
             <div class="card m-border">
                 <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
@@ -118,32 +103,60 @@
             <div class="time-header">📅 CORSI PALINSESTO</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
+
+            <div class="time-header">🏃 CORSA E ALTRO</div>
+            <div class="card m-border">
+                <div class="user-title">MASSIMO - CORSA (Km/min)</div>
+                <input type="text" id="run-m" placeholder="Es: 5km in 25min" oninput="salvaDato(this)">
+                <div class="user-title" style="margin-top:10px;">MASSIMO - ALTRO</div>
+                <textarea id="altro-m" rows="2" placeholder="Note allenamento..." oninput="salvaDato(this)"></textarea>
+            </div>
+            <div class="card l-border">
+                <div class="user-title">LILIANA - ALTRO</div>
+                <textarea id="altro-l" rows="2" placeholder="Note allenamento..." oninput="salvaDato(this)"></textarea>
+            </div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 PLAYLIST</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="play-m" rows="2" placeholder="Link o nomi brani..." oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="play-l" rows="2" placeholder="Link o nomi brani..." oninput="salvaDato(this)"></textarea></div>
+            <div class="time-header">🎵 PLAYLIST SPOTIFY</div>
+            <div class="card m-border">
+                <div class="user-title">LINK PLAYLIST MASSIMO</div>
+                <input type="text" id="play-m" placeholder="Incolla link Spotify..." oninput="salvaDato(this)">
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-m').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY M</button>
+            </div>
+            <div class="card l-border">
+                <div class="user-title">LINK PLAYLIST LILIANA</div>
+                <input type="text" id="play-l" placeholder="Incolla link Spotify..." oninput="salvaDato(this)">
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY L</button>
+            </div>
 
-            <div class="time-header">🧘 LEZIONI E RELAX</div>
+            <div class="time-header">🧘 VIDEO E RELAX</div>
             <div class="card" style="border-left: 5px solid var(--relax);">
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 APRI YOGA</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 APRI PILATES</button>
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 YOGA</button>
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 PILATES</button>
                 <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+italiano','_blank')">🧠 MINDFULNESS</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=relaxing+sounds+nature','_blank')">🌊 SUONI RILASSANTI</button>
             </div>
         </div>
 
         <div id="tab-report" class="tab-content">
-            <div class="time-header">⚖️ PESO DEL MATTINO</div>
+            <div class="time-header">📏 DATI FISICI (ALTREZZA IN CM)</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border" style="text-align:center;">MASSIMO (KG)<br><input type="number" id="peso-m" step="0.1" style="width:80%; margin-top:5px;" oninput="salvaDato(this)"></div>
-                <div class="card l-border" style="text-align:center;">LILIANA (KG)<br><input type="number" id="peso-l" step="0.1" style="width:80%; margin-top:5px;" oninput="salvaDato(this)"></div>
+                <div class="card m-border">M: Altezza<input type="number" id="alt-m" placeholder="cm" oninput="salvaDato(this)"></div>
+                <div class="card l-border">L: Altezza<input type="number" id="alt-l" placeholder="cm" oninput="salvaDato(this)"></div>
             </div>
+            <div class="time-header">⚖️ PESO DEL MATTINO (KG)</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="card m-border"><input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
+                <div class="card l-border"><input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
+            </div>
+            <div class="time-header">📈 INDICE DI MASSA CORPOREA (IMC)</div>
+            <div id="bmi-display" class="report-summary" style="margin-bottom:15px; border-color: var(--relax);">Inserisci peso e altezza...</div>
+            
             <div class="time-header">📝 NOTE</div>
-            <div class="card m-border"><textarea id="note-m" rows="2" placeholder="Note Massimo..." oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="note-l" rows="2" placeholder="Note Liliana..." oninput="salvaDato(this)"></textarea></div>
-            <div class="time-header">📈 RIEPILOGO SETTIMANALE</div>
+            <div class="card m-border"><textarea id="note-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><textarea id="note-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            
+            <div class="time-header">📊 RIEPILOGO SETTIMANALE</div>
             <div id="weekly-sum" class="report-summary">Calcolo...</div>
         </div>
     </div>
@@ -162,12 +175,12 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"19:00", c:"TRX", i:"Vincenzo"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."}],
+        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
+        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"19:00", c:"TRX", i:"Vincenzo"}],
+        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
+        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
+        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}],
         "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
     };
 
@@ -209,16 +222,28 @@
             document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b>" + (createList('m') || "<br>Nessun corso");
             document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b>" + (createList('l') || "<br>Nessun corso");
 
-            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','run-l-corsa','cardio-m','cardio-l','altro-m','altro-l','play-m','play-l'];
+            const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','altro-m','altro-l','play-m','play-l'];
             fields.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = v[id] || ""; });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
     }
 
-    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
+    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); if(el.id.includes('peso') || el.id.includes('alt')) calcolaBMI(); }
     function salvaCheckV3(el, cid) { db.ref("dailyData/" + curKey + "/" + (cid || el.id)).set(el.checked); statusUpdate(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
+
+    function calcolaBMI() {
+        const pm = parseFloat(document.getElementById('peso-m').value);
+        const am = parseFloat(document.getElementById('alt-m').value) / 100;
+        const pl = parseFloat(document.getElementById('peso-l').value);
+        const al = parseFloat(document.getElementById('alt-l').value) / 100;
+        
+        let resM = (pm && am) ? (pm / (am * am)).toFixed(1) : "--";
+        let resL = (pl && al) ? (pl / (al * al)).toFixed(1) : "--";
+        
+        document.getElementById('bmi-display').innerHTML = `<b>MASSIMO IMC:</b> ${resM} | <b>LILIANA IMC:</b> ${resL}`;
+    }
 
     async function generaReportEvoluto() {
         let kmM = 0, corsiM = 0, corsiL = 0, pesiM = 0, pesiL = 0, pM = [], pL = [];
@@ -237,6 +262,7 @@
             <strong>💙 MASSIMO:</strong> ${kmM.toFixed(1)} km | ${corsiM} corsi | ${pesiM} sala. Peso: ${pM.length?pM[pM.length-1]:'--'} (${diff(pM)}kg)<br>
             <strong>💖 LILIANA:</strong> ${corsiL} corsi | ${pesiL} sala. Peso: ${pL.length?pL[pL.length-1]:'--'} (${diff(pL)}kg)
         `;
+        calcolaBMI();
     }
 
     function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
