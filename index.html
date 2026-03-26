@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v17</title>
+    <title>M&L Wellness Planner v18</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -29,7 +29,6 @@
         .m-border { border-left: 5px solid var(--massimo) !important; } .l-border { border-left: 5px solid var(--liliana) !important; }
         textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
         
-        /* Box Split per Palestra/Corsa */
         .split-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .mini-card { padding: 10px; border-radius: 15px; border: 1px solid #eee; }
         .m-bg { background: #e3f2fd; } .l-bg { background: #fce4ec; }
@@ -85,8 +84,19 @@
             <textarea id="col-l" class="l-border" rows="1" oninput="salvaDato(this)"></textarea>
         </div>
 
-        <div class="time-header">👟 CORSI DEL GIORNO</div>
-        <div id="gym-list" class="card"></div>
+        <div class="time-header">👟 CORSI MATTINA (FINO ORE 13)</div>
+        <div id="gym-morning" class="card"></div>
+
+        <div class="time-header">🥗 ORE 13:00 - PRANZO</div>
+        <div class="card">
+            <div class="user-label m-text">MASSIMO</div>
+            <textarea id="pra-m" class="m-border" rows="2" oninput="salvaDato(this)"></textarea>
+            <div class="user-label l-text">LILIANA</div>
+            <textarea id="pra-l" class="l-border" rows="2" oninput="salvaDato(this)"></textarea>
+        </div>
+
+        <div class="time-header">👟 CORSI POMERIGGIO / SERA</div>
+        <div id="gym-afternoon" class="card"></div>
 
         <div class="time-header">🏋️ SALA PESI E CORSA</div>
         <div class="split-box">
@@ -100,14 +110,6 @@
                 <button class="btn-scheda" onclick="apriScheda('l')">📋 SCHEDA</button>
                 <input type="text" id="run-l" class="run-input" placeholder="Corsa (km/min)" oninput="salvaDato(this)">
             </div>
-        </div>
-
-        <div class="time-header">🥗 ORE 13:00 - PRANZO</div>
-        <div class="card">
-            <div class="user-label m-text">MASSIMO</div>
-            <textarea id="pra-m" class="m-border" rows="2" oninput="salvaDato(this)"></textarea>
-            <div class="user-label l-text">LILIANA</div>
-            <textarea id="pra-l" class="l-border" rows="2" oninput="salvaDato(this)"></textarea>
         </div>
 
         <div class="time-header">🥩 ORE 20:00 - CENA</div>
@@ -179,16 +181,25 @@
 
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
-            
-            // Corsi
             const corsi = palinsesto[gL] || [];
-            document.getElementById('gym-list').innerHTML = corsi.map((c, i) => `
-                <div class="gym-row">
-                    <input type="checkbox" class="gym-check" ${v['chk-'+i]?'checked':''} onchange="salvaCheckV3(this,'chk-${i}')">
-                    <b>${c.t}</b> <span>${c.c} <span class="instr">(${c.i})</span></span>
-                </div>`).join("") || "Nessun corso previsto";
+            
+            // Filtro corsi: Mattina (fino alle 12:59) e Pomeriggio (dalle 13:00)
+            const morning = corsi.filter(c => parseInt(c.t.split(":")[0]) < 13);
+            const afternoon = corsi.filter(c => parseInt(c.t.split(":")[0]) >= 13);
 
-            // Campi testo
+            const renderCorsi = (lista) => lista.map((c, i) => {
+                // Cerco l'indice originale per mantenere la sincronia dei checkbox
+                const originalIndex = corsi.indexOf(c);
+                return `
+                <div class="gym-row">
+                    <input type="checkbox" class="gym-check" ${v['chk-'+originalIndex]?'checked':''} onchange="salvaCheckV3(this,'chk-${originalIndex}')">
+                    <b>${c.t}</b> <span>${c.c} <span class="instr">(${c.i})</span></span>
+                </div>`;
+            }).join("") || "Nessun corso previsto";
+
+            document.getElementById('gym-morning').innerHTML = renderCorsi(morning);
+            document.getElementById('gym-afternoon').innerHTML = renderCorsi(afternoon);
+
             const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','run-m','run-l','note-giorno','pl-url'];
             fields.forEach(id => {
                 const el = document.getElementById(id);
@@ -196,14 +207,13 @@
                 if(id === 'pl-url') document.getElementById('pl-link').href = el.value || "#";
             });
             
-            // Checkbox Sala Pesi
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
     }
 
     function apriScheda(u) {
-        const file = u === 'm' ? "Schedamassimo.jpg" : "Schedaliliana.jpg";
+        const file = u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg";
         document.getElementById('view-src').src = file + "?v=" + Date.now();
         document.getElementById('img-viewer').style.display = 'flex';
     }
