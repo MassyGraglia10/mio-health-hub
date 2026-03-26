@@ -13,10 +13,10 @@
             --massimo: #2196f3; --liliana: #e91e63;
             --relax: #9c27b0; --spotify: #1DB954;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
-        .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: var(--text); }
         
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; padding: 12px; max-width: 900px; margin: auto; }
         .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -26,34 +26,33 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 95vh; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; overflow: hidden; }
         
-        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; }
-        .tab-btn { flex: 1; border: none; padding: 12px 5px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; }
+        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; }
+        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .tab-content { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; box-sizing: border-box; }
         .tab-content.active { display: block; }
 
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 15px; display: inline-block; margin: 15px 0 5px; text-transform: uppercase; }
-        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; position: relative; }
+        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
+        .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
-        textarea, input { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; }
-        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.85rem; }
+        textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
+        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
         
-        .btn-view { border: none; padding: 14px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
+        .btn-view { border: none; padding: 12px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
         .btn-link { background: var(--relax); }
         .btn-spotify { background: var(--spotify); }
-        
-        .report-summary { background: #fff; border: 2px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.9rem; text-align: center; }
-        .btn-reset { position: absolute; right: 10px; top: 35px; background: #ff5252; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
+        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h2 style="margin:0; font-size: 1.1rem;">🍱 M&L Smart Planner v32</h2>
-    <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO</div>
+    <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO ATTIVA</div>
 </div>
 
 <div class="nav-bar">
@@ -80,56 +79,60 @@
 
         <div id="tab-menu" class="tab-content active">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border"><textarea id="col-m" rows="2" placeholder="Massimo..." oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="col-l" rows="2" placeholder="Liliana..." oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="3" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border"><textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="pra-m" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="pra-l" rows="3" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border"><textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="cen-m" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="cen-l" rows="3" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">M: SCHEDA</button>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">L: SCHEDA</button>
+            <div class="card m-border">
+                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
+                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
             </div>
-            <div class="time-header">📅 CORSI DEL GIORNO</div>
+            <div class="card l-border">
+                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
+                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
+            </div>
+            <div class="time-header">📅 CORSI PALINSESTO</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 PLAYLIST DIRETTE</div>
+            <div class="time-header">🎵 MUSICA</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
                 <button class="btn-view btn-spotify" onclick="window.open('https://open.spotify.com/playlist/6tWU66NiHF9SF5prLMLqpg?si=L6M59ymATu6ZnyMkf407mQ','_blank')">🎧 SPOTIFY M</button>
                 <button class="btn-view btn-spotify" onclick="window.open('https://open.spotify.com/playlist/6tWU66NiHF9SF5prLMLqpg?si=L6M59ymATu6ZnyMkf407mQ','_blank')">🎧 SPOTIFY L</button>
             </div>
-            <div class="time-header">🧘 CORSI & SUONI</div>
+            <div class="time-header">🧘 RELAX & VIDEO</div>
             <div class="card" style="border-left: 5px solid var(--relax);">
                 <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 YOGA</button>
                 <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 PILATES</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+relax','_blank')">🌊 RUMORE DEL MARE</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata','_blank')">🧠 MEDITAZIONE</button>
+                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+relaxing','_blank')">🌊 RUMORE DEL MARE</button>
             </div>
         </div>
 
         <div id="tab-report" class="tab-content">
-            <div class="time-header">⚖️ PESO E IMC</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-                <div class="card m-border">M: Kg <input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"><button class="btn-reset" onclick="resetPeso('peso-m')">×</button></div>
-                <div class="card l-border">L: Kg <input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"><button class="btn-reset" onclick="resetPeso('peso-l')">×</button></div>
+            <div class="time-header">📏 MISURE</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="card m-border">M: Peso <input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"> Alt (cm) <input type="number" id="alt-m" oninput="salvaDato(this)"></div>
+                <div class="card l-border">L: Peso <input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"> Alt (cm) <input type="number" id="alt-l" oninput="salvaDato(this)"></div>
             </div>
-            <div id="bmi-display" class="report-summary">Inserisci i dati...</div>
-            <div class="time-header">📊 ANDAMENTO SETTIMANALE</div>
+            <div class="time-header">📈 ANALISI IMC</div>
+            <div id="bmi-display" class="report-summary">Calcolo...</div>
+            <div class="time-header">📊 TREND PESO</div>
             <div class="card"><canvas id="weightChart"></canvas></div>
         </div>
     </div>
 </div>
 
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height:90%;"></div>
+<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height:80%;"></div>
 
 <script>
     const firebaseConfig = {
@@ -174,48 +177,47 @@
         let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
         document.getElementById('modal-title').innerText = gL + " " + data.getDate();
         document.getElementById('modal').style.display = 'flex';
-        db.ref("dailyData/" + curKey).once('value', snap => {
-            const v = snap.val() || {};
+        db.ref("dailyData/" + curKey).once('value', snapshot => {
+            const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
-            const createList = (u) => corsi.map((c, i) => `<div class="gym-row"><input type="checkbox" ${v['chk-'+u+'-'+i]?'checked':''} onchange="salvaCheck(this,'chk-${u}-${i}')"><b style="margin-left:8px">${c.t}</b> - ${c.c}</div>`).join("");
-            document.getElementById('gym-list-m').innerHTML = "<b>MASSIMO:</b>" + (createList('m') || "<br>Libero");
-            document.getElementById('gym-list-l').innerHTML = "<b>LILIANA:</b>" + (createList('l') || "<br>Libero");
-            ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = v[id] || ""; });
+            const createList = (u) => corsi.map((c, i) => `<div class="gym-row"><input type="checkbox" ${v['chk-'+u+'-'+i]?'checked':''} onchange="salvaCheckV3(this,'chk-${u}-${i}')"><b>${c.t}</b> ${c.c}</div>`).join("");
+            document.getElementById('gym-list-m').innerHTML = "<b>MASSIMO:</b>" + createList('m');
+            document.getElementById('gym-list-l').innerHTML = "<b>LILIANA:</b>" + createList('l');
+            const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l'];
+            fields.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = v[id] || ""; });
+            document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
+            document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
             calcolaBMI();
         });
     }
 
-    function resetPeso(id) {
-        document.getElementById(id).value = "";
-        salvaDato(document.getElementById(id));
-    }
-
-    function openTab(evt, tabId) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
-        evt.currentTarget.classList.add("active");
-        if(tabId === 'tab-report') generaReport();
-    }
-
-    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); if(el.id.includes('peso')) calcolaBMI(); }
-    function salvaCheck(el, cid) { db.ref("dailyData/" + curKey + "/" + cid).set(el.checked); statusUpdate(); }
-    function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
+    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); if(el.id.includes('peso') || el.id.includes('alt')) calcolaBMI(); }
+    function salvaCheckV3(el, cid) { db.ref("dailyData/" + curKey + "/" + (cid || el.id)).set(el.checked); statusUpdate(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
 
     function calcolaBMI() {
         const pm = parseFloat(document.getElementById('peso-m').value);
+        const am = parseFloat(document.getElementById('alt-m').value) / 100;
         const pl = parseFloat(document.getElementById('peso-l').value);
-        const am = 175, al = 165; 
-        const getStatus = (v) => v < 18.5 ? "Sottopeso 🔵" : v < 25 ? "Regolare 🟢" : v < 30 ? "Sovrappeso 🟡" : "Obeso 🔴";
-        let resM = pm ? (pm / ((am/100)*(am/100))).toFixed(1) : "--";
-        let resL = pl ? (pl / ((al/100)*(al/100))).toFixed(1) : "--";
-        document.getElementById('bmi-display').innerHTML = `<b>M:</b> ${resM} (${getStatus(resM)}) | <b>L:</b> ${resL} (${getStatus(resL)})`;
+        const al = parseFloat(document.getElementById('alt-l').value) / 100;
+        
+        const getLabel = (v) => {
+            if (!v || isNaN(v)) return "--";
+            if (v < 18.5) return v + " (Sottopeso 🔵)";
+            if (v < 25) return v + " (Peso Regolare 🟢)";
+            if (v < 30) return v + " (Sovrappeso 🟡)";
+            return v + " (Obeso 🔴)";
+        };
+
+        let imcM = (pm && am) ? (pm / (am * am)).toFixed(1) : null;
+        let imcL = (pl && al) ? (pl / (al * al)).toFixed(1) : null;
+        
+        document.getElementById('bmi-display').innerHTML = `<b>MASSIMO:</b> ${getLabel(imcM)}<br><b>LILIANA:</b> ${getLabel(imcL)}`;
     }
 
-    async function generaReport() {
+    async function generaReportEvoluto() {
         let labels = [], pM = [], pL = [];
         for(let i=0; i<7; i++){
             let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
@@ -227,11 +229,21 @@
         if(myChart) myChart.destroy();
         myChart = new Chart(document.getElementById('weightChart'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: 'M', data: pM, borderColor: '#2196f3', tension: 0.3 }, { label: 'L', data: pL, borderColor: '#e91e63', tension: 0.3 }] },
-            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+            data: { labels: labels, datasets: [{ label: 'M', data: pM, borderColor: '#2196f3' }, { label: 'L', data: pL, borderColor: '#e91e63' }] },
+            options: { responsive: true, plugins: { legend: { display: false } } }
         });
+        calcolaBMI();
     }
 
+    function openTab(evt, tabId) {
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+        if(tabId === 'tab-report') generaReportEvoluto();
+    }
+
+    function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
     window.onload = renderCalendar;
 </script>
 </body>
