@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v11</title>
+    <title>M&L Wellness Planner v12</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -34,22 +34,22 @@
         .gym-card { background: #fdf7ff; border: 1px dashed var(--workout); border-radius: 15px; padding: 12px; }
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; gap: 12px; }
         .gym-row:last-child { border-bottom: none; }
-        .extra-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #eee; margin-top: 5px; flex-wrap: wrap; }
-        .gym-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
-        .gym-time { font-weight: 900; color: var(--workout); width: 50px; }
-        .gym-text.done { text-decoration: line-through; color: #aaa; }
-        .instr { font-size: 0.75rem; color: #777; font-style: italic; margin-left: 4px; }
+        
+        /* Nuova Sezione Sala Pesi Divisa */
+        .split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid #eee; margin-top: 5px; }
+        .user-box-gym { padding: 8px; border-radius: 12px; display: flex; flex-direction: column; gap: 5px; }
+        .box-m { background: #e3f2fd; border: 1px solid #bbdefb; }
+        .box-l { background: #fce4ec; border: 1px solid #f8bbd0; }
+        
+        .gym-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); }
+        .run-input, .scheda-url { border: 1px solid #ddd; border-radius: 8px; padding: 4px; font-size: 0.75rem; width: 100%; box-sizing: border-box; }
+        .btn-scheda { display: inline-block; text-align: center; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 5px; text-decoration: none; font-size: 0.8rem; font-weight: bold; color: #555; }
+        .btn-scheda.active { background: var(--primary); color: white; border-color: var(--primary); }
+
         textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; margin-top: 2px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .weight-row { display: flex; gap: 10px; margin: 10px 0; }
         .weight-box { flex: 1; background: #fff9f0; padding: 10px; border-radius: 15px; text-align: center; border: 1px solid #ffe0b2; }
-        .weight-box input, .run-input, .scheda-url { border: 1px solid #ddd; border-radius: 8px; padding: 5px; text-align: center; font-weight: bold; }
-        .weight-box input { width: 80%; font-size: 1.2rem; }
-        .run-input { width: 45px; font-size: 0.8rem; }
-        .scheda-url { width: 100px; font-size: 0.6rem; font-weight: normal; }
-        .btn-scheda { text-decoration: none; font-size: 1.3rem; filter: grayscale(1); transition: 0.2s; padding: 5px; }
-        .btn-scheda.active { filter: grayscale(0); }
-        .playlist-area { background: #191414; color: white; padding: 15px; border-radius: 20px; margin-top: 25px; display: flex; align-items: center; justify-content: space-between; }
-        .spotify-link { background: #1DB954; color: white; text-decoration: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
+        .weight-box input { width: 80%; border: 1px solid #ddd; border-radius: 8px; padding: 5px; text-align: center; font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -115,16 +115,9 @@
         <div class="time-header">🌙 DOPO CENA</div>
         <div id="gym-evening" class="gym-card"></div>
 
-        <div class="time-header">📝 NOTE DEL GIORNO</div>
-        <textarea id="note-giorno" rows="3" placeholder="Note extra, obiettivi..." oninput="salvaDato(this)"></textarea>
+        <div class="time-header">📝 NOTE</div>
+        <textarea id="note-giorno" rows="2" oninput="salvaDato(this)"></textarea>
 
-        <div class="playlist-area">
-            <div>
-                <div style="font-size: 0.8rem; font-weight: bold;">MUSICA ALLENAMENTO</div>
-                <input type="text" id="pl-url" placeholder="Link Spotify..." style="background:#333; border:none; color:white; padding:5px; border-radius:5px; font-size:0.7rem; width:150px; margin-top:5px" oninput="salvaDato(this)">
-            </div>
-            <a id="pl-link" href="#" target="_blank" class="spotify-link">APRI ORA</a>
-        </div>
         <div style="height:50px"></div>
     </div>
 </div>
@@ -140,12 +133,12 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"10:15", c:"Acqua Fit", i:"Marianna", p:"M", s:"P"}, {t:"12:00", c:"Power Functional", i:"Vincenzo", p:"M"}, {t:"17:00", c:"Pilates", i:"Duilio", p:"P"}, {t:"18:00", c:"Aero Dance", i:"Sonia", p:"P"}, {t:"19:00", c:"Spinning", i:"Beppe", p:"P"}, {t:"20:00", c:"Fit Boxe", i:"Vincenzo", p:"P"}, {t:"21:00", c:"Yoga", i:"Silvia", p:"S"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Sonia", p:"M"}, {t:"10:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"11:00", c:"Pilates", i:"Duilio", p:"M"}, {t:"13:00", c:"Acqua Tone", i:"Marianna", p:"M", s:"P"}, {t:"14:00", c:"Latin Moove", i:"Sonia", p:"P"}, {t:"16:00", c:"Acqua Bike", i:"Marianna", p:"P", s:"P"}, {t:"17:00", c:"Pilates", i:"Duilio", p:"P"}, {t:"18:00", c:"Tone Up", i:"Beppe", p:"P"}, {t:"19:00", c:"TRX", i:"Vincenzo", p:"P"}, {t:"19:15", c:"Acqua Gym", i:"Marianna", p:"P", s:"P"}, {t:"20:00", c:"Walking Tone", i:"Vincenzo", p:"P"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Duilio", p:"M"}, {t:"10:00", c:"Tonificazione", i:"Beppe", p:"M"}, {t:"10:15", c:"Acqua Strong", i:"Marianna", p:"M", s:"P"}, {t:"12:00", c:"Total Body", i:"Vincenzo", p:"M"}, {t:"13:00", c:"Total Body", i:"Vincenzo", p:"M"}, {t:"15:00", c:"Yoga", i:"Silvia", p:"P"}, {t:"17:00", c:"Body Sculpture", i:"Vincenzo", p:"P"}, {t:"18:00", c:"Mobility", i:"Duilio", p:"P"}, {t:"19:00", c:"Tone Up", i:"Beppe", p:"P"}, {t:"19:30", c:"Acqua Circuit", i:"Marianna", p:"P", s:"P"}, {t:"20:00", c:"Pump", i:"Vincenzo", p:"P"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"10:00", c:"Pilates", i:"Duilio", p:"M"}, {t:"12:00", c:"Aero Dance", i:"Sonia", p:"M"}, {t:"13:00", c:"Power Yoga", i:"Silvia", p:"M"}, {t:"17:00", c:"Pilates", i:"Duilio", p:"P"}, {t:"18:00", c:"Total Body", i:"Vincenzo", p:"P"}, {t:"19:00", c:"Latin Moove", i:"Sonia", p:"P"}, {t:"19:15", c:"Acqua Gym", i:"Marianna", p:"P", s:"P"}, {t:"20:00", c:"Body Cond.", i:"Beppe", p:"P"}, {t:"20:30", c:"Cross Training", i:"Vincenzo", p:"S"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G.", i:"Beppe", p:"M"}, {t:"10:00", c:"Circuit Training", i:"Vincenzo", p:"M"}, {t:"10:15", c:"Acqua Fit", i:"Marianna", p:"M", s:"P"}, {t:"13:00", c:"Spinning", i:"Beppe", p:"M"}, {t:"17:00", c:"Yoga", i:"Silvia", p:"P"}, {t:"18:00", c:"Fit Dance", i:"Sonia", p:"P"}, {t:"19:00", c:"Tone Up", i:"Beppe", p:"P"}, {t:"20:00", c:"Tone Up Light", i:"Beppe", p:"P"}, {t:"20:30", c:"Cross Training", i:"Vincenzo", p:"S"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Silvia", p:"M"}, {t:"10:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"11:00", c:"Mobility", i:"Duilio", p:"M"}, {t:"12:00", c:"Fit Dance", i:"Sonia", p:"M"}],
+        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"10:15", c:"Acqua Fit", i:"Francy", p:"M", s:"P"}, {t:"12:00", c:"Power & Func.", i:"Giorgio R.", p:"M"}],
+        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe", p:"M"}, {t:"10:00", c:"Tone Up", i:"Duilio", p:"M"}],
+        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby", p:"M"}, {t:"10:00", c:"Tonificazione", i:"Roby", p:"M"}],
+        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio", p:"M"}, {t:"10:00", c:"Pilates", i:"Giuseppe", p:"M"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Super Simo", p:"M"}, {t:"10:00", c:"Circuit", i:"Super Simo", p:"M"}],
+        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo", p:"M"}, {t:"10:00", c:"Tone Up", i:"Giancarlo", p:"M"}],
         "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff", p:"M"}]
     };
 
@@ -184,47 +177,44 @@
                     return `<div class="gym-row">
                         <input type="checkbox" class="gym-check" ${vals[checkId]?'checked':''} onchange="salvaCheck('${dateKey}','${checkId}',this)">
                         <span class="gym-time">${c.t}</span>
-                        <span class="gym-text ${vals[checkId]?'done':''}">${c.c}<span class="instr">(${c.i})</span> ${c.s?'💧':''}</span>
+                        <span class="gym-text ${vals[checkId]?'done':''}">${c.c} <small>(${c.i})</small></span>
                     </div>`;
                 }).join("");
 
                 if(part !== 'S') {
-                    // Scheda Massimo (quella che mi hai inviato)
-                    const urlM = vals[`url-m-${part}`] || 'https://raw.githubusercontent.com/massimograglia/miomenu/main/Schedamassimo.jpg'; 
-                    const urlL = vals[`url-l-${part}`] || '';
                     html += `
-                    <div class="extra-row">
-                        <input type="checkbox" class="gym-check" id="pesi-${part}" ${vals['pesi-'+part]?'checked':''} onchange="salvaCheck('${dateKey}','pesi-${part}',this)">
-                        <span style="font-size:0.8rem; font-weight:bold; color:var(--primary); margin-right:10px;">SALA PESI</span>
-                        
-                        <a href="${urlM}" target="_blank" id="btn-m-${part}" class="btn-scheda active">📋🟦</a>
-                        <input type="text" class="scheda-url" id="url-m-${part}" placeholder="Link Massimo" value="${urlM}" oninput="aggiornaLink(this, '${part}', 'm')">
-                        
-                        <a href="${urlL||'#'}" target="_blank" id="btn-l-${part}" class="btn-scheda ${urlL?'active':''}">📋🟥</a>
-                        <input type="text" class="scheda-url" id="url-l-${part}" placeholder="Link Liliana" value="${urlL}" oninput="aggiornaLink(this, '${part}', 'l')">
-                    </div>
-                    <div class="extra-row">
-                        <span style="font-size:0.8rem; font-weight:bold; color:#f57c00">CORSA:</span>
-                        <input type="number" class="run-input" id="km-${part}" placeholder="Km" value="${vals['km-'+part]||''}" oninput="salvaDato(this)">
-                        <input type="number" class="run-input" id="min-${part}" placeholder="Min" value="${vals['min-'+part]||''}" oninput="salvaDato(this)">
+                    <div class="split-row">
+                        <div class="user-box-gym box-m">
+                            <div class="user-label m-text" style="margin:0">MASSIMO</div>
+                            <label style="font-size:0.7rem"><input type="checkbox" ${vals['p-m-'+part]?'checked':''} onchange="salvaCheck('${dateKey}','p-m-${part}',this)"> Sala Pesi</label>
+                            <input type="text" class="run-input" placeholder="Km/Min Corsa" value="${vals['r-m-'+part]||''}" id="r-m-${part}" oninput="salvaDato(this)">
+                            <a href="${vals['u-m']||'#'}" target="_blank" class="btn-scheda ${vals['u-m']?'active':''}" id="link-m">APRI SCHEDA</a>
+                            <input type="text" class="scheda-url" placeholder="Incolla Link..." value="${vals['u-m']||''}" id="u-m" oninput="aggiornaLink(this, 'm')">
+                        </div>
+                        <div class="user-box-gym box-l">
+                            <div class="user-label l-text" style="margin:0">LILIANA</div>
+                            <label style="font-size:0.7rem"><input type="checkbox" ${vals['p-l-'+part]?'checked':''} onchange="salvaCheck('${dateKey}','p-l-${part}',this)"> Sala Pesi</label>
+                            <input type="text" class="run-input" placeholder="Km/Min Corsa" value="${vals['r-l-'+part]||''}" id="r-l-${part}" oninput="salvaDato(this)">
+                            <a href="${vals['u-l']||'#'}" target="_blank" class="btn-scheda ${vals['u-l']?'active':''}" id="link-l">APRI SCHEDA</a>
+                            <input type="text" class="scheda-url" placeholder="Incolla Link..." value="${vals['u-l']||''}" id="u-l" oninput="aggiornaLink(this, 'l')">
+                        </div>
                     </div>`;
                 }
                 el.innerHTML = html || "Riposo";
             };
             fillGym('gym-morning','M'); fillGym('gym-afternoon','P'); fillGym('gym-evening','S');
 
-            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','pl-url','note-giorno'];
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-giorno'];
             fields.forEach(f => {
-                const el = document.getElementById(f);
-                el.dataset.datekey = dateKey;
-                el.value = vals[f] || "";
-                if(f === 'pl-url') document.getElementById('pl-link').href = el.value || "#";
+                const fieldEl = document.getElementById(f);
+                fieldEl.dataset.datekey = dateKey;
+                fieldEl.value = vals[f] || "";
             });
         });
     }
 
-    function aggiornaLink(el, part, user) {
-        const btn = document.getElementById(`btn-${user}-${part}`);
+    function aggiornaLink(el, user) {
+        const btn = document.getElementById(`link-${user}`);
         btn.href = el.value || "#";
         el.value ? btn.classList.add('active') : btn.classList.remove('active');
         const refKey = document.querySelector('[data-datekey]').dataset.datekey;
@@ -233,18 +223,13 @@
     }
 
     function salvaDato(el) {
-        const path = "dailyData/" + el.dataset.datekey + "/" + el.id;
-        db.ref(path).set(el.value);
-        if(el.id === 'pl-url') document.getElementById('pl-link').href = el.value;
+        const refKey = el.dataset.datekey || document.querySelector('[data-datekey]').dataset.datekey;
+        db.ref("dailyData/" + refKey + "/" + el.id).set(el.value);
         statusUpdate();
     }
 
     function salvaCheck(dateKey, checkId, checkbox) {
         db.ref("dailyData/" + dateKey + "/" + checkId).set(checkbox.checked);
-        const text = checkbox.nextElementSibling.nextElementSibling;
-        if(text && text.classList.contains('gym-text')) {
-            checkbox.checked ? text.classList.add('done') : text.classList.remove('done');
-        }
         statusUpdate();
     }
 
