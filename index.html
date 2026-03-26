@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v35</title>
+    <title>Massy e Lilly v36</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -48,6 +48,11 @@
         .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
         .imc-legend { font-size: 0.65rem; margin-top: 8px; color: #777; line-height: 1.2; }
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        
+        /* Stile aggiuntivo per le frecce nel modal */
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 0; }
+        .modal-nav { display: flex; align-items: center; gap: 15px; }
+        .btn-nav-sm { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -67,9 +72,13 @@
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <div style="padding: 15px 20px 0;">
-            <span style="float:right; font-size:1.5rem; color:#ccc; cursor:pointer" onclick="chiudi()">×</span>
-            <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.2rem;"></h2>
+        <div class="modal-header">
+            <div class="modal-nav">
+                <button class="btn-nav-sm" onclick="navigaGiorno(-1)">◀</button>
+                <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.2rem; min-width: 110px; text-align: center;"></h2>
+                <button class="btn-nav-sm" onclick="navigaGiorno(1)">▶</button>
+            </div>
+            <span style="font-size:1.8rem; color:#ccc; cursor:pointer; line-height: 1;" onclick="chiudi()">×</span>
         </div>
 
         <div class="tab-bar">
@@ -126,8 +135,8 @@
                 <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-m').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY MASSY</button>
             </div>
             <div class="card l-border">
-                <input type="text" id="play-l" value="https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg" oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 APRI SPOTIFY LILLY</button>
+                <input type="text" id="play-l" oninput="salvaDato(this)">
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY LILLY</button>
             </div>
             <div class="time-header">🧘 VIDEO GUIDATI</div>
             <div class="card" style="border-left: 5px solid var(--relax);">
@@ -186,6 +195,7 @@
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
+    let dataCorrenteVisualizzata = new Date(); // Supporto navigazione modal
     let myChart = null;
 
     function openTab(evt, tabId) {
@@ -210,9 +220,13 @@
     }
 
     function apriDettaglio(data) {
-        curKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + data.getDate();
+        dataCorrenteVisualizzata = new Date(data);
+        curKey = `${dataCorrenteVisualizzata.getFullYear()}-${dataCorrenteVisualizzata.getMonth()+1}-${dataCorrenteVisualizzata.getDate()}`;
+        
+        let gL = dataCorrenteVisualizzata.toLocaleDateString('it-IT', {weekday:'long'}); 
+        gL = gL.charAt(0).toUpperCase() + gL.slice(1);
+        
+        document.getElementById('modal-title').innerText = gL + " " + dataCorrenteVisualizzata.getDate();
         document.getElementById('modal').style.display = 'flex';
 
         db.ref("dailyData/" + curKey).once('value', snapshot => {
@@ -225,9 +239,8 @@
             const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','altro-m','altro-l','play-m','play-l'];
             fields.forEach(id => { 
                 if(document.getElementById(id)) {
-                    // Logica specifica per Lilly: se è vuoto, metti il link predefinito
                     if(id === 'play-l' && !v[id]) {
-                        document.getElementById(id).value = "https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg";
+                        document.getElementById(id).value = "https://open.spotify.com";
                     } else {
                         document.getElementById(id).value = v[id] || "";
                     }
@@ -235,7 +248,16 @@
             });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
+            
+            // Aggiorna BMI se siamo nel tab report
+            if(document.getElementById('tab-report').classList.contains('active')) calcolaBMI();
         });
+    }
+
+    // Funzione per navigare nel modal senza chiuderlo
+    function navigaGiorno(n) {
+        dataCorrenteVisualizzata.setDate(dataCorrenteVisualizzata.getDate() + n);
+        apriDettaglio(new Date(dataCorrenteVisualizzata));
     }
 
     function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); if(el.id.includes('peso') || el.id.includes('alt')) calcolaBMI(); }
