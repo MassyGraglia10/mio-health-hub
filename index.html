@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v13</title>
+    <title>M&L Wellness Planner v14</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -11,51 +11,45 @@
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --workout: #9c27b0; --massimo: #2196f3; --liliana: #e91e63;
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--text); }
-        .header { text-align: center; background: var(--primary); color: white; padding: 15px; position: sticky; top:0; z-index:100; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--text); overflow-x: hidden; }
+        .header { text-align: center; background: var(--primary); color: white; padding: 15px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #eee; }
-        .btn-nav { background: #eee; border: none; padding: 10px 18px; border-radius: 12px; font-weight: bold; }
+        .btn-nav { background: #eee; border: none; padding: 10px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         
-        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; padding: 15px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; padding: 15px; max-width: 900px; margin: auto; }
         .day-dot { background: white; border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; }
+        .day-dot .num { font-size: 1.6rem; font-weight: 900; }
+        .day-dot .label { font-size: 0.7rem; font-weight: bold; color: #999; text-transform: uppercase; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: flex-end; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 94vh; border-radius: 30px 30px 0 0; padding: 20px; overflow-y: auto; box-sizing: border-box; }
         
-        .section-box { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .time-header { font-size: 0.8rem; font-weight: 800; color: #78909c; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Stile Tabelle Utenti */
-        .user-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .user-col { border-radius: 15px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .col-m { background: #e3f2fd; border: 1px solid #bbdefb; }
-        .col-l { background: #fce4ec; border: 1px solid #f8bbd0; }
-
-        /* Pulsanti e Input */
-        .btn-action { width: 100%; padding: 10px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-m { background: var(--massimo); color: white; }
-        .btn-l { background: var(--liliana); color: white; }
-        .input-run { width: 100%; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 8px; box-sizing: border-box; font-weight: bold; text-align: center; }
+        .time-header { background: #eceff1; color: #546e7a; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; width: auto; }
         
-        /* Checkbox grandi per facilità d'uso */
-        .check-container { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
-        input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); }
+        /* Box Sala Pesi e Corsa */
+        .user-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .user-box { padding: 12px; border-radius: 18px; display: flex; flex-direction: column; gap: 8px; }
+        .box-m { background: #e3f2fd; border: 1px solid #bbdefb; }
+        .box-l { background: #fce4ec; border: 1px solid #f8bbd0; }
+        
+        .btn-view-scheda { background: white; border: 1px solid rgba(0,0,0,0.1); padding: 8px; border-radius: 10px; font-weight: bold; font-size: 0.75rem; cursor: pointer; color: var(--text); }
+        .input-run { border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 8px; font-size: 0.8rem; text-align: center; width: 100%; box-sizing: border-box; }
 
-        /* Visualizzatore Scheda */
-        #viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; flex-direction: column; }
-        #viewer img { width: 100%; height: 90%; object-fit: contain; }
-        .close-viewer { color: white; padding: 20px; text-align: right; font-size: 1.5rem; font-weight: bold; }
+        /* Visualizzatore Immagine */
+        #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #img-viewer img { max-width: 95%; max-height: 80%; border-radius: 10px; }
+        .close-viewer { color: white; font-weight: bold; padding: 20px; cursor: pointer; font-size: 1.2rem; }
 
-        .gym-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        textarea { width: 100%; border: 1px solid #eee; border-radius: 10px; padding: 10px; font-family: inherit; margin-top: 5px; }
+        textarea { width: 100%; border: 1px solid #eee; border-radius: 12px; padding: 10px; font-family: inherit; margin-top: 5px; box-sizing: border-box; }
+        .gym-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h2 style="margin:0;">M&L Wellness v13</h2>
-    <div id="sync-status" style="font-size: 0.6rem;">● SINCRO ATTIVA</div>
+    <h2 style="margin:0; font-size: 1.4rem;">M&L Wellness v14</h2>
+    <div id="sync-status" style="font-size: 0.6rem; font-weight: bold; margin-top: 4px;">● SINCRO ATTIVA</div>
 </div>
 
 <div class="nav-bar">
@@ -68,55 +62,52 @@
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <span style="float:right; font-size:2rem; color:#ccc;" onclick="chiudi()">×</span>
-        <h2 id="modal-title" style="color:var(--primary); margin-top:0;"></h2>
-
-        <div class="time-header">📅 CORSI DEL GIORNO</div>
-        <div class="section-box" id="corsi-list"></div>
+        <span style="float:right; font-size:2rem; cursor:pointer" onclick="chiudi()">×</span>
+        <h2 id="modal-title" style="margin:0; color:var(--primary);"></h2>
 
         <div class="time-header">🏋️ SALA PESI</div>
-        <div class="section-box">
-            <div class="user-grid">
-                <div class="user-col col-m">
-                    <div class="check-container"><input type="checkbox" id="p-m" onchange="salvaCheck(this)"> MASSIMO</div>
-                    <button class="btn-action btn-m" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
-                </div>
-                <div class="user-col col-l">
-                    <div class="check-container"><input type="checkbox" id="p-l" onchange="salvaCheck(this)"> LILIANA</div>
-                    <button class="btn-action btn-l" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
-                </div>
+        <div class="user-grid">
+            <div class="user-box box-m">
+                <label style="font-weight:bold; font-size:0.8rem;"><input type="checkbox" id="check-p-m" onchange="salvaCheck(this)"> MASSIMO</label>
+                <button class="btn-view-scheda" onclick="apriImmagine('m')">📋 VEDI SCHEDA</button>
+            </div>
+            <div class="user-box box-l">
+                <label style="font-weight:bold; font-size:0.8rem;"><input type="checkbox" id="check-p-l" onchange="salvaCheck(this)"> LILIANA</label>
+                <button class="btn-view-scheda" onclick="apriImmagine('l')">📋 VEDI SCHEDA</button>
             </div>
         </div>
 
         <div class="time-header">🏃 CORSA / CARDIO</div>
-        <div class="section-box">
-            <div class="user-grid">
-                <div class="user-col col-m">
-                    <span style="font-size:0.7rem; font-weight:bold;">MASSIMO</span>
-                    <input type="text" id="r-m" class="input-run" placeholder="Km / Min" oninput="salvaDato(this)">
-                </div>
-                <div class="user-col col-l">
-                    <span style="font-size:0.7rem; font-weight:bold;">LILIANA</span>
-                    <input type="text" id="r-l" class="input-run" placeholder="Km / Min" oninput="salvaDato(this)">
-                </div>
+        <div class="user-grid">
+            <div class="user-box box-m">
+                <span style="font-size:0.6rem; font-weight:bold;">KM / MIN MASSIMO</span>
+                <input type="text" id="run-m" class="input-run" placeholder="es: 5km / 30m" oninput="salvaDato(this)">
+            </div>
+            <div class="user-box box-l">
+                <span style="font-size:0.6rem; font-weight:bold;">KM / MIN LILIANA</span>
+                <input type="text" id="run-l" class="input-run" placeholder="es: 3km / 20m" oninput="salvaDato(this)">
             </div>
         </div>
 
-        <div class="time-header">🍱 ALIMENTAZIONE</div>
-        <div class="section-box">
-            <div class="user-label m-text">PRANZO</div>
-            <textarea id="pra-m" rows="2" placeholder="Massimo..." oninput="salvaDato(this)"></textarea>
-            <div class="user-label l-text" style="margin-top:10px;">CENA</div>
-            <textarea id="cen-m" rows="2" placeholder="Cosa mangiamo stasera?" oninput="salvaDato(this)"></textarea>
+        <div class="time-header">👟 CORSI DEL GIORNO</div>
+        <div id="corsi-oggi" style="background:#fff; padding:10px; border-radius:15px; border:1px solid #eee;"></div>
+
+        <div class="time-header">🥗 ALIMENTAZIONE</div>
+        <div style="background:#fff; padding:12px; border-radius:15px; border:1px solid #eee;">
+            <span style="font-size:0.7rem; font-weight:bold; color:var(--massimo)">PRANZO</span>
+            <textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea>
+            <div style="margin-top:10px"></div>
+            <span style="font-size:0.7rem; font-weight:bold; color:var(--liliana)">CENA</span>
+            <textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea>
         </div>
         
-        <div style="height:40px"></div>
+        <div style="height:50px"></div>
     </div>
 </div>
 
-<div id="viewer">
-    <div class="close-viewer" onclick="document.getElementById('viewer').style.display='none'">CHIUDI [X]</div>
-    <img id="scheda-img" src="" alt="Caricamento...">
+<div id="img-viewer">
+    <div class="close-viewer" onclick="document.getElementById('img-viewer').style.display='none'">CHIUDI [X]</div>
+    <img id="scheda-img" src="">
 </div>
 
 <script>
@@ -129,14 +120,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Link alle immagini caricate (qui usiamo quelle che hai fornito)
-    const schede = {
-        m: "https://raw.githubusercontent.com/massimograglia/miomenu/main/Schedamassimo.jpg", // Sostituisci con link definitivo
-        l: "" // Link scheda Liliana
+    // Link pre-impostato per Massimo
+    const linkSchede = {
+        m: "https://raw.githubusercontent.com/massimograglia/miomenu/main/Schedamassimo.jpg",
+        l: "" // Qui puoi mettere quella di Liliana
     };
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up"}, {t:"10:15", c:"Acqua Fit"}, {t:"12:00", c:"Power Func."}],
+        "Lunedì": [{t:"09:00", c:"Tone Up"}, {t:"10:15", c:"Acqua Fit"}, {t:"12:00", c:"Power & Func."}],
         "Martedì": [{t:"09:00", c:"Gym Dance"}, {t:"10:00", c:"Tone Up"}],
         "Mercoledì": [{t:"09:00", c:"Posturale"}, {t:"10:00", c:"Tonificazione"}],
         "Giovedì": [{t:"09:00", c:"Tone Up"}, {t:"10:00", c:"Pilates"}],
@@ -147,7 +138,7 @@
 
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
-    let currentKey = "";
+    let activeKey = "";
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
@@ -156,44 +147,46 @@
             let dot = document.createElement('div');
             dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''}`;
             dot.onclick = () => apriDettaglio(new Date(d));
-            dot.innerHTML = `<span style="font-size:0.7rem;">${d.toLocaleDateString('it-IT',{weekday:'short'})}</span><span style="font-size:1.5rem; font-weight:900;">${d.getDate()}</span>`;
+            dot.innerHTML = `<span class="label">${d.toLocaleDateString('it-IT',{weekday:'short'})}</span><span class="num">${d.getDate()}</span>`;
             grid.appendChild(dot);
         }
         document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
     }
 
     function apriDettaglio(data) {
-        currentKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        let giorno = data.toLocaleDateString('it-IT', {weekday:'long'});
-        document.getElementById('modal-title').innerText = giorno.charAt(0).toUpperCase() + giorno.slice(1) + " " + data.getDate();
+        activeKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
+        let giornoLong = data.toLocaleDateString('it-IT', {weekday:'long'});
+        giornoLong = giornoLong.charAt(0).toUpperCase() + giornoLong.slice(1);
+        document.getElementById('modal-title').innerText = giornoLong + " " + data.getDate();
         document.getElementById('modal').style.display = 'flex';
 
         // Carica Corsi
-        const corsi = palinsesto[giorno.charAt(0).toUpperCase() + giorno.slice(1)] || [];
-        document.getElementById('corsi-list').innerHTML = corsi.map(c => `<div class="gym-row"><span>${c.t}</span><b>${c.c}</b></div>`).join("") || "Nessun corso oggi";
+        const corsi = palinsesto[giornoLong] || [];
+        document.getElementById('corsi-oggi').innerHTML = corsi.map(c => `<div class="gym-row"><span>${c.t}</span><b>${c.c}</b></div>`).join("") || "Nessun corso";
 
-        // Carica Dati Firebase
-        db.ref("dailyData/" + currentKey).once('value', snapshot => {
+        // Carica dati da Firebase
+        db.ref("dailyData/" + activeKey).once('value', snapshot => {
             const v = snapshot.val() || {};
-            document.getElementById('p-m').checked = v['p-m'] || false;
-            document.getElementById('p-l').checked = v['p-l'] || false;
-            document.getElementById('r-m').value = v['r-m'] || "";
-            document.getElementById('r-l').value = v['r-l'] || "";
+            document.getElementById('check-p-m').checked = v['check-p-m'] || false;
+            document.getElementById('check-p-l').checked = v['check-p-l'] || false;
+            document.getElementById('run-m').value = v['run-m'] || "";
+            document.getElementById('run-l').value = v['run-l'] || "";
             document.getElementById('pra-m').value = v['pra-m'] || "";
             document.getElementById('cen-m').value = v['cen-m'] || "";
         });
     }
 
-    function apriScheda(user) {
-        if (!schede[user]) { alert("Scheda non ancora caricata!"); return; }
-        document.getElementById('scheda-img').src = schede[user];
-        document.getElementById('viewer').style.display = 'flex';
+    function apriImmagine(user) {
+        const src = linkSchede[user];
+        if(!src) { alert("Scheda non disponibile"); return; }
+        document.getElementById('scheda-img').src = src;
+        document.getElementById('img-viewer').style.display = 'flex';
     }
 
-    function salvaDato(el) { db.ref("dailyData/" + currentKey + "/" + el.id).set(el.value); status(); }
-    function salvaCheck(el) { db.ref("dailyData/" + currentKey + "/" + el.id).set(el.checked); status(); }
+    function salvaDato(el) { db.ref("dailyData/" + activeKey + "/" + el.id).set(el.value); statusUpdate(); }
+    function salvaCheck(el) { db.ref("dailyData/" + activeKey + "/" + el.id).set(el.checked); statusUpdate(); }
     
-    function status() {
+    function statusUpdate() {
         document.getElementById('sync-status').innerText = "☁️ SALVATAGGIO...";
         setTimeout(() => document.getElementById('sync-status').innerText = "✅ SINCRO ATTIVA", 600);
     }
