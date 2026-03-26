@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v8</title>
+    <title>M&L Wellness Planner v9</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -13,25 +13,17 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 15px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        /* Navigazione Settimane */
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 10px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         #week-label { font-weight: 800; color: var(--primary); }
-
-        /* Griglia Calendario */
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; padding: 15px; max-width: 900px; margin: auto; }
         .day-dot { background: white; border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; transform: scale(1.05); }
         .day-dot .num { font-size: 1.6rem; font-weight: 900; margin-top: 5px; }
         .day-dot .label { font-size: 0.7rem; font-weight: bold; color: #999; text-transform: uppercase; }
-
-        /* Popup */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(8px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 94vh; border-radius: 30px 30px 0 0; padding: 20px; overflow-y: auto; box-sizing: border-box; }
         .close-btn { float: right; font-size: 2.5rem; color: #ccc; cursor: pointer; line-height: 1; }
-
-        /* Sezioni Timeline */
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; }
         .card { background: white; border: 1px solid #eee; border-radius: 18px; padding: 12px; margin-bottom: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .user-label { font-size: 0.65rem; font-weight: 900; margin-bottom: 4px; margin-top: 8px; }
@@ -39,23 +31,20 @@
         .l-text { color: var(--liliana); }
         .m-border { border-left: 5px solid var(--massimo) !important; }
         .l-border { border-left: 5px solid var(--liliana) !important; }
-        
-        /* Corsi Palestra & Checkbox */
         .gym-card { background: #fdf7ff; border: 1px dashed var(--workout); border-radius: 15px; padding: 12px; }
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; gap: 12px; }
         .gym-row:last-child { border-bottom: none; }
+        .extra-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid #eee; margin-top: 5px; }
         .gym-check { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
         .gym-time { font-weight: 900; color: var(--workout); width: 50px; }
         .gym-text.done { text-decoration: line-through; color: #aaa; }
-        .piscina-icon { color: var(--piscina); margin-left: 5px; font-size: 0.8rem; }
-
-        /* Input */
+        .instr { font-size: 0.75rem; color: #777; font-style: italic; margin-left: 4px; }
         textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; margin-top: 2px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .weight-row { display: flex; gap: 10px; margin: 10px 0; }
         .weight-box { flex: 1; background: #fff9f0; padding: 10px; border-radius: 15px; text-align: center; border: 1px solid #ffe0b2; }
-        .weight-box input { width: 80%; border: 1px solid #ddd; border-radius: 10px; padding: 8px; text-align: center; font-weight: bold; font-size: 1.2rem; }
-
-        /* Social / Playlist */
+        .weight-box input, .run-input { border: 1px solid #ddd; border-radius: 8px; padding: 5px; text-align: center; font-weight: bold; }
+        .weight-box input { width: 80%; font-size: 1.2rem; }
+        .run-input { width: 45px; font-size: 0.8rem; }
         .playlist-area { background: #191414; color: white; padding: 15px; border-radius: 20px; margin-top: 25px; display: flex; align-items: center; justify-content: space-between; }
         .spotify-link { background: #1DB954; color: white; text-decoration: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
     </style>
@@ -95,18 +84,18 @@
         <div class="time-header">☕ COLAZIONE</div>
         <div class="card">
             <div class="user-label m-text">MASSIMO</div>
-            <textarea id="col-m" class="m-border" rows="1" placeholder="Cosa mangia Massimo?" oninput="salvaDato(this)"></textarea>
+            <textarea id="col-m" class="m-border" rows="1" oninput="salvaDato(this)"></textarea>
             <div class="user-label l-text">LILIANA</div>
-            <textarea id="col-l" class="l-border" rows="1" placeholder="Cosa mangia Liliana?" oninput="salvaDato(this)"></textarea>
+            <textarea id="col-l" class="l-border" rows="1" oninput="salvaDato(this)"></textarea>
         </div>
         <div id="gym-morning" class="gym-card" style="margin-top:5px"></div>
 
         <div class="time-header">🥗 ORE 13:00 - PRANZO</div>
         <div class="card">
             <div class="user-label m-text">MASSIMO</div>
-            <textarea id="pra-m" class="m-border" rows="2" placeholder="Cosa mangia Massimo?" oninput="salvaDato(this)"></textarea>
+            <textarea id="pra-m" class="m-border" rows="2" oninput="salvaDato(this)"></textarea>
             <div class="user-label l-text">LILIANA</div>
-            <textarea id="pra-l" class="l-border" rows="2" placeholder="Cosa mangia Liliana?" oninput="salvaDato(this)"></textarea>
+            <textarea id="pra-l" class="l-border" rows="2" oninput="salvaDato(this)"></textarea>
         </div>
 
         <div class="time-header">👟 CORSI POMERIGGIO</div>
@@ -115,22 +104,24 @@
         <div class="time-header">🥩 ORE 20:00 - CENA</div>
         <div class="card">
             <div class="user-label m-text">MASSIMO</div>
-            <textarea id="cen-m" class="m-border" rows="2" placeholder="Cosa mangia Massimo?" oninput="salvaDato(this)"></textarea>
+            <textarea id="cen-m" class="m-border" rows="2" oninput="salvaDato(this)"></textarea>
             <div class="user-label l-text">LILIANA</div>
-            <textarea id="cen-l" class="l-border" rows="2" placeholder="Cosa mangia Liliana?" oninput="salvaDato(this)"></textarea>
+            <textarea id="cen-l" class="l-border" rows="2" oninput="salvaDato(this)"></textarea>
         </div>
 
         <div class="time-header">🌙 DOPO CENA</div>
         <div id="gym-evening" class="gym-card"></div>
 
+        <div class="time-header">📝 NOTE DEL GIORNO</div>
+        <textarea id="note-giorno" rows="3" placeholder="Note extra, umore, obiettivi..." oninput="salvaDato(this)"></textarea>
+
         <div class="playlist-area">
             <div>
                 <div style="font-size: 0.8rem; font-weight: bold;">MUSICA ALLENAMENTO</div>
-                <input type="text" id="pl-url" placeholder="Incolla link Spotify..." style="background:#333; border:none; color:white; padding:5px; border-radius:5px; font-size:0.7rem; width:150px; margin-top:5px" oninput="salvaDato(this)">
+                <input type="text" id="pl-url" placeholder="Link Spotify..." style="background:#333; border:none; color:white; padding:5px; border-radius:5px; font-size:0.7rem; width:150px; margin-top:5px" oninput="salvaDato(this)">
             </div>
             <a id="pl-link" href="#" target="_blank" class="spotify-link">APRI ORA</a>
         </div>
-
         <div style="height:50px"></div>
     </div>
 </div>
@@ -146,13 +137,13 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up (Beppe)", p:"M"}, {t:"10:15", c:"Acqua Fit", p:"M", s:"P"}, {t:"12:00", c:"Power & Functional", p:"M"}, {t:"17:00", c:"Pilates (Duilio)", p:"P"}, {t:"18:00", c:"Aero Dance", p:"P"}, {t:"19:00", c:"Tone Up / Spinning", p:"P"}, {t:"20:00", c:"Fit Boxe", p:"P"}, {t:"21:00", c:"Yoga", p:"S"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", p:"M"}, {t:"10:00", c:"Tone Up", p:"M"}, {t:"11:00", c:"Pilates", p:"M"}, {t:"13:00", c:"Tone Up / Acqua Tone", p:"M"}, {t:"14:00", c:"Latin Moove", p:"P"}, {t:"16:00", c:"Acqua Bike", p:"P", s:"P"}, {t:"17:00", c:"Pilates", p:"P"}, {t:"18:00", c:"Tone Up", p:"P"}, {t:"19:00", c:"TRX", p:"P"}, {t:"19:15", c:"Acqua Gym", p:"P", s:"P"}, {t:"20:00", c:"Walking Tone", p:"P"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", p:"M"}, {t:"10:00", c:"Tonificazione", p:"M"}, {t:"10:15", c:"Acqua Strong", p:"M", s:"P"}, {t:"12:00", c:"Total Body", p:"M"}, {t:"13:00", c:"Total Body", p:"M"}, {t:"15:00", c:"Yoga", p:"P"}, {t:"17:00", c:"Body Sculpture", p:"P"}, {t:"18:00", c:"Mobility", p:"P"}, {t:"19:00", c:"Tone Up", p:"P"}, {t:"19:30", c:"Acqua Circuit", p:"P", s:"P"}, {t:"20:00", c:"Pump", p:"P"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", p:"M"}, {t:"10:00", c:"Pilates", p:"M"}, {t:"12:00", c:"Aero Dance", p:"M"}, {t:"13:00", c:"Power Yoga", p:"M"}, {t:"17:00", c:"Pilates", p:"P"}, {t:"18:00", c:"Total Body", p:"P"}, {t:"19:00", c:"Latin Moove", p:"P"}, {t:"19:15", c:"Acqua Gym", p:"P", s:"P"}, {t:"20:00", c:"Body Conditioning", p:"P"}, {t:"20:30", c:"Cross Training", p:"S"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G.", p:"M"}, {t:"10:00", c:"Circuit Training", p:"M"}, {t:"10:15", c:"Acqua Fit", p:"M", s:"P"}, {t:"13:00", c:"Latin Moove / Spinning", p:"M"}, {t:"17:00", c:"Yoga", p:"P"}, {t:"18:00", c:"Fit Dance", p:"P"}, {t:"19:00", c:"Tone Up / Acqua Gym", p:"P"}, {t:"20:00", c:"Tone Up Light", p:"P"}, {t:"20:30", c:"Cross Training", p:"S"}],
-        "Sabato": [{t:"09:00", c:"Yoga", p:"M"}, {t:"10:00", c:"Tone Up", p:"M"}, {t:"11:00", c:"Mobility", p:"M"}, {t:"12:00", c:"Fit Dance / Acqua Gym", p:"M"}],
-        "Domenica": [{t:"10:00", c:"Sala Pesi Libera (fino 14)", p:"M"}]
+        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"10:15", c:"Acqua Fit", i:"Marianna", p:"M", s:"P"}, {t:"12:00", c:"Power Functional", i:"Vincenzo", p:"M"}, {t:"17:00", c:"Pilates", i:"Duilio", p:"P"}, {t:"18:00", c:"Aero Dance", i:"Sonia", p:"P"}, {t:"19:00", c:"Spinning", i:"Beppe", p:"P"}, {t:"20:00", c:"Fit Boxe", i:"Vincenzo", p:"P"}, {t:"21:00", c:"Yoga", i:"Silvia", p:"S"}],
+        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Sonia", p:"M"}, {t:"10:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"11:00", c:"Pilates", i:"Duilio", p:"M"}, {t:"13:00", c:"Acqua Tone", i:"Marianna", p:"M", s:"P"}, {t:"14:00", c:"Latin Moove", i:"Sonia", p:"P"}, {t:"16:00", c:"Acqua Bike", i:"Marianna", p:"P", s:"P"}, {t:"17:00", c:"Pilates", i:"Duilio", p:"P"}, {t:"18:00", c:"Tone Up", i:"Beppe", p:"P"}, {t:"19:00", c:"TRX", i:"Vincenzo", p:"P"}, {t:"19:15", c:"Acqua Gym", i:"Marianna", p:"P", s:"P"}, {t:"20:00", c:"Walking Tone", i:"Vincenzo", p:"P"}],
+        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Duilio", p:"M"}, {t:"10:00", c:"Tonificazione", i:"Beppe", p:"M"}, {t:"10:15", c:"Acqua Strong", i:"Marianna", p:"M", s:"P"}, {t:"12:00", c:"Total Body", i:"Vincenzo", p:"M"}, {t:"13:00", c:"Total Body", i:"Vincenzo", p:"M"}, {t:"15:00", c:"Yoga", i:"Silvia", p:"P"}, {t:"17:00", c:"Body Sculpture", i:"Vincenzo", p:"P"}, {t:"18:00", c:"Mobility", i:"Duilio", p:"P"}, {t:"19:00", c:"Tone Up", i:"Beppe", p:"P"}, {t:"19:30", c:"Acqua Circuit", i:"Marianna", p:"P", s:"P"}, {t:"20:00", c:"Pump", i:"Vincenzo", p:"P"}],
+        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"10:00", c:"Pilates", i:"Duilio", p:"M"}, {t:"12:00", c:"Aero Dance", i:"Sonia", p:"M"}, {t:"13:00", c:"Power Yoga", i:"Silvia", p:"M"}, {t:"17:00", c:"Pilates", i:"Duilio", p:"P"}, {t:"18:00", c:"Total Body", i:"Vincenzo", p:"P"}, {t:"19:00", c:"Latin Moove", i:"Sonia", p:"P"}, {t:"19:15", c:"Acqua Gym", i:"Marianna", p:"P", s:"P"}, {t:"20:00", c:"Body Cond.", i:"Beppe", p:"P"}, {t:"20:30", c:"Cross Training", i:"Vincenzo", p:"S"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G.", i:"Beppe", p:"M"}, {t:"10:00", c:"Circuit Training", i:"Vincenzo", p:"M"}, {t:"10:15", c:"Acqua Fit", i:"Marianna", p:"M", s:"P"}, {t:"13:00", c:"Spinning", i:"Beppe", p:"M"}, {t:"17:00", c:"Yoga", i:"Silvia", p:"P"}, {t:"18:00", c:"Fit Dance", i:"Sonia", p:"P"}, {t:"19:00", c:"Tone Up", i:"Beppe", p:"P"}, {t:"20:00", c:"Tone Up Light", i:"Beppe", p:"P"}, {t:"20:30", c:"Cross Training", i:"Vincenzo", p:"S"}],
+        "Sabato": [{t:"09:00", c:"Yoga", i:"Silvia", p:"M"}, {t:"10:00", c:"Tone Up", i:"Beppe", p:"M"}, {t:"11:00", c:"Mobility", i:"Duilio", p:"M"}, {t:"12:00", c:"Fit Dance", i:"Sonia", p:"M"}],
+        "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff", p:"M"}]
     };
 
     let dataInizio = new Date();
@@ -174,38 +165,43 @@
     function apriDettaglio(data) {
         let giornoLong = data.toLocaleDateString('it-IT', {weekday:'long'});
         giornoLong = giornoLong.charAt(0).toUpperCase() + giornoLong.slice(1);
-        
-        // Chiave univoca basata sulla data reale (es: 2026-3-25)
         const dateKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        
         document.getElementById('modal-title').innerText = giornoLong + " " + data.getDate();
         document.getElementById('modal').style.display = 'flex';
 
         db.ref("dailyData/" + dateKey).once('value', snapshot => {
             const vals = snapshot.val() || {};
             
-            // Gestione Corsi
-            const corsi = palinsesto[giornoLong] || [];
             const fillGym = (id, part) => {
                 const el = document.getElementById(id);
+                const corsi = palinsesto[giornoLong] || [];
                 const list = corsi.filter(c => c.p === part);
-                el.innerHTML = list.map((c, idx) => {
+                let html = list.map((c, idx) => {
                     const checkId = `check-${part}-${idx}`;
-                    const isChecked = vals[checkId] ? 'checked' : '';
-                    const textClass = vals[checkId] ? 'done' : '';
-                    return `
-                        <div class="gym-row">
-                            <input type="checkbox" class="gym-check" ${isChecked} 
-                                   onchange="salvaCheck('${dateKey}', '${checkId}', this)">
-                            <span class="gym-time">${c.t}</span>
-                            <span class="gym-text ${textClass}">${c.c} ${c.s?'<span class="piscina-icon">💧</span>':''}</span>
-                        </div>`;
-                }).join("") || "Riposo";
+                    return `<div class="gym-row">
+                        <input type="checkbox" class="gym-check" ${vals[checkId]?'checked':''} onchange="salvaCheck('${dateKey}','${checkId}',this)">
+                        <span class="gym-time">${c.t}</span>
+                        <span class="gym-text ${vals[checkId]?'done':''}">${c.c}<span class="instr">(${c.i})</span> ${c.s?'💧':''}</span>
+                    </div>`;
+                }).join("");
+
+                if(part !== 'S') {
+                    html += `
+                    <div class="extra-row">
+                        <input type="checkbox" class="gym-check" id="pesi-${part}" ${vals['pesi-'+part]?'checked':''} onchange="salvaCheck('${dateKey}','pesi-${part}',this)">
+                        <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">SALA PESI</span>
+                    </div>
+                    <div class="extra-row">
+                        <span style="font-size:0.8rem; font-weight:bold; color:#f57c00">CORSA:</span>
+                        <input type="number" class="run-input" id="km-${part}" placeholder="Km" value="${vals['km-'+part]||''}" oninput="salvaDato(this)">
+                        <input type="number" class="run-input" id="min-${part}" placeholder="Min" value="${vals['min-'+part]||''}" oninput="salvaDato(this)">
+                    </div>`;
+                }
+                el.innerHTML = html || "Riposo";
             };
             fillGym('gym-morning','M'); fillGym('gym-afternoon','P'); fillGym('gym-evening','S');
 
-            // Gestione Campi Testo
-            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l', 'pl-url'];
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','pl-url','note-giorno'];
             fields.forEach(f => {
                 const el = document.getElementById(f);
                 el.dataset.datekey = dateKey;
@@ -223,10 +219,11 @@
     }
 
     function salvaCheck(dateKey, checkId, checkbox) {
-        const path = "dailyData/" + dateKey + "/" + checkId;
-        db.ref(path).set(checkbox.checked);
+        db.ref("dailyData/" + dateKey + "/" + checkId).set(checkbox.checked);
         const text = checkbox.nextElementSibling.nextElementSibling;
-        checkbox.checked ? text.classList.add('done') : text.classList.remove('done');
+        if(text && text.classList.contains('gym-text')) {
+            checkbox.checked ? text.classList.add('done') : text.classList.remove('done');
+        }
         statusUpdate();
     }
 
@@ -237,9 +234,7 @@
 
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
-    
     window.onload = renderCalendar;
 </script>
-
 </body>
 </html>
