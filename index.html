@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v35</title>
+    <title>Massy e Lilly v36</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -39,14 +39,13 @@
         .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
         textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
-        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
-        .instr { font-size: 0.65rem; color: #aaa; margin-left: auto; font-style: italic; }
-        
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
-        .btn-link { background: var(--relax); margin-bottom: 8px; }
         .btn-spotify { background: var(--spotify); margin-bottom: 8px; }
-        .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
-        .imc-legend { font-size: 0.65rem; margin-top: 8px; color: #777; line-height: 1.2; }
+        
+        /* Stile Lista Spesa */
+        .spesa-container { background: #fffbe6; border: 2px dashed #ffe58f; border-radius: 15px; padding: 15px; margin-top: 10px; display: none; }
+        .spesa-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid #fff1b8; font-size: 0.9rem; text-transform: capitalize; }
+        
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
@@ -80,6 +79,13 @@
         </div>
 
         <div id="tab-menu" class="tab-content active">
+            <button class="btn-view" style="background:#ff9800; margin-bottom:15px;" onclick="generaSpesa()">🛒 GENERA LISTA SPESA SETTIMANALE</button>
+            
+            <div id="box-spesa" class="spesa-container">
+                <h3 style="margin:0 0 10px 0; font-size:0.9rem;">🍏 COSA COMPRARE QUESTA SETTIMANA:</h3>
+                <div id="lista-spesa-corpo"></div>
+            </div>
+
             <div class="time-header">☕ COLAZIONE</div>
             <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="3" oninput="salvaDato(this)"></textarea></div>
             <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="3" oninput="salvaDato(this)"></textarea></div>
@@ -93,30 +99,10 @@
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
-            </div>
-            <div class="card l-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
-            </div>
-
-            <div class="time-header">📅 CORSI PALINSESTO COMPLETO</div>
+            <div class="card m-border"><label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label></div>
+            <div class="card l-border"><label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label></div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
-
-            <div class="time-header">🏃 ATTIVITÀ EXTRA</div>
-            <div class="card m-border">
-                <div class="user-title">MASSIMO - CORSA (Km/min)</div>
-                <input type="text" id="run-m" placeholder="Es: 10km in 50min" oninput="salvaDato(this)">
-                <div class="user-title" style="margin-top:10px;">MASSIMO - ALTRO</div>
-                <textarea id="altro-m" rows="2" placeholder="Note extra..." oninput="salvaDato(this)"></textarea>
-            </div>
-            <div class="card l-border">
-                <div class="user-title">LILIANA - ALTRO</div>
-                <textarea id="altro-l" rows="2" placeholder="Note extra..." oninput="salvaDato(this)"></textarea>
-            </div>
         </div>
 
         <div id="tab-relax" class="tab-content">
@@ -129,39 +115,18 @@
                 <input type="text" id="play-l" value="https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg" oninput="salvaDato(this)">
                 <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 APRI SPOTIFY LILLY</button>
             </div>
-            <div class="time-header">🧘 VIDEO GUIDATI</div>
-            <div class="card" style="border-left: 5px solid var(--relax);">
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 YOGA</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 PILATES</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+italiano','_blank')">🧠 MEDITAZIONE</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+relaxing','_blank')">🌊 RUMORE DEL MARE</button>
-            </div>
         </div>
 
         <div id="tab-report" class="tab-content">
             <div class="time-header">⚖️ DATI FISICI</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border">M: Peso (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)">M: Alt (cm)<input type="number" id="alt-m" oninput="salvaDato(this)"></div>
-                <div class="card l-border">L: Peso (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)">L: Alt (cm)<input type="number" id="alt-l" oninput="salvaDato(this)"></div>
+                <div class="card m-border">Peso M<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
+                <div class="card l-border">Peso L<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
             </div>
-
-            <div class="time-header">📈 INDICE DI MASSA CORPOREA (IMC)</div>
-            <div id="bmi-display" class="report-summary">Calcolo...</div>
-            <div class="imc-legend">
-                🔵 < 18.5: Sottopeso | 🟢 18.5-24.9: Regolare | 🟡 25-29.9: Sovrappeso | 🔴 > 30: Obesità
-            </div>
-
-            <div class="time-header">📊 ANDAMENTO PESO (7gg)</div>
-            <div class="card"><canvas id="weightChart"></canvas></div>
-            
-            <div class="time-header">📝 NOTE</div>
-            <div class="card m-border"><textarea id="note-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="note-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div id="bmi-display" class="card" style="text-align:center; font-size:0.8rem;">...</div>
         </div>
     </div>
 </div>
-
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height:80%;"></div>
 
 <script>
     const firebaseConfig = {
@@ -173,27 +138,53 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"19:00", c:"TRX", i:"Vincenzo"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Fit Boxe", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."}],
-        "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
-    };
-
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
-    let myChart = null;
 
-    function openTab(evt, tabId) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
-        evt.currentTarget.classList.add("active");
-        if(tabId === 'tab-report') generaReportEvoluto();
+    // Funzione Intelligente Lista Spesa
+    async function generaSpesa() {
+        const box = document.getElementById('box-spesa');
+        const corpo = document.getElementById('lista-spesa-corpo');
+        box.style.display = 'block';
+        corpo.innerHTML = "Analisi menù in corso...";
+
+        let ingredientiRaw = [];
+        const stopWords = ["olio", "sale", "pepe", "caffe", "caffè", "zucchero", "acqua", "e", "con", "di", "per", "un", "una", "a", "in"];
+
+        // Recuperiamo tutti i dati della settimana corrente
+        for(let i=0; i<7; i++){
+            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
+            let k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+            const snap = await db.ref("dailyData/" + k).once('value');
+            const v = snap.val() || {};
+            
+            // Uniamo i testi di pranzo e cena di entrambi
+            const testoGiorno = `${v['pra-m']||''} ${v['pra-l']||''} ${v['cen-m']||''} ${v['cen-l']||''}`;
+            // Pulizia base: togliamo virgole e andiamo a capo, rendiamo minuscolo
+            const parole = testoGiorno.toLowerCase().replace(/[,.\n]/g, " ").split(" ");
+            ingredientiRaw.push(...parole);
+        }
+
+        // Pulizia Intelligente
+        let listaPulita = ingredientiRaw
+            .map(p => p.trim())
+            .filter(p => p.length > 2) // via parole troppo corte
+            .filter(p => !stopWords.includes(p)) // via olio, sale, etc.
+            .filter(p => isNaN(p)); // via numeri (grammi, etc)
+
+        // Rimuovi Duplicati
+        let setSpesa = [...new Set(listaPulita)];
+
+        if(setSpesa.length === 0) {
+            corpo.innerHTML = "Nessun ingrediente trovato nei menù della settimana.";
+        } else {
+            corpo.innerHTML = setSpesa.map(item => `
+                <div class="spesa-item">
+                    <input type="checkbox"> <span>${item}</span>
+                </div>
+            `).join("");
+        }
     }
 
     function renderCalendar() {
@@ -211,89 +202,33 @@
 
     function apriDettaglio(data) {
         curKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + data.getDate();
+        document.getElementById('modal-title').innerText = data.toLocaleDateString('it-IT', {weekday:'long', day:'numeric'});
         document.getElementById('modal').style.display = 'flex';
+        document.getElementById('box-spesa').style.display = 'none'; // Nascondi spesa all'apertura giorno
 
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
-            const corsi = palinsesto[gL] || [];
-            const createList = (u) => corsi.map((c, i) => `<div class="gym-row"><input type="checkbox" ${v['chk-'+u+'-'+i]?'checked':''} onchange="salvaCheckV3(this,'chk-${u}-${i}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`).join("");
-            document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b>" + (createList('m') || "<br>Nessun corso");
-            document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b>" + (createList('l') || "<br>Nessun corso");
-
-            const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','altro-m','altro-l','play-m','play-l'];
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','play-m','play-l'];
             fields.forEach(id => { 
                 if(document.getElementById(id)) {
-                    // Logica specifica per Lilly: se è vuoto, metti il link predefinito
-                    if(id === 'play-l' && !v[id]) {
-                        document.getElementById(id).value = "https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg";
-                    } else {
-                        document.getElementById(id).value = v[id] || "";
-                    }
+                    if(id === 'play-l' && !v[id]) document.getElementById(id).value = "https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg";
+                    else document.getElementById(id).value = v[id] || "";
                 }
             });
-            document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
-            document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
     }
 
-    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); if(el.id.includes('peso') || el.id.includes('alt')) calcolaBMI(); }
-    function salvaCheckV3(el, cid) { db.ref("dailyData/" + curKey + "/" + (cid || el.id)).set(el.checked); statusUpdate(); }
-    function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
-
-    function getIMCStatus(val) {
-        if(val === "--") return "";
-        if(val < 18.5) return " (🔵 Sottopeso)";
-        if(val < 25) return " (🟢 Regolare)";
-        if(val < 30) return " (🟡 Sovrappeso)";
-        return " (🔴 Obesità)";
-    }
-
-    function calcolaBMI() {
-        const pm = parseFloat(document.getElementById('peso-m').value);
-        const am = parseFloat(document.getElementById('alt-m').value) / 100;
-        const pl = parseFloat(document.getElementById('peso-l').value);
-        const al = parseFloat(document.getElementById('alt-l').value) / 100;
-        let resM = (pm && am) ? (pm / (am * am)).toFixed(1) : "--";
-        let resL = (pl && al) ? (pl / (al * al)).toFixed(1) : "--";
-        document.getElementById('bmi-display').innerHTML = `<b>MASSIMO IMC:</b> ${resM}${getIMCStatus(resM)}<br><b>LILIANA IMC:</b> ${resL}${getIMCStatus(resL)}`;
-    }
-
-    async function generaReportEvoluto() {
-        let labels = [], pM = [], pL = [];
-        for(let i=0; i<7; i++){
-            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
-            let k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-            labels.push(d.getDate());
-            const snap = await db.ref("dailyData/" + k).once('value');
-            const v = snap.val() || {};
-            pM.push(parseFloat(v['peso-m']) || null);
-            pL.push(parseFloat(v['peso-l']) || null);
-        }
-        renderChart(labels, pM, pL);
-        calcolaBMI();
-    }
-
-    function renderChart(labels, dataM, dataL) {
-        if(myChart) myChart.destroy();
-        const ctx = document.getElementById('weightChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Massimo', data: dataM, borderColor: '#2196f3', tension: 0.3, spanGaps: true },
-                    { label: 'Liliana', data: dataL, borderColor: '#e91e63', tension: 0.3, spanGaps: true }
-                ]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-    }
-
+    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
+    function salvaCheckV3(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.checked); statusUpdate(); }
     function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
+    function openTab(evt, tabId) {
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
     window.onload = renderCalendar;
 </script>
 </body>
