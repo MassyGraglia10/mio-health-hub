@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v19</title>
+    <title>M&L Wellness Planner v20</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -88,17 +88,17 @@
         <div class="time-header">👟 CORSI MATTINA (FINO ORE 13:30)</div>
         <div id="gym-morning" class="card"></div>
 
-        <div class="time-header">🏋️ SALA PESI E CORSA</div>
+        <div class="time-header">🏋️ SALA PESI E CORSA (MATTINA)</div>
         <div class="split-box">
             <div class="mini-card m-bg">
-                <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> MASSIMO</label>
+                <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-m-1" class="sync-check-m" onchange="syncCheck(this, 'm')"> MASSIMO</label>
                 <button class="btn-scheda" onclick="apriScheda('m')">📋 SCHEDA</button>
-                <input type="text" id="run-m" class="run-input" placeholder="Corsa (km/min)" oninput="salvaDato(this)">
+                <input type="text" id="run-m-1" class="run-input sync-input-m" placeholder="Corsa (km/min)" oninput="syncInput(this, 'm')">
             </div>
             <div class="mini-card l-bg">
-                <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> LILIANA</label>
+                <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-l-1" class="sync-check-l" onchange="syncCheck(this, 'l')"> LILIANA</label>
                 <button class="btn-scheda" onclick="apriScheda('l')">📋 SCHEDA</button>
-                <input type="text" id="run-l" class="run-input" placeholder="Corsa (km/min)" oninput="salvaDato(this)">
+                <input type="text" id="run-l-1" class="run-input sync-input-l" placeholder="Corsa (km/min)" oninput="syncInput(this, 'l')">
             </div>
         </div>
 
@@ -112,6 +112,20 @@
 
         <div class="time-header">👟 CORSI POMERIGGIO / SERA</div>
         <div id="gym-afternoon" class="card"></div>
+
+        <div class="time-header">🏋️ SALA PESI E CORSA (SERA)</div>
+        <div class="split-box">
+            <div class="mini-card m-bg">
+                <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-m-2" class="sync-check-m" onchange="syncCheck(this, 'm')"> MASSIMO</label>
+                <button class="btn-scheda" onclick="apriScheda('m')">📋 SCHEDA</button>
+                <input type="text" id="run-m-2" class="run-input sync-input-m" placeholder="Corsa (km/min)" oninput="syncInput(this, 'm')">
+            </div>
+            <div class="mini-card l-bg">
+                <label style="font-size:0.7rem; font-weight:bold;"><input type="checkbox" id="check-pesi-l-2" class="sync-check-l" onchange="syncCheck(this, 'l')"> LILIANA</label>
+                <button class="btn-scheda" onclick="apriScheda('l')">📋 SCHEDA</button>
+                <input type="text" id="run-l-2" class="run-input sync-input-l" placeholder="Corsa (km/min)" oninput="syncInput(this, 'l')">
+            </div>
+        </div>
 
         <div class="time-header">🥩 ORE 20:00 - CENA</div>
         <div class="card">
@@ -191,11 +205,7 @@
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
             
-            // Filtro corsi: Mattina fino alle 13:30 inclusa per pre-pranzo
-            const morning = corsi.filter(c => {
-                const hour = parseInt(c.t.split(":")[0]);
-                return hour <= 13;
-            });
+            const morning = corsi.filter(c => parseInt(c.t.split(":")[0]) <= 13);
             const afternoon = corsi.filter(c => parseInt(c.t.split(":")[0]) > 13);
 
             const renderCorsi = (lista) => lista.map((c) => {
@@ -210,17 +220,40 @@
             document.getElementById('gym-morning').innerHTML = renderCorsi(morning);
             document.getElementById('gym-afternoon').innerHTML = renderCorsi(afternoon);
 
-            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','run-m','run-l','note-giorno','pl-m','pl-l'];
+            const fields = ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-giorno','pl-m','pl-l'];
             fields.forEach(id => {
                 const el = document.getElementById(id);
                 el.value = v[id] || "";
                 if(id === 'pl-m') document.getElementById('link-m').href = el.value || "#";
                 if(id === 'pl-l') document.getElementById('link-l').href = el.value || "#";
             });
+
+            // Sincronizzazione campi Sala Pesi / Corsa
+            const runM = v['run-m'] || "";
+            const runL = v['run-l'] || "";
+            document.querySelectorAll('.sync-input-m').forEach(i => i.value = runM);
+            document.querySelectorAll('.sync-input-l').forEach(i => i.value = runL);
             
-            document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
-            document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
+            const chkM = v['check-pesi-m'] || false;
+            const chkL = v['check-pesi-l'] || false;
+            document.querySelectorAll('.sync-check-m').forEach(i => i.checked = chkM);
+            document.querySelectorAll('.sync-check-l').forEach(i => i.checked = chkL);
         });
+    }
+
+    // Funzioni di Sincronizzazione per i doppi box
+    function syncInput(el, user) {
+        const val = el.value;
+        document.querySelectorAll(`.sync-input-${user}`).forEach(i => i.value = val);
+        db.ref(`dailyData/${curKey}/run-${user}`).set(val);
+        statusUpdate();
+    }
+
+    function syncCheck(el, user) {
+        const val = el.checked;
+        document.querySelectorAll(`.sync-check-${user}`).forEach(i => i.checked = val);
+        db.ref(`dailyData/${curKey}/check-pesi-${user}`).set(val);
+        statusUpdate();
     }
 
     function apriScheda(u) {
