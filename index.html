@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>M&L Wellness Planner v9</title>
+    <title>M&L Wellness Planner v11</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -34,17 +34,20 @@
         .gym-card { background: #fdf7ff; border: 1px dashed var(--workout); border-radius: 15px; padding: 12px; }
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; gap: 12px; }
         .gym-row:last-child { border-bottom: none; }
-        .extra-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid #eee; margin-top: 5px; }
-        .gym-check { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+        .extra-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #eee; margin-top: 5px; flex-wrap: wrap; }
+        .gym-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
         .gym-time { font-weight: 900; color: var(--workout); width: 50px; }
         .gym-text.done { text-decoration: line-through; color: #aaa; }
         .instr { font-size: 0.75rem; color: #777; font-style: italic; margin-left: 4px; }
         textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 10px; padding: 10px; margin-top: 2px; font-family: inherit; font-size: 1rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .weight-row { display: flex; gap: 10px; margin: 10px 0; }
         .weight-box { flex: 1; background: #fff9f0; padding: 10px; border-radius: 15px; text-align: center; border: 1px solid #ffe0b2; }
-        .weight-box input, .run-input { border: 1px solid #ddd; border-radius: 8px; padding: 5px; text-align: center; font-weight: bold; }
+        .weight-box input, .run-input, .scheda-url { border: 1px solid #ddd; border-radius: 8px; padding: 5px; text-align: center; font-weight: bold; }
         .weight-box input { width: 80%; font-size: 1.2rem; }
         .run-input { width: 45px; font-size: 0.8rem; }
+        .scheda-url { width: 100px; font-size: 0.6rem; font-weight: normal; }
+        .btn-scheda { text-decoration: none; font-size: 1.3rem; filter: grayscale(1); transition: 0.2s; padding: 5px; }
+        .btn-scheda.active { filter: grayscale(0); }
         .playlist-area { background: #191414; color: white; padding: 15px; border-radius: 20px; margin-top: 25px; display: flex; align-items: center; justify-content: space-between; }
         .spotify-link { background: #1DB954; color: white; text-decoration: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
     </style>
@@ -113,7 +116,7 @@
         <div id="gym-evening" class="gym-card"></div>
 
         <div class="time-header">📝 NOTE DEL GIORNO</div>
-        <textarea id="note-giorno" rows="3" placeholder="Note extra, umore, obiettivi..." oninput="salvaDato(this)"></textarea>
+        <textarea id="note-giorno" rows="3" placeholder="Note extra, obiettivi..." oninput="salvaDato(this)"></textarea>
 
         <div class="playlist-area">
             <div>
@@ -186,10 +189,19 @@
                 }).join("");
 
                 if(part !== 'S') {
+                    // Scheda Massimo (quella che mi hai inviato)
+                    const urlM = vals[`url-m-${part}`] || 'https://raw.githubusercontent.com/massimograglia/miomenu/main/Schedamassimo.jpg'; 
+                    const urlL = vals[`url-l-${part}`] || '';
                     html += `
                     <div class="extra-row">
                         <input type="checkbox" class="gym-check" id="pesi-${part}" ${vals['pesi-'+part]?'checked':''} onchange="salvaCheck('${dateKey}','pesi-${part}',this)">
-                        <span style="font-size:0.8rem; font-weight:bold; color:var(--primary)">SALA PESI</span>
+                        <span style="font-size:0.8rem; font-weight:bold; color:var(--primary); margin-right:10px;">SALA PESI</span>
+                        
+                        <a href="${urlM}" target="_blank" id="btn-m-${part}" class="btn-scheda active">📋🟦</a>
+                        <input type="text" class="scheda-url" id="url-m-${part}" placeholder="Link Massimo" value="${urlM}" oninput="aggiornaLink(this, '${part}', 'm')">
+                        
+                        <a href="${urlL||'#'}" target="_blank" id="btn-l-${part}" class="btn-scheda ${urlL?'active':''}">📋🟥</a>
+                        <input type="text" class="scheda-url" id="url-l-${part}" placeholder="Link Liliana" value="${urlL}" oninput="aggiornaLink(this, '${part}', 'l')">
                     </div>
                     <div class="extra-row">
                         <span style="font-size:0.8rem; font-weight:bold; color:#f57c00">CORSA:</span>
@@ -209,6 +221,15 @@
                 if(f === 'pl-url') document.getElementById('pl-link').href = el.value || "#";
             });
         });
+    }
+
+    function aggiornaLink(el, part, user) {
+        const btn = document.getElementById(`btn-${user}-${part}`);
+        btn.href = el.value || "#";
+        el.value ? btn.classList.add('active') : btn.classList.remove('active');
+        const refKey = document.querySelector('[data-datekey]').dataset.datekey;
+        db.ref("dailyData/" + refKey + "/" + el.id).set(el.value);
+        statusUpdate();
     }
 
     function salvaDato(el) {
