@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v39.5</title>
+    <title>Massy e Lilly v39.6</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --massimo: #2196f3; --liliana: #e91e63;
-            --spotify: #1DB954;
+            --spotify: #1DB954; --relax: #9c27b0;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
@@ -103,9 +103,15 @@
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 SPOTIFY</div>
+            <div class="time-header">🎵 MUSICA</div>
             <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSIMO</button>
-            <button class="btn-view" style="background:var(--spotify); margin-top:15px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 SPOTIFY LILIANA</button>
+            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 SPOTIFY LILIANA</button>
+            
+            <div class="time-header">🧘 CORSI VIDEO & WELLNESS</div>
+            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout','_blank')">🩰 PILATES</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+meditation','_blank')">🧠 MINDFULNESS</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=ocean+waves+sound','_blank')">🌊 RUMORE DEL MARE</button>
         </div>
     </div>
 </div>
@@ -123,12 +129,12 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.) / ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.) / ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo) / ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe) / ACQUA GYM (Giulia)"}],
-        "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola) / ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff) / ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE (Roby)"}, {t:"10:00", c:"TONIFICAZIONE (Roby) / ACQUA STRONG (Francy 10:15)"}, {t:"12:00", c:"TOTAL BODY (Franklin) / ACQUA GYM (Super Simo)"}, {t:"13:00", c:"TOTAL BODY (Simone L.) / ACQUA BIKE (Super Simo)"}, {t:"15:00", c:"YOGA (Riccardo)"}, {t:"16:00", c:"TONE UP (Gianni) / ACQUA BIKE (Fabio)"}, {t:"17:00", c:"BODY SCULPTURE (Duilio)"}, {t:"17:15", c:"ACQUA TONE (Giulia)"}, {t:"18:00", c:"G.A.G (Duilio) / ACQUA FIT (Giulia)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"PUMP (Vincenzo)"}],
-        "Giovedì": [{t:"09:00", c:"TONE UP (Duilio)"}, {t:"10:00", c:"PILATES (Giuseppe)"}, {t:"11:00", c:"TONE UP (Giuseppe)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"POWER YOGA (Domenico)"}, {t:"13:15", c:"ACQUA GYM (Giulia)"}, {t:"13:30", c:"FIT BOXE (Giancarlo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"G.A.G (Manuela) / ACQUA GYM (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"BODY COND. (Beppe)"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G (Super Simo)"}, {t:"10:00", c:"CIRCUIT TRAINING (Super Simo) / ACQUA FIT (Francy 10:15)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo) / ACQUA GYM (Francy) / SPINN (Michela)"}, {t:"17:00", c:"YOGA (Riccardo)"}, {t:"18:00", c:"FIT DANCE (Stefano P.) / ACQUA FIT (Francy)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Francy)"}],
-        "Sabato": [{t:"09:00", c:"YOGA (Giancarlo)"}, {t:"10:00", c:"TONE UP (Giancarlo)"}, {t:"11:00", c:"MOBILITY (Simona B.) / ACQUA BIKE (11:30)"}, {t:"12:00", c:"FIT DANCE (Stefano P.) / ACQUA GYM (Katty)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}],
+        "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.)"}, {t:"12:00", c:"ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.)"}, {t:"13:00", c:"ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:00", c:"ACQUA GYM (Giulia)"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola)"}, {t:"13:00", c:"ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff)"}, {t:"18:00", c:"ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE (Roby)"}, {t:"10:00", c:"TONIFICAZIONE (Roby)"}, {t:"10:15", c:"ACQUA STRONG (Francy)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"12:00", c:"ACQUA GYM (Super Simo)"}, {t:"13:00", c:"TOTAL BODY (Simone L.)"}, {t:"13:00", c:"ACQUA BIKE (Super Simo)"}, {t:"15:00", c:"YOGA (Riccardo)"}, {t:"16:00", c:"TONE UP (Gianni)"}, {t:"16:00", c:"ACQUA BIKE (Fabio)"}, {t:"17:00", c:"BODY SCULPTURE (Duilio)"}, {t:"17:15", c:"ACQUA TONE (Giulia)"}, {t:"18:00", c:"G.A.G (Duilio)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"PUMP (Vincenzo)"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP (Duilio)"}, {t:"10:00", c:"PILATES (Giuseppe)"}, {t:"11:00", c:"TONE UP (Giuseppe)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"POWER YOGA (Domenico)"}, {t:"13:15", c:"ACQUA GYM (Giulia)"}, {t:"13:30", c:"FIT BOXE (Giancarlo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"G.A.G (Manuela)"}, {t:"18:00", c:"ACQUA GYM (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"BODY COND. (Beppe)"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G (Super Simo)"}, {t:"10:00", c:"CIRCUIT TRAINING (Super Simo)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"13:00", c:"ACQUA GYM (Francy)"}, {t:"13:00", c:"SPINNING (Michela)"}, {t:"17:00", c:"YOGA (Riccardo)"}, {t:"18:00", c:"FIT DANCE (Stefano P.)"}, {t:"18:00", c:"ACQUA FIT (Francy)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Francy)"}],
+        "Sabato": [{t:"09:00", c:"YOGA (Giancarlo)"}, {t:"10:00", c:"TONE UP (Giancarlo)"}, {t:"11:00", c:"MOBILITY (Simona B.)"}, {t:"11:30", c:"ACQUA BIKE (Staff)"}, {t:"12:00", c:"FIT DANCE (Stefano P.)"}, {t:"12:00", c:"ACQUA GYM (Katty)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}],
         "Domenica": [{t:"10:00", c:"SALA PESI LIBERA (Staff)"}]
     };
 
@@ -161,9 +167,14 @@
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
+            
             const buildList = (u) => corsi.map(c => {
                 const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,10).replace(/\s+/g,'').toLowerCase()}`;
-                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b>${c.t}</b> &nbsp; ${c.c}</div>`;
+                return `<div class="gym-row">
+                            <input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')">
+                            <b style="min-width:45px; display:inline-block; margin-left:5px;">${c.t}</b> 
+                            <span>${c.c}</span>
+                        </div>`;
             }).join("");
             
             document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
