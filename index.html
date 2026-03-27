@@ -61,11 +61,12 @@
         /* Stile per il popup di avviso agenda */
         #alert-popup { 
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #ff5252; color: white; padding: 15px 25px; border-radius: 50px;
+            background: #ff5252; color: white; padding: 15px 25px; border-radius: 20px;
             font-weight: bold; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: none; animation: slideDown 0.5s ease;
+            display: none; animation: slideDown 0.5s ease; width: 80%; max-width: 400px;
+            text-align: center; line-height: 1.4;
         }
-        @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
+        @keyframes slideDown { from { top: -100px; } to { top: 20px; } }
     </style>
 </head>
 <body>
@@ -256,12 +257,21 @@
         db.ref("dailyData").once('value', snapshot => {
             const allData = snapshot.val() || {};
             
-            // CONTROLLO POPUP APPUNTAMENTI OGGI
-            if(allData[todayKey] && (allData[todayKey]['agenda-m'] || allData[todayKey]['agenda-l'])) {
-                const popup = document.getElementById('alert-popup');
-                popup.innerText = "🔔 OGGI AVETE APPUNTAMENTI!";
-                popup.style.display = 'block';
-                setTimeout(() => { popup.style.display = 'none'; }, 5000);
+            // CONTROLLO POPUP APPUNTAMENTI OGGI (CON LETTURA TESTO)
+            if(allData[todayKey]) {
+                const agM = allData[todayKey]['agenda-m'] || "";
+                const agL = allData[todayKey]['agenda-l'] || "";
+                
+                if(agM || agL) {
+                    const popup = document.getElementById('alert-popup');
+                    let msg = "🔔 APPUNTAMENTI DI OGGI:\n";
+                    if(agM) msg += `\nⓂ️ ${agM}`;
+                    if(agL) msg += `\nⓁ ${agL}`;
+                    
+                    popup.innerText = msg;
+                    popup.style.display = 'block';
+                    setTimeout(() => { popup.style.display = 'none'; }, 8000);
+                }
             }
 
             for(let i=0; i<7; i++){
