@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v38</title>
+    <title>Massy e Lilly v39</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -136,7 +136,7 @@
             </div>
             <div class="card l-border">
                 <input type="text" id="play-l" placeholder="Link Spotify Lilly..." oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 APRI SPOTIFY LILLY</button>
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://spotify.com','_blank')">🎧 APRI SPOTIFY LILLY</button>
             </div>
             <div class="time-header">🧘 VIDEO GUIDATI</div>
             <div class="card" style="border-left: 5px solid var(--relax);">
@@ -182,14 +182,44 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // PALINSESTO AGGIORNATO DAL FILE EXCEL
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"19:00", c:"TRX", i:"Vincenzo"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Fit Boxe", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."}],
-        "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
+        "Lunedì": [
+            {t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, 
+            {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, 
+            {t:"16:00", c:"Body Fit", i:"Gianni"}, {t:"17:00", c:"Pilates", i:"Duilio"}, 
+            {t:"18:00", c:"Posturale", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Beppe"}
+        ],
+        "Martedì": [
+            {t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"11:00", c:"Pilates", i:"Duilio"},
+            {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"14:00", c:"Latin Moove", i:"Osvaldo"},
+            {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"19:00", c:"TRX", i:"Vincenzo"}
+        ],
+        "Mercoledì": [
+            {t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:00", c:"Tonificazione", i:"Roby"}, {t:"10:15", c:"Acqua Strong", i:"Francy"},
+            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"15:00", c:"Yoga", i:"Riccardo"},
+            {t:"16:00", c:"Tone Up", i:"Gianni"}, {t:"17:00", c:"Body Sculpture", i:"Duilio"}, 
+            {t:"18:00", c:"Functional Step", i:"Gianni"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}
+        ],
+        "Giovedì": [
+            {t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"11:00", c:"Tone Up", i:"Giuseppe"},
+            {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Power Yoga", i:"Domenico"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"},
+            {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"G.A.G", i:"Manuela"}, 
+            {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}
+        ],
+        "Venerdì": [
+            {t:"09:00", c:"G.A.G", i:"Super Simo"}, {t:"10:00", c:"Circuit Training", i:"Super Simo"}, {t:"10:15", c:"Acqua Fit", i:"Francy"},
+            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"},
+            {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Total Body", i:"Franklin"}, 
+            {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Beppe"}
+        ],
+        "Sabato": [
+            {t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."},
+            {t:"12:00", c:"Fit Dance", i:"Stefano P."}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}
+        ],
+        "Domenica": [
+            {t:"10:00", c:"Sala Pesi Libera", i:"Staff"}
+        ]
     };
 
     let dataInizio = new Date();
@@ -239,12 +269,7 @@
             const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','altro-m','altro-l','play-m','play-l'];
             fields.forEach(id => { 
                 if(document.getElementById(id)) {
-                    // Logica flessibile: usa il dato salvato, altrimenti metti il link di default se è Lilly
-                    if(id === 'play-l') {
-                        document.getElementById(id).value = v[id] || "https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg";
-                    } else {
-                        document.getElementById(id).value = v[id] || "";
-                    }
+                    document.getElementById(id).value = v[id] || "";
                 }
             });
 
