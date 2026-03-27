@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v39.6</title>
+    <title>Massy e Lilly v39.7</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --massimo: #2196f3; --liliana: #e91e63;
-            --spotify: #1DB954; --relax: #9c27b0;
+            --spotify: #1DB954; --relax: #9c27b0; --report: #ff9800;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
@@ -26,7 +26,7 @@
         .modal-content { background: white; width: 100%; max-width: 600px; height: 95vh; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; overflow: hidden; }
         
         .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; }
-        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
+        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.6rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .tab-content { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; box-sizing: border-box; }
@@ -36,9 +36,13 @@
         .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
         
-        textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; font-family: inherit; }
+        .input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .input-group label { font-size: 0.7rem; font-weight: bold; width: 60px; }
+        input[type="number"], textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; font-family: inherit; }
+        
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.75rem; }
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
+        .bmi-badge { background: var(--report); color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-top: 5px; }
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; }
     </style>
 </head>
@@ -72,6 +76,7 @@
             <button class="tab-btn active" onclick="openTab(event, 'tab-agenda')">📅 AGENDA</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-menu')">🍴 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-report')">📊 REPORT</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
 
@@ -102,12 +107,28 @@
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
+        <div id="tab-report" class="tab-content">
+            <div class="time-header">📉 PARAMETRI MASSIMO</div>
+            <div class="card m-border">
+                <div class="input-group"><label>PESO (kg)</label><input type="number" id="peso-m" step="0.1" oninput="calcBMI('m')"></div>
+                <div class="input-group"><label>ALT. (cm)</label><input type="number" id="alt-m" oninput="calcBMI('m')"></div>
+                <div class="input-group"><label>GRASSO %</label><input type="number" id="fat-m" oninput="salvaDato(this)"></div>
+                <div id="bmi-m" class="bmi-badge">BMI: --</div>
+            </div>
+            <div class="time-header">📉 PARAMETRI LILIANA</div>
+            <div class="card l-border">
+                <div class="input-group"><label>PESO (kg)</label><input type="number" id="peso-l" step="0.1" oninput="calcBMI('l')"></div>
+                <div class="input-group"><label>ALT. (cm)</label><input type="number" id="alt-l" oninput="calcBMI('l')"></div>
+                <div class="input-group"><label>GRASSO %</label><input type="number" id="fat-l" oninput="salvaDato(this)"></div>
+                <div id="bmi-l" class="bmi-badge">BMI: --</div>
+            </div>
+        </div>
+
         <div id="tab-relax" class="tab-content">
             <div class="time-header">🎵 MUSICA</div>
             <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSIMO</button>
             <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 SPOTIFY LILIANA</button>
-            
-            <div class="time-header">🧘 CORSI VIDEO & WELLNESS</div>
+            <div class="time-header">🧘 WELLNESS</div>
             <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout','_blank')">🩰 PILATES</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+meditation','_blank')">🧠 MINDFULNESS</button>
@@ -167,22 +188,31 @@
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
-            
             const buildList = (u) => corsi.map(c => {
                 const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,10).replace(/\s+/g,'').toLowerCase()}`;
-                return `<div class="gym-row">
-                            <input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')">
-                            <b style="min-width:45px; display:inline-block; margin-left:5px;">${c.t}</b> 
-                            <span>${c.c}</span>
-                        </div>`;
+                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b style="min-width:45px; margin-left:5px;">${c.t}</b><span>${c.c}</span></div>`;
             }).join("");
-            
             document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
             document.getElementById('gym-list-l').innerHTML = buildList('l') || "Nessun corso";
-            ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l'].forEach(id => { document.getElementById(id).value = v[id] || ""; });
+            const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','fat-m','peso-l','alt-l','fat-l'];
+            ids.forEach(id => { document.getElementById(id).value = v[id] || ""; });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
+            calcBMI('m'); calcBMI('l');
         });
+    }
+
+    function calcBMI(u) {
+        const p = document.getElementById(`peso-${u}`).value;
+        const a = document.getElementById(`alt-${u}`).value / 100;
+        const bmiEl = document.getElementById(`bmi-${u}`);
+        if(p && a) {
+            const res = (p / (a*a)).toFixed(1);
+            bmiEl.innerText = "BMI: " + res;
+            db.ref("dailyData/" + curKey + "/peso-" + u).set(p);
+            db.ref("dailyData/" + curKey + "/alt-" + u).set(document.getElementById(`alt-${u}`).value);
+        } else bmiEl.innerText = "BMI: --";
+        statusUpdate();
     }
 
     function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
@@ -195,8 +225,7 @@
     function openTab(e, id) { 
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        e.currentTarget.classList.add('active');
+        document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
     }
     window.onload = renderCalendar;
 </script>
