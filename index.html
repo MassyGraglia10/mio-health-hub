@@ -3,62 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v44 - Full & Fixed</title>
+    <title>Massy e Lilly v41.6 - Photo Edit</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; --massimo: #2196f3; --liliana: #e91e63; --spotify: #1DB954; --relax: #9c27b0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); overflow-x: hidden; }
+        :root { 
+            --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
+            --massimo: #2196f3; --liliana: #e91e63;
+            --spotify: #1DB954; --relax: #9c27b0; --report: #ff9800;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
-        .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: var(--text); }
+        
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 12px; max-width: 900px; margin: auto; }
-        .day-dot { background: white; border-radius: 15px; padding: 12px 5px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .day-dot { background: white; border-radius: 15px; padding: 12px 5px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
         .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; }
         .day-dot .num { font-size: 1.4rem; font-weight: 900; }
+
         .event-indicator { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; margin-top: 4px; display: none; }
         .has-event .event-indicator { display: block; }
+
+        /* --- MODALE --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 95vh; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; }
-        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; }
+        
+        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; }
+        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.6rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
         .tab-content { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; box-sizing: border-box; }
         .tab-content.active { display: block; }
-        .time-header { background: #eceff1; color: #546e7a; font-size: 0.7rem; font-weight: 800; padding: 5px 12px; border-radius: 15px; display: inline-block; margin: 15px 0 8px; text-transform: uppercase; }
-        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; position: relative; box-sizing: border-box; }
-        .m-border { border-left: 6px solid var(--massimo); } .l-border { border-left: 6px solid var(--liliana); }
-        .user-label { font-weight: 800; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 2px; }
-        .m-text { color: var(--massimo); } .l-text { color: var(--liliana); }
-        textarea { width: 100%; border: 1px solid #e0e0e0; border-radius: 10px; padding: 12px; font-family: inherit; resize: none; box-sizing: border-box; background: #fafafa; font-size: 1rem; }
-        .action-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; }
-        .icon-btn { background: #f0f0f0; border: none; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        .time-header { background: #eceff1; color: #546e7a; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 15px; display: inline-block; margin: 15px 0 5px; text-transform: uppercase; }
+        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; position: relative; }
+        .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
+        
+        /* --- AZIONI --- */
+        .action-btns { position: absolute; right: 10px; top: 10px; display: flex; gap: 5px; }
+        .icon-btn { background: #f0f0f0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         .icon-btn.recording { background: #ff5252; color: white; animation: pulse 1.5s infinite; }
-        .photo-container { position: relative; width: 80px; height: 80px; margin-top: 5px; display: none; }
-        .photo-container.visible { display: block; }
-        .thumb-pasto { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
-        .btn-del-photo { position: absolute; top: -8px; right: -8px; background: #ff5252; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-weight: bold; cursor: pointer; }
-        .bmi-badge { padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.85rem; margin-top: 8px; color: white; text-align: center; transition: 0.3s; }
-        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.8rem; }
-        .btn-view { border: none; padding: 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 10px; color: white; text-align: center; text-decoration: none; }
-        #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; }
+
+        /* --- FOTO AGGIORNATE --- */
+        .photo-container { position: relative; width: 60px; height: 60px; margin-top: 10px; display: none; }
+        .photo-container.visible { display: inline-block; }
+        .thumb-pasto { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
+        .btn-del-photo { position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; font-weight: bold; }
+
+        /* --- POPUP APPUNTAMENTI --- */
+        #alert-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #ff9800; color: white; padding: 12px 20px; border-radius: 15px; font-size: 0.85rem; font-weight: bold; z-index: 5000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; animation: slideDown 0.4s ease; text-align: center; min-width: 250px; }
+        @keyframes slideDown { from { top: -50px; } to { top: 80px; } }
+
+        input[type="number"], textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; font-family: inherit; }
+        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.75rem; }
+        .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
+        
+        #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; display: none; align-items: center; justify-content: center; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        /* POPUP STYLE */
-        #alert-box { position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 5000; width: 85%; max-width: 400px; display: none; text-align: center; border: 3px solid var(--primary); }
     </style>
 </head>
 <body>
 
-<div id="alert-box">
-    <h3 style="margin-top:0; color:var(--primary);">🔔 Impegni di Oggi</h3>
-    <div id="alert-msg" style="font-size: 0.9rem; margin-bottom: 15px; text-align: left; white-space: pre-wrap;"></div>
-    <button class="btn-view" style="background:var(--primary)" onclick="document.getElementById('alert-box').style.display='none'">OK, GRAZIE</button>
-</div>
+<div id="alert-popup" onclick="this.style.display='none'"></div>
 
 <div class="header">
-    <h2 style="margin:0; font-size: 1.2rem;">🍱 Massy e Lilly</h2>
-    <div id="sync-status" style="font-size: 0.6rem; font-weight: bold;">✅ SINCRO</div>
+    <h2 style="margin:0; font-size: 1.1rem;">🍱 Massy e Lilly</h2>
+    <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO</div>
 </div>
 
 <div class="nav-bar">
@@ -71,12 +83,15 @@
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px;">
-            <button class="btn-nav" onclick="navigaGiorno(-1)">◀</button>
-            <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.1rem;"></h2>
-            <button class="btn-nav" onclick="navigaGiorno(1)">▶</button>
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px 0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn-nav" onclick="navigaGiorno(-1)">◀</button>
+                <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.1rem; min-width: 120px; text-align:center;"></h2>
+                <button class="btn-nav" onclick="navigaGiorno(1)">▶</button>
+            </div>
             <span style="font-size:2rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
         </div>
+
         <div class="tab-bar">
             <button class="tab-btn active" onclick="openTab(event, 'tab-agenda')">📅 AGENDA</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-menu')">🍴 MENÙ</button>
@@ -86,56 +101,81 @@
         </div>
 
         <div id="tab-agenda" class="tab-content active">
-            <div class="time-header">📌 IMPEGNI</div>
-            <div class="card m-border"><span class="user-label m-text">MASSIMO</span><textarea id="agenda-m" rows="3" oninput="salvaDato(this)"></textarea><div class="action-btns"><button class="icon-btn" onclick="startVoice('agenda-m')">🎤</button></div></div>
-            <div class="card l-border"><span class="user-label l-text">LILIANA</span><textarea id="agenda-l" rows="3" oninput="salvaDato(this)"></textarea><div class="action-btns"><button class="icon-btn" onclick="startVoice('agenda-l')">🎤</button></div></div>
+            <div class="time-header">📌 IMPEGNI DEL GIORNO</div>
+            <div class="card m-border">
+                <span class="user-label" style="color:var(--massimo)">MASSIMO</span>
+                <textarea id="agenda-m" rows="3" oninput="salvaDato(this)"></textarea>
+                <div class="action-btns"><button class="icon-btn" onclick="startVoice('agenda-m')">🎤</button></div>
+            </div>
+            <div class="card l-border">
+                <span class="user-label" style="color:var(--liliana)">LILIANA</span>
+                <textarea id="agenda-l" rows="3" oninput="salvaDato(this)"></textarea>
+                <div class="action-btns"><button class="icon-btn" onclick="startVoice('agenda-l')">🎤</button></div>
+            </div>
         </div>
 
-        <div id="tab-menu" class="tab-content"><div id="menu-sections"></div><input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none"></div>
+        <div id="tab-menu" class="tab-content">
+            <div id="menu-sections"></div>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+        </div>
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
             <div class="card m-border"><label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI M.</label><button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button></div>
             <div class="card l-border"><label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI L.</label><button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button></div>
-            <div class="time-header">📅 CORSI</div>
+            <div class="time-header">📅 CORSI DEL GIORNO</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
         <div id="tab-report" class="tab-content">
             <div class="time-header">📈 PARAMETRI</div>
-            <div class="card m-border"><span class="user-label m-text">MASSIMO</span><div style="display:flex; gap:10px;"><input type="number" id="peso-m" placeholder="Peso" step="0.1" oninput="salvaDato(this); calcBMI('m')" style="width:50%; padding:10px; border-radius:8px; border:1px solid #ddd;"><input type="number" id="alt-m" placeholder="Alt" oninput="salvaDato(this); calcBMI('m')" style="width:50%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div><div id="bmi-m" class="bmi-badge">BMI: --</div></div>
-            <div class="card l-border"><span class="user-label l-text">LILIANA</span><div style="display:flex; gap:10px;"><input type="number" id="peso-l" placeholder="Peso" step="0.1" oninput="salvaDato(this); calcBMI('l')" style="width:50%; padding:10px; border-radius:8px; border:1px solid #ddd;"><input type="number" id="alt-l" placeholder="Alt" oninput="salvaDato(this); calcBMI('l')" style="width:50%; padding:10px; border-radius:8px; border:1px solid #ddd;"></div><div id="bmi-l" class="bmi-badge">BMI: --</div></div>
-            <div class="card" style="height: 250px;"><canvas id="weightChart"></canvas></div>
+            <div class="card m-border">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="number" id="peso-m" placeholder="Peso M" step="0.1" oninput="salvaDato(this); calcBMI('m')">
+                    <input type="number" id="alt-m" placeholder="Alt M" oninput="salvaDato(this); calcBMI('m')">
+                </div>
+                <div id="bmi-m" class="bmi-badge">BMI: --</div>
+            </div>
+            <div class="card l-border">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="number" id="peso-l" placeholder="Peso L" step="0.1" oninput="salvaDato(this); calcBMI('l')">
+                    <input type="number" id="alt-l" placeholder="Alt L" oninput="salvaDato(this); calcBMI('l')">
+                </div>
+                <div id="bmi-l" class="bmi-badge">BMI: --</div>
+            </div>
+            <div class="card chart-box"><canvas id="weightChart"></canvas></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('spotify:','_blank')">🎧 APRI SPOTIFY</button>
-            <div class="time-header">🧘 WELLNESS VIDEO</div>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🎬 PILATES</button>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+completo+italiano','_blank')">🧘 YOGA</button>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata+ansia','_blank')">🧠 MEDITAZIONE</button>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=rumore+mare+rilassante+4k','_blank')">🌊 RUMORE MARE</button>
+            <div class="time-header">🎵 MUSICA & WELLNESS</div>
+            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com')">🎧 SPOTIFY M</button>
+            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=n1X3onJWT1G-zvQG4ZIR0w')">🎧 SPOTIFY L</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
         </div>
     </div>
 </div>
 
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:90%; max-height: 80vh; border-radius:10px;"></div>
+<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height: 80vh; border-radius:10px; border: 3px solid white;"></div>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
+        authDomain: "miomenu-e2e51.firebaseapp.com",
+        databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", 
+        projectId: "miomenu-e2e51"
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP"}, {t:"10:15", c:"ACQUA FIT"}, {t:"18:00", c:"PUMP"}],
-        "Martedì": [{t:"10:00", c:"PILATES"}, {t:"13:00", c:"TONE UP"}, {t:"19:00", c:"TRX"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE"}, {t:"12:00", c:"ACQUA GYM"}, {t:"19:00", c:"PUMP"}],
-        "Giovedì": [{t:"10:00", c:"PILATES"}, {t:"13:00", c:"YOGA"}, {t:"19:00", c:"SPINNING"}],
-        "Venerdì": [{t:"09:00", c:"GAG"}, {t:"13:00", c:"ACQUA FIT"}, {t:"19:00", c:"TONE UP"}],
-        "Sabato": [{t:"10:00", c:"TONE UP"}, {t:"12:00", c:"ACQUA GYM"}],
-        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA"}]
+        "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.)"}, {t:"12:00", c:"ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.)"}, {t:"13:00", c:"ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:00", c:"ACQUA GYM (Giulia)"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola)"}, {t:"13:00", c:"ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff)"}, {t:"18:00", c:"ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE (Roby)"}, {t:"10:00", c:"TONIFICAZIONE (Roby)"}, {t:"10:15", c:"ACQUA STRONG (Francy)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"12:00", c:"ACQUA GYM (Super Simo)"}, {t:"13:00", c:"TOTAL BODY (Simone L.)"}, {t:"13:00", c:"ACQUA BIKE (Super Simo)"}, {t:"15:00", c:"YOGA (Riccardo)"}, {t:"16:00", c:"TONE UP (Gianni)"}, {t:"16:00", c:"ACQUA BIKE (Fabio)"}, {t:"17:00", c:"BODY SCULPTURE (Duilio)"}, {t:"17:15", c:"ACQUA TONE (Giulia)"}, {t:"18:00", c:"G.A.G (Duilio)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"PUMP (Vincenzo)"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP (Duilio)"}, {t:"10:00", c:"PILATES (Giuseppe)"}, {t:"11:00", c:"TONE UP (Giuseppe)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"POWER YOGA (Domenico)"}, {t:"13:15", c:"ACQUA GYM (Giulia)"}, {t:"13:30", c:"FIT BOXE (Giancarlo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"G.A.G (Manuela)"}, {t:"18:00", c:"ACQUA GYM (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"BODY COND. (Beppe)"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G (Super Simo)"}, {t:"10:00", c:"CIRCUIT TRAINING (Super Simo)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"13:00", c:"ACQUA GYM (Francy)"}, {t:"13:00", c:"SPINNING (Michela)"}, {t:"17:00", c:"YOGA (Riccardo)"}, {t:"18:00", c:"FIT DANCE (Stefano P.)"}, {t:"18:00", c:"ACQUA FIT (Francy)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Francy)"}],
+        "Sabato": [{t:"09:00", c:"YOGA (Giancarlo)"}, {t:"10:00", c:"TONE UP (Giancarlo)"}, {t:"11:00", c:"MOBILITY (Simona B.)"}, {t:"11:30", c:"ACQUA BIKE (Staff)"}, {t:"12:00", c:"FIT DANCE (Stefano P.)"}, {t:"12:00", c:"ACQUA GYM (Katty)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}],
+        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA (Staff)"}]
     };
 
     let dataInizio = new Date();
@@ -143,148 +183,186 @@
     let curKey = "";
     let weightChart = null;
 
+    // Inizializza Menu
     const sezioni = [{id:'col', n:'☕ COLAZIONE'}, {id:'pra', n:'🥗 PRANZO'}, {id:'cen', n:'🥩 CENA'}];
-    let menuHTML = "";
     sezioni.forEach(s => {
-        menuHTML += `<div class="time-header">${s.n}</div>
-            <div class="card m-border"><span class="user-label m-text">MASSIMO</span><textarea id="${s.id}-m" rows="2" oninput="salvaDato(this)"></textarea>
-                <div id="cont-img-${s.id}-m" class="photo-container"><img id="img-${s.id}-m" class="thumb-pasto" onclick="zoomImg(this.src)"><button class="btn-del-photo" onclick="deletePhoto('${s.id}-m')">×</button></div>
-                <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-m')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-m')">🎤</button></div></div>
-            <div class="card l-border"><span class="user-label l-text">LILIANA</span><textarea id="${s.id}-l" rows="2" oninput="salvaDato(this)"></textarea>
-                <div id="cont-img-${s.id}-l" class="photo-container"><img id="img-${s.id}-l" class="thumb-pasto" onclick="zoomImg(this.src)"><button class="btn-del-photo" onclick="deletePhoto('${s.id}-l')">×</button></div>
-                <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-l')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-l')">🎤</button></div></div>`;
+        document.getElementById('menu-sections').innerHTML += `
+            <div class="time-header">${s.n}</div>
+            <div class="card m-border"><span class="user-label" style="color:var(--massimo)">MASSIMO</span>
+                <textarea id="${s.id}-m" rows="2" oninput="salvaDato(this)"></textarea>
+                <div id="cont-img-${s.id}-m" class="photo-container">
+                    <img id="img-${s.id}-m" class="thumb-pasto" onclick="zoomImg(this.src)">
+                    <button class="btn-del-photo" onclick="deletePhoto('${s.id}-m')">×</button>
+                </div>
+                <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-m')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-m')">🎤</button></div>
+            </div>
+            <div class="card l-border"><span class="user-label" style="color:var(--liliana)">LILIANA</span>
+                <textarea id="${s.id}-l" rows="2" oninput="salvaDato(this)"></textarea>
+                <div id="cont-img-${s.id}-l" class="photo-container">
+                    <img id="img-${s.id}-l" class="thumb-pasto" onclick="zoomImg(this.src)">
+                    <button class="btn-del-photo" onclick="deletePhoto('${s.id}-l')">×</button>
+                </div>
+                <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-l')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-l')">🎤</button></div>
+            </div>`;
     });
-    document.getElementById('menu-sections').innerHTML = menuHTML;
 
-    // NOTIFICA POPUP AUTOMATICA
-    function checkTodayEvents() {
-        let oggi = new Date();
-        let key = `${oggi.getFullYear()}-${oggi.getMonth()+1}-${oggi.getDate()}`;
-        db.ref("dailyData/" + key).once('value', snap => {
-            let d = snap.val();
-            if(d && (d['agenda-m'] || d['agenda-l'])) {
-                let msg = "";
-                if(d['agenda-m']) msg += `🔹 MASSIMO: ${d['agenda-m']}\n`;
-                if(d['agenda-l']) msg += `🔸 LILIANA: ${d['agenda-l']}`;
-                document.getElementById('alert-msg').innerText = msg;
-                document.getElementById('alert-box').style.display = 'block';
-            }
-        });
+    // --- FUNZIONE NOTIFICA AGENDA ---
+    function checkAgendaAlert(data) {
+        const popup = document.getElementById('alert-popup');
+        const m = data['agenda-m'] || "";
+        const l = data['agenda-l'] || "";
+        if(m.trim() !== "" || l.trim() !== "") {
+            let msg = "<b>⚠️ APPUNTAMENTI OGGI:</b><br>";
+            if(m) msg += "M: " + m.substring(0,30) + (m.length>30?'...':'') + "<br>";
+            if(l) msg += "L: " + l.substring(0,30) + (l.length>30?'...':'');
+            popup.innerHTML = msg; popup.style.display = 'block';
+            setTimeout(() => popup.style.display = 'none', 5000);
+        } else { popup.style.display = 'none'; }
+    }
+
+    // --- GESTIONE FOTO AGGIORNATA ---
+    let photoTarget = "";
+    function takePhoto(id) { photoTarget = id; document.getElementById('cameraInput').click(); }
+    
+    document.getElementById('cameraInput').onchange = function(e) {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const base64 = event.target.result;
+            db.ref("dailyData/" + curKey + "/img-" + photoTarget).set(base64);
+            aggiornaUIFoto(photoTarget, base64);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    function deletePhoto(id) {
+        if(confirm("Vuoi cancellare questa foto?")) {
+            db.ref("dailyData/" + curKey + "/img-" + id).remove();
+            aggiornaUIFoto(id, null);
+        }
+    }
+
+    function aggiornaUIFoto(id, src) {
+        const container = document.getElementById("cont-img-" + id);
+        const img = document.getElementById("img-" + id);
+        if(src) {
+            img.src = src; container.classList.add('visible');
+        } else {
+            img.src = ""; container.classList.remove('visible');
+        }
+    }
+
+    function startVoice(targetId) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'it-IT';
+        const btn = event.currentTarget;
+        recognition.onstart = () => btn.classList.add('recording');
+        recognition.onend = () => btn.classList.remove('recording');
+        recognition.onresult = (e) => {
+            const text = e.results[0][0].transcript;
+            const el = document.getElementById(targetId);
+            el.value = (el.value ? el.value + " " : "") + text;
+            salvaDato(el);
+        };
+        recognition.start();
     }
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
-        db.ref("dailyData").once('value', snap => {
-            const data = snap.val() || {};
+        db.ref("dailyData").once('value', snapshot => {
+            const allData = snapshot.val() || {};
             for(let i=0; i<7; i++){
                 let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
                 let k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
                 let dot = document.createElement('div');
-                dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''} ${(data[k] && (data[k]['agenda-m'] || data[k]['agenda-l']))?'has-event':''}`;
+                dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''}`;
+                if(allData[k] && (allData[k]['agenda-m'] || allData[k]['agenda-l'])) dot.classList.add('has-event');
                 dot.onclick = () => apriDettaglio(new Date(d));
-                dot.innerHTML = `<span style="font-size:0.6rem; font-weight:bold;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span><div class="event-indicator"></div>`;
+                dot.innerHTML = `<span style="font-size:0.6rem; color:#999; font-weight:bold;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span>
+                                 <span class="num">${d.getDate()}</span><div class="event-indicator"></div>`;
                 grid.appendChild(dot);
+                if(d.toDateString() == new Date().toDateString()) checkAgendaAlert(allData[k] || {});
             }
         });
         document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
     }
 
     function apriDettaglio(data) {
-        curKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + data.getDate();
+        let dObj = new Date(data);
+        curKey = `${dObj.getFullYear()}-${dObj.getMonth()+1}-${dObj.getDate()}`;
+        let gL = dObj.toLocaleDateString('it-IT', {weekday:'long'});
+        gL = gL.charAt(0).toUpperCase() + gL.slice(1);
+        document.getElementById('modal-title').innerText = gL + " " + dObj.getDate();
         document.getElementById('modal').style.display = 'flex';
-        db.ref("dailyData/" + curKey).once('value', snap => {
-            const v = snap.val() || {};
-            const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','peso-l','alt-l','check-pesi-m','check-pesi-l'];
-            ids.forEach(id => { const el = document.getElementById(id); if(el.type==='checkbox') el.checked=v[id]||false; else el.value=v[id]||""; });
-            ['col','pra','cen'].forEach(p => ['m','l'].forEach(u => aggiornaUIFoto(`${p}-${u}`, v[`img-${p}-${u}`])));
+        
+        db.ref("dailyData/" + curKey).once('value', snapshot => {
+            const v = snapshot.val() || {};
+            checkAgendaAlert(v);
+            
+            const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','peso-l','alt-l'];
+            ids.forEach(id => { document.getElementById(id).value = v[id] || ""; });
+            
+            ['col','pra','cen'].forEach(p => {
+                ['m','l'].forEach(u => {
+                    aggiornaUIFoto(`${p}-${u}`, v[`img-${p}-${u}`]);
+                });
+            });
+
             const corsi = palinsesto[gL] || [];
             const buildList = (u) => corsi.map(c => {
-                const uid = `chk-${u}-${c.t.replace(':','')}`;
-                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b style="margin:0 8px;">${c.t}</b><span>${c.c}</span></div>`;
+                const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,10).replace(/\s+/g,'').toLowerCase()}`;
+                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b style="min-width:45px; margin-left:5px;">${c.t}</b><span>${c.c}</span></div>`;
             }).join("");
             document.getElementById('gym-list-m').innerHTML = buildList('m');
             document.getElementById('gym-list-l').innerHTML = buildList('l');
+            
+            document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
+            document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
             calcBMI('m'); calcBMI('l');
+            initChart();
         });
     }
 
+    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
+    function salvaCheckV3(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); statusUpdate(); }
+    function statusUpdate() { 
+        document.getElementById('sync-status').innerText = "☁️..."; 
+        setTimeout(() => { document.getElementById('sync-status').innerText="✅ SINCRO"; renderCalendar(); }, 600); 
+    }
+    
     function calcBMI(u) {
         const p = parseFloat(document.getElementById(`peso-${u}`).value);
         const a = parseFloat(document.getElementById(`alt-${u}`).value) / 100;
-        const div = document.getElementById(`bmi-${u}`);
-        if(p && a) {
-            const b = (p / (a*a)).toFixed(1);
-            div.innerText = `BMI: ${b} (${b<25?'NORMALE':'SOVRAPPESO'})`;
-            div.style.background = b < 25 ? "#4caf50" : "#ff9800";
-        }
+        if(p && a) document.getElementById(`bmi-${u}`).innerText = "BMI: " + (p / (a*a)).toFixed(1);
     }
 
-    let photoTarget = "";
-    function takePhoto(id) { photoTarget = id; document.getElementById('cameraInput').click(); }
-    document.getElementById('cameraInput').onchange = function(e) {
-        const file = e.target.files[0]; if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            db.ref("dailyData/" + curKey + "/img-" + photoTarget).set(event.target.result);
-            aggiornaUIFoto(photoTarget, event.target.result);
-        };
-        reader.readAsDataURL(file);
-    };
-
-    function aggiornaUIFoto(id, src) {
-        const c = document.getElementById("cont-img-"+id), i = document.getElementById("img-"+id);
-        if(src){ i.src = src; c.classList.add('visible'); } else { c.classList.remove('visible'); }
-    }
-
-    function deletePhoto(id) { if(confirm("Cancello?")) { db.ref("dailyData/"+curKey+"/img-"+id).remove(); aggiornaUIFoto(id, null); } }
-
-    function startVoice(tid) {
-        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        rec.lang = 'it-IT';
-        const btn = event.currentTarget;
-        rec.onstart = () => btn.classList.add('recording');
-        rec.onend = () => btn.classList.remove('recording');
-        rec.onresult = (e) => {
-            const el = document.getElementById(tid);
-            el.value = (el.value ? el.value + " " : "") + e.results[0][0].transcript;
-            salvaDato(el);
-        };
-        rec.start();
-    }
-
-    function salvaDato(el) { db.ref("dailyData/"+curKey+"/"+el.id).set(el.value); statusUpdate(); }
-    function salvaCheckV3(el, id) { db.ref("dailyData/"+curKey+"/"+(id||el.id)).set(el.checked); statusUpdate(); }
-    function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(() => { document.getElementById('sync-status').innerText="✅ SINCRO"; renderCalendar(); }, 500); }
-
-    function openTab(e, id) { 
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
-        if(id === 'tab-report') initChart();
-    }
-    
     function initChart() {
-        db.ref("dailyData").limitToLast(10).once('value', snap => {
-            const data = snap.val() || {}, labels = [], wM = [], wL = [];
+        db.ref("dailyData").limitToLast(20).once('value', snapshot => {
+            const data = snapshot.val() || {};
+            const labels = [], wM = [], wL = [];
             Object.keys(data).sort().forEach(k => {
-                if(data[k]['peso-m'] || data[k]['peso-l']) {
-                    labels.push(k.split('-')[2]); wM.push(data[k]['peso-m'] || null); wL.push(data[k]['peso-l'] || null);
+                if(data[k]['peso-m'] || data[k]['peso-l']){
+                    labels.push(k.split('-')[2]+"/"+k.split('-')[1]);
+                    wM.push(data[k]['peso-m'] || null); wL.push(data[k]['peso-l'] || null);
                 }
             });
             if(weightChart) weightChart.destroy();
-            weightChart = new Chart(document.getElementById('weightChart'), { type: 'line', data: { labels: labels, datasets: [{ label: 'M', data: wM, borderColor: '#2196f3', tension: 0.3 }, { label: 'L', data: wL, borderColor: '#e91e63', tension: 0.3 }] }, options: { maintainAspectRatio: false } });
+            weightChart = new Chart(document.getElementById('weightChart'), { type: 'line', data: { labels: labels.slice(-7), datasets: [{ label: 'M', data: wM.slice(-7), borderColor: '#2196f3' }, { label: 'L', data: wL.slice(-7), borderColor: '#e91e63' }] } });
         });
     }
 
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
-    function navigaGiorno(n) { let d = new Date(curKey.split('-').join('/')); d.setDate(d.getDate()+n); apriDettaglio(d); }
-    function zoomImg(src) { document.getElementById('view-src').src = src; document.getElementById('img-viewer').style.display = 'flex'; }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
-
-    window.onload = () => { renderCalendar(); checkTodayEvents(); };
+    function zoomImg(src) { document.getElementById('view-src').src = src; document.getElementById('img-viewer').style.display = 'flex'; }
+    function navigaGiorno(n) { let d = new Date(curKey.split('-').join('/')); d.setDate(d.getDate()+n); apriDettaglio(d); }
+    function openTab(e, id) { 
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
+        if(id === 'tab-report') setTimeout(initChart, 200);
+    }
+    window.onload = () => renderCalendar();
 </script>
 </body>
 </html>
