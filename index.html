@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v39.7</title>
+    <title>Massy e Lilly v39.8</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
@@ -42,8 +43,13 @@
         
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.75rem; }
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
-        .bmi-badge { background: var(--report); color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-top: 5px; }
+        
+        .bmi-container { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
+        .bmi-badge { background: var(--report); color: white; padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; width: fit-content; }
+        .bmi-status { font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 5px; width: fit-content; }
+        
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .chart-box { height: 200px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -108,31 +114,36 @@
         </div>
 
         <div id="tab-report" class="tab-content">
-            <div class="time-header">📉 PARAMETRI MASSIMO</div>
+            <div class="time-header">📈 PARAMETRI MASSIMO</div>
             <div class="card m-border">
                 <div class="input-group"><label>PESO (kg)</label><input type="number" id="peso-m" step="0.1" oninput="calcBMI('m')"></div>
                 <div class="input-group"><label>ALT. (cm)</label><input type="number" id="alt-m" oninput="calcBMI('m')"></div>
-                <div class="input-group"><label>GRASSO %</label><input type="number" id="fat-m" oninput="salvaDato(this)"></div>
-                <div id="bmi-m" class="bmi-badge">BMI: --</div>
+                <div class="bmi-container">
+                    <div id="bmi-m" class="bmi-badge">BMI: --</div>
+                    <div id="bmi-status-m" class="bmi-status"></div>
+                </div>
             </div>
-            <div class="time-header">📉 PARAMETRI LILIANA</div>
+            <div class="time-header">📈 PARAMETRI LILIANA</div>
             <div class="card l-border">
                 <div class="input-group"><label>PESO (kg)</label><input type="number" id="peso-l" step="0.1" oninput="calcBMI('l')"></div>
                 <div class="input-group"><label>ALT. (cm)</label><input type="number" id="alt-l" oninput="calcBMI('l')"></div>
-                <div class="input-group"><label>GRASSO %</label><input type="number" id="fat-l" oninput="salvaDato(this)"></div>
-                <div id="bmi-l" class="bmi-badge">BMI: --</div>
+                <div class="bmi-container">
+                    <div id="bmi-l" class="bmi-badge">BMI: --</div>
+                    <div id="bmi-status-l" class="bmi-status"></div>
+                </div>
+            </div>
+            <div class="time-header">📊 TREND PESO (Ultimi 7 inserimenti)</div>
+            <div class="card chart-box">
+                <canvas id="weightChart"></canvas>
             </div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSIMO</button>
-            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 SPOTIFY LILIANA</button>
             <div class="time-header">🧘 WELLNESS</div>
             <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout','_blank')">🩰 PILATES</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+meditation','_blank')">🧠 MINDFULNESS</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=ocean+waves+sound','_blank')">🌊 RUMORE DEL MARE</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=ocean+waves+sound','_blank')">🌊 MARE</button>
         </div>
     </div>
 </div>
@@ -150,19 +161,20 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.)"}, {t:"12:00", c:"ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.)"}, {t:"13:00", c:"ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:00", c:"ACQUA GYM (Giulia)"}],
-        "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola)"}, {t:"13:00", c:"ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff)"}, {t:"18:00", c:"ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE (Roby)"}, {t:"10:00", c:"TONIFICAZIONE (Roby)"}, {t:"10:15", c:"ACQUA STRONG (Francy)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"12:00", c:"ACQUA GYM (Super Simo)"}, {t:"13:00", c:"TOTAL BODY (Simone L.)"}, {t:"13:00", c:"ACQUA BIKE (Super Simo)"}, {t:"15:00", c:"YOGA (Riccardo)"}, {t:"16:00", c:"TONE UP (Gianni)"}, {t:"16:00", c:"ACQUA BIKE (Fabio)"}, {t:"17:00", c:"BODY SCULPTURE (Duilio)"}, {t:"17:15", c:"ACQUA TONE (Giulia)"}, {t:"18:00", c:"G.A.G (Duilio)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"PUMP (Vincenzo)"}],
-        "Giovedì": [{t:"09:00", c:"TONE UP (Duilio)"}, {t:"10:00", c:"PILATES (Giuseppe)"}, {t:"11:00", c:"TONE UP (Giuseppe)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"POWER YOGA (Domenico)"}, {t:"13:15", c:"ACQUA GYM (Giulia)"}, {t:"13:30", c:"FIT BOXE (Giancarlo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"G.A.G (Manuela)"}, {t:"18:00", c:"ACQUA GYM (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"BODY COND. (Beppe)"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G (Super Simo)"}, {t:"10:00", c:"CIRCUIT TRAINING (Super Simo)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"13:00", c:"ACQUA GYM (Francy)"}, {t:"13:00", c:"SPINNING (Michela)"}, {t:"17:00", c:"YOGA (Riccardo)"}, {t:"18:00", c:"FIT DANCE (Stefano P.)"}, {t:"18:00", c:"ACQUA FIT (Francy)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Francy)"}],
-        "Sabato": [{t:"09:00", c:"YOGA (Giancarlo)"}, {t:"10:00", c:"TONE UP (Giancarlo)"}, {t:"11:00", c:"MOBILITY (Simona B.)"}, {t:"11:30", c:"ACQUA BIKE (Staff)"}, {t:"12:00", c:"FIT DANCE (Stefano P.)"}, {t:"12:00", c:"ACQUA GYM (Katty)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}],
-        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA (Staff)"}]
+        "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL"}, {t:"12:00", c:"ACQUA GYM"}, {t:"13:00", c:"FAT BURNS"}, {t:"16:00", c:"BODY FIT"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"S. PUMP"}, {t:"19:00", c:"SPINNING"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE"}, {t:"10:00", c:"TONE UP"}, {t:"12:00", c:"AERO DANCE"}, {t:"13:00", c:"ACQUA TONE"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"KRAV MAGA"}, {t:"19:00", c:"TRX"}, {t:"20:00", c:"ZUMBA"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE"}, {t:"10:00", c:"TONIFICAZIONE"}, {t:"12:00", c:"TOTAL BODY"}, {t:"13:00", c:"ACQUA BIKE"}, {t:"15:00", c:"YOGA"}, {t:"17:00", c:"BODY SCULPTURE"}, {t:"18:00", c:"G.A.G"}, {t:"19:00", c:"TONE UP"}, {t:"20:00", c:"PUMP"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP"}, {t:"10:00", c:"PILATES"}, {t:"12:00", c:"AERO DANCE"}, {t:"13:00", c:"POWER YOGA"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"G.A.G"}, {t:"19:00", c:"SPINNING"}, {t:"20:00", c:"BODY COND."}],
+        "Venerdì": [{t:"09:00", c:"G.A.G"}, {t:"10:00", c:"CIRCUIT TRAINING"}, {t:"12:00", c:"TOTAL BODY"}, {t:"13:00", c:"LATIN MOOVE"}, {t:"17:00", c:"YOGA"}, {t:"18:00", c:"FIT DANCE"}, {t:"19:00", c:"TONE UP"}],
+        "Sabato": [{t:"09:00", c:"YOGA"}, {t:"10:00", c:"TONE UP"}, {t:"11:00", c:"MOBILITY"}, {t:"12:00", c:"FIT DANCE"}],
+        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA"}]
     };
 
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
     let dataCorrente = new Date();
+    let weightChart = null;
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
@@ -194,25 +206,68 @@
             }).join("");
             document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
             document.getElementById('gym-list-l').innerHTML = buildList('l') || "Nessun corso";
-            const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','fat-m','peso-l','alt-l','fat-l'];
+            const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','peso-l','alt-l'];
             ids.forEach(id => { document.getElementById(id).value = v[id] || ""; });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
             calcBMI('m'); calcBMI('l');
+            initChart();
         });
     }
 
     function calcBMI(u) {
-        const p = document.getElementById(`peso-${u}`).value;
-        const a = document.getElementById(`alt-${u}`).value / 100;
+        const p = parseFloat(document.getElementById(`peso-${u}`).value);
+        const a = parseFloat(document.getElementById(`alt-${u}`).value) / 100;
         const bmiEl = document.getElementById(`bmi-${u}`);
+        const statusEl = document.getElementById(`bmi-status-${u}`);
+        
         if(p && a) {
             const res = (p / (a*a)).toFixed(1);
             bmiEl.innerText = "BMI: " + res;
+            let status = ""; let color = "";
+            if(res < 18.5) { status = "SOTTOPESO"; color = "#ffc107"; }
+            else if(res < 25) { status = "NORMOPESO"; color = "#4caf50"; }
+            else if(res < 30) { status = "SOVRAPPESO"; color = "#ff9800"; }
+            else { status = "OBESITÀ"; color = "#f44336"; }
+            statusEl.innerText = status;
+            statusEl.style.backgroundColor = color;
+            statusEl.style.color = "white";
             db.ref("dailyData/" + curKey + "/peso-" + u).set(p);
             db.ref("dailyData/" + curKey + "/alt-" + u).set(document.getElementById(`alt-${u}`).value);
-        } else bmiEl.innerText = "BMI: --";
+        } else {
+            bmiEl.innerText = "BMI: --";
+            statusEl.innerText = "";
+            statusEl.style.backgroundColor = "transparent";
+        }
         statusUpdate();
+    }
+
+    function initChart() {
+        db.ref("dailyData").limitToLast(30).once('value', snapshot => {
+            const data = snapshot.val() || {};
+            const labels = []; const weightsM = []; const weightsL = [];
+            Object.keys(data).sort().forEach(k => {
+                if(data[k]['peso-m'] || data[k]['peso-l']) {
+                    labels.push(k.split('-').slice(1).reverse().join('/'));
+                    weightsM.push(data[k]['peso-m'] || null);
+                    weightsL.push(data[k]['peso-l'] || null);
+                }
+            });
+
+            if(weightChart) weightChart.destroy();
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            weightChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.slice(-7),
+                    datasets: [
+                        { label: 'Massy', data: weightsM.slice(-7), borderColor: '#2196f3', tension: 0.3, spanGaps: true },
+                        { label: 'Lilly', data: weightsL.slice(-7), borderColor: '#e91e63', tension: 0.3, spanGaps: true }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        });
     }
 
     function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
@@ -226,6 +281,7 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
+        if(id === 'tab-report') setTimeout(initChart, 100);
     }
     window.onload = renderCalendar;
 </script>
