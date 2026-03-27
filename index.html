@@ -3,39 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v39.3</title>
+    <title>Massy e Lilly v39.5</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --massimo: #2196f3; --liliana: #e91e63;
-            --relax: #9c27b0; --spotify: #1DB954;
-            --agenda: #ff9800;
+            --spotify: #1DB954;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: var(--text); }
         
-        /* Agenda Home */
-        .agenda-home { max-width: 900px; margin: 10px auto; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .agenda-card { background: white; border-radius: 15px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid #ccc; }
-        .agenda-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
-
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; padding: 12px; max-width: 900px; margin: auto; }
-        .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 2px solid transparent; }
-        .day-dot.selected { background: #fffde7; border-color: var(--agenda); }
-        .day-dot.today { border-color: var(--primary); background: #e0f2f1; }
+        .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; }
         .day-dot .num { font-size: 1.4rem; font-weight: 900; }
 
-        /* Modal & Tabs */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 95vh; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; overflow: hidden; }
-        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; overflow-x: auto; }
+        
+        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; }
         .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
         .tab-content { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; box-sizing: border-box; }
         .tab-content.active { display: block; }
 
@@ -43,8 +36,8 @@
         .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
         
-        textarea, input { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
-        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
+        textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; font-family: inherit; }
+        .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.75rem; }
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
         #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; }
     </style>
@@ -53,7 +46,7 @@
 
 <div class="header">
     <h2 style="margin:0; font-size: 1.1rem;">🍱 Massy e Lilly</h2>
-    <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO ATTIVA</div>
+    <div id="sync-status" style="font-size: 0.55rem; font-weight: bold;">✅ SINCRO</div>
 </div>
 
 <div class="nav-bar">
@@ -62,59 +55,49 @@
     <button class="btn-nav" onclick="cambiaSett(7)">▶</button>
 </div>
 
-<div id="agenda-date-label" style="text-align:center; font-size:0.75rem; font-weight:900; margin-top:10px; color:var(--agenda); text-transform: uppercase;"></div>
-<div class="agenda-home">
-    <div class="agenda-card" style="border-color: var(--massimo);">
-        <div class="agenda-title" style="color:var(--massimo)">Massimo ♂</div>
-        <textarea id="agenda-m" rows="3" placeholder="Es: 15:30 Riunione" oninput="salvaDato(this)"></textarea>
-    </div>
-    <div class="agenda-card" style="border-color: var(--liliana);">
-        <div class="agenda-title" style="color:var(--liliana)">Liliana ♀</div>
-        <textarea id="agenda-l" rows="3" placeholder="Es: 10:00 Estetista" oninput="salvaDato(this)"></textarea>
-    </div>
-</div>
-
 <div class="calendar-grid" id="grid"></div>
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px;">
-            <button class="btn-nav" onclick="navigaGiorno(-1)">◀</button>
-            <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.2rem;"></h2>
-            <button class="btn-nav" onclick="navigaGiorno(1)">▶</button>
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px 0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn-nav" onclick="navigaGiorno(-1)">◀</button>
+                <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.1rem; min-width: 120px; text-align:center;"></h2>
+                <button class="btn-nav" onclick="navigaGiorno(1)">▶</button>
+            </div>
             <span style="font-size:2rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
         </div>
 
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-menu')">🍴 MENÙ</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-agenda')">📅 AGENDA</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-menu')">🍴 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-report')">📊 REPORT</button>
         </div>
 
-        <div id="tab-menu" class="tab-content active">
+        <div id="tab-agenda" class="tab-content active">
+            <div class="time-header">📌 IMPEGNI</div>
+            <div class="card m-border"><div style="font-size:0.7rem; font-weight:900; color:var(--massimo)">MASSIMO</div><textarea id="agenda-m" rows="4" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><div style="font-size:0.7rem; font-weight:900; color:var(--liliana)">LILIANA</div><textarea id="agenda-l" rows="4" oninput="salvaDato(this)"></textarea></div>
+        </div>
+
+        <div id="tab-menu" class="tab-content">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border">MASSY<textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border">LILLY<textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border">MASSY<textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border">LILLY<textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border">MASSY<textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border">LILLY<textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border"><textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border">
-                <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button>
-            </div>
-            <div class="card l-border">
-                <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button>
-            </div>
-            <div class="time-header">📅 CORSI</div>
+            <div class="card m-border"><label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI M.</label><button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button></div>
+            <div class="card l-border"><label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI L.</label><button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button></div>
+            <div class="time-header">📅 CORSI DEL GIORNO</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
@@ -123,14 +106,6 @@
             <div class="time-header">🎵 SPOTIFY</div>
             <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSIMO</button>
             <button class="btn-view" style="background:var(--spotify); margin-top:15px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 SPOTIFY LILIANA</button>
-        </div>
-
-        <div id="tab-report" class="tab-content">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border">Peso M (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
-                <div class="card l-border">Peso L (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
-            </div>
-            <canvas id="weightChart"></canvas>
         </div>
     </div>
 </div>
@@ -148,71 +123,56 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"18:00", c:"S. Pump", i:"Vincenzo"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
-        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"19:00", c:"TRX", i:"Vincenzo"}, {t:"20:00", c:"Zumba", i:"Nicola"}],
-        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:00", c:"Tonificazione", i:"Roby"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"17:00", c:"Body Sculpture", i:"Duilio"}, {t:"18:00", c:"G.A.G", i:"Duilio"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
-        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Power Yoga", i:"Domenico"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:00", c:"Circuit Training", i:"Simo"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Fit Dance", i:"Stefano P."}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
-        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}],
-        "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
+        "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.) / ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.) / ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo) / ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe) / ACQUA GYM (Giulia)"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola) / ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff) / ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE (Roby)"}, {t:"10:00", c:"TONIFICAZIONE (Roby) / ACQUA STRONG (Francy 10:15)"}, {t:"12:00", c:"TOTAL BODY (Franklin) / ACQUA GYM (Super Simo)"}, {t:"13:00", c:"TOTAL BODY (Simone L.) / ACQUA BIKE (Super Simo)"}, {t:"15:00", c:"YOGA (Riccardo)"}, {t:"16:00", c:"TONE UP (Gianni) / ACQUA BIKE (Fabio)"}, {t:"17:00", c:"BODY SCULPTURE (Duilio)"}, {t:"17:15", c:"ACQUA TONE (Giulia)"}, {t:"18:00", c:"G.A.G (Duilio) / ACQUA FIT (Giulia)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"PUMP (Vincenzo)"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP (Duilio)"}, {t:"10:00", c:"PILATES (Giuseppe)"}, {t:"11:00", c:"TONE UP (Giuseppe)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"POWER YOGA (Domenico)"}, {t:"13:15", c:"ACQUA GYM (Giulia)"}, {t:"13:30", c:"FIT BOXE (Giancarlo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"G.A.G (Manuela) / ACQUA GYM (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Giulia)"}, {t:"20:00", c:"BODY COND. (Beppe)"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G (Super Simo)"}, {t:"10:00", c:"CIRCUIT TRAINING (Super Simo) / ACQUA FIT (Francy 10:15)"}, {t:"12:00", c:"TOTAL BODY (Franklin)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo) / ACQUA GYM (Francy) / SPINN (Michela)"}, {t:"17:00", c:"YOGA (Riccardo)"}, {t:"18:00", c:"FIT DANCE (Stefano P.) / ACQUA FIT (Francy)"}, {t:"19:00", c:"TONE UP (Beppe)"}, {t:"19:15", c:"ACQUA BIKE (Francy)"}],
+        "Sabato": [{t:"09:00", c:"YOGA (Giancarlo)"}, {t:"10:00", c:"TONE UP (Giancarlo)"}, {t:"11:00", c:"MOBILITY (Simona B.) / ACQUA BIKE (11:30)"}, {t:"12:00", c:"FIT DANCE (Stefano P.) / ACQUA GYM (Katty)"}, {t:"13:00", c:"LATIN MOOVE (Osvaldo)"}],
+        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA (Staff)"}]
     };
 
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
-    let dataSelezionata = new Date();
+    let dataCorrente = new Date();
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         for(let i=0; i<7; i++){
             let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
             let dot = document.createElement('div');
-            dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''} ${d.toDateString()==dataSelezionata.toDateString()?'selected':''}`;
-            dot.onclick = () => selezionaGiorno(new Date(d));
-            dot.innerHTML = `<span style="font-size:0.6rem; color:#999;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span>`;
+            dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''}`;
+            dot.onclick = () => apriDettaglio(new Date(d));
+            dot.innerHTML = `<span style="font-size:0.6rem; color:#999; font-weight:bold;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span>`;
             grid.appendChild(dot);
         }
         document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
     }
 
-    function selezionaGiorno(data) {
-        dataSelezionata = new Date(data);
-        curKey = `${dataSelezionata.getFullYear()}-${dataSelezionata.getMonth()+1}-${dataSelezionata.getDate()}`;
-        document.getElementById('agenda-date-label').innerText = dataSelezionata.toLocaleDateString('it-IT',{weekday:'long', day:'numeric', month:'long'});
-        db.ref("dailyData/" + curKey).once('value', snap => {
-            const v = snap.val() || {};
-            document.getElementById('agenda-m').value = v['agenda-m'] || "";
-            document.getElementById('agenda-l').value = v['agenda-l'] || "";
-        });
-        renderCalendar();
-    }
-
     function apriDettaglio(data) {
-        selezionaGiorno(data);
-        let gL = dataSelezionata.toLocaleDateString('it-IT', {weekday:'long'});
+        dataCorrente = new Date(data);
+        curKey = `${dataCorrente.getFullYear()}-${dataCorrente.getMonth()+1}-${dataCorrente.getDate()}`;
+        let gL = dataCorrente.toLocaleDateString('it-IT', {weekday:'long'});
         gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + dataSelezionata.getDate();
+        document.getElementById('modal-title').innerText = gL + " " + dataCorrente.getDate();
         document.getElementById('modal').style.display = 'flex';
+
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
             const buildList = (u) => corsi.map(c => {
-                const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.replace(/\s+/g,'').toLowerCase()}`;
-                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b>${c.t}</b> ${c.c}</div>`;
+                const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,10).replace(/\s+/g,'').toLowerCase()}`;
+                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b>${c.t}</b> &nbsp; ${c.c}</div>`;
             }).join("");
+            
             document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
             document.getElementById('gym-list-l').innerHTML = buildList('l') || "Nessun corso";
-            ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','peso-m','peso-l'].forEach(id => {
-                if(document.getElementById(id)) document.getElementById(id).value = v[id] || "";
-            });
+            ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l'].forEach(id => { document.getElementById(id).value = v[id] || ""; });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
     }
-
-    document.addEventListener('click', e => {
-        if(e.target.closest('.day-dot')?.classList.contains('selected')) apriDettaglio(dataSelezionata);
-    });
 
     function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
     function salvaCheckV3(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); statusUpdate(); }
@@ -220,15 +180,14 @@
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
-    function navigaGiorno(n) { dataSelezionata.setDate(dataSelezionata.getDate()+n); apriDettaglio(new Date(dataSelezionata)); }
+    function navigaGiorno(n) { dataCorrente.setDate(dataCorrente.getDate()+n); apriDettaglio(new Date(dataCorrente)); }
     function openTab(e, id) { 
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         e.currentTarget.classList.add('active');
     }
-
-    window.onload = () => { selezionaGiorno(new Date()); renderCalendar(); };
+    window.onload = renderCalendar;
 </script>
 </body>
 </html>
