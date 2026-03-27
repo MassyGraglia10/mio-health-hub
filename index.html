@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v40.1</title>
+    <title>Massy e Lilly v40.2</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -135,8 +135,13 @@
 
         <div id="tab-relax" class="tab-content">
             <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/playlist/37i9dQZF1E356WbU96z3rY','_blank')">🎧 SPOTIFY MASSIMO</button>
-            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/playlist/37i9dQZF1E38392XAnF8Bf','_blank')">🎧 SPOTIFY LILIANA</button>
+            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/')">🎧 SPOTIFY MASSIMO</button>
+            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/')">🎧 SPOTIFY LILIANA</button>
+            <div class="time-header">🧘 WELLNESS</div>
+            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout','_blank')">🩰 PILATES</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+meditation','_blank')">🧠 MINDFULNESS</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=ocean+waves+sound','_blank')">🌊 MARE</button>
         </div>
     </div>
 </div>
@@ -169,16 +174,25 @@
     let dataCorrente = new Date();
     let weightChart = null;
 
-    // --- FUNZIONE FAST ALERT ---
-    function checkImpegniOggi() {
+    // --- LOGICA NOTIFICA SOLO ALL'APERTURA ---
+    function checkAlertOggi() {
+        // Se in questa sessione abbiamo già mostrato l'alert, non fare nulla
+        if (sessionStorage.getItem('alertMostrato')) return;
+
         const oggi = new Date();
-        const keyOggi = `${oggi.getFullYear()}-${oggi.getMonth()+1}-${oggi.getDate()}`;
-        db.ref("dailyData/" + keyOggi).once('value', snapshot => {
+        const k = `${oggi.getFullYear()}-${oggi.getMonth()+1}-${oggi.getDate()}`;
+        
+        db.ref("dailyData/" + k).once('value', snapshot => {
             const v = snapshot.val() || {};
-            let msg = "";
-            if (v['agenda-m'] && v['agenda-m'].trim() !== "") msg += "🟦 MASSIMO: " + v['agenda-m'] + "\n";
-            if (v['agenda-l'] && v['agenda-l'].trim() !== "") msg += "🟪 LILIANA: " + v['agenda-l'] + "\n";
-            if (msg !== "") alert("⚠️ ATTENZIONE! IMPEGNI DI OGGI:\n\n" + msg);
+            let impegni = "";
+            if (v['agenda-m'] && v['agenda-m'].trim() !== "") impegni += "🔹 MASSIMO: " + v['agenda-m'] + "\n";
+            if (v['agenda-l'] && v['agenda-l'].trim() !== "") impegni += "🔸 LILIANA: " + v['agenda-l'] + "\n";
+            
+            if (impegni !== "") {
+                alert("✨ PROMEMORIA DI OGGI ✨\n\n" + impegni);
+                // Segna come mostrato per questa sessione
+                sessionStorage.setItem('alertMostrato', 'true');
+            }
         });
     }
 
@@ -285,7 +299,7 @@
     
     window.onload = () => {
         renderCalendar();
-        checkImpegniOggi(); // Esegue il controllo immediato
+        checkAlertOggi(); // Esegue il controllo intelligente
     };
 </script>
 </body>
