@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v40.4 - Voice & Design</title>
+    <title>Massy e Lilly v40.5 - Stable</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -109,79 +109,55 @@
 
         <div id="tab-menu" class="tab-content">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border">
-                <span class="user-label m-label">MASSIMO</span>
-                <textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea>
-                <button class="voice-btn" onclick="startVoice('col-m')">🎤</button>
-            </div>
-            <div class="card l-border">
-                <span class="user-label l-label">LILIANA</span>
-                <textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea>
-                <button class="voice-btn" onclick="startVoice('col-l')">🎤</button>
-            </div>
-
+            <div class="card m-border"><span class="user-label m-label">MASSIMO</span><textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><span class="user-label l-label">LILIANA</span><textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border">
-                <span class="user-label m-label">MASSIMO</span>
-                <textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea>
-                <button class="voice-btn" onclick="startVoice('pra-m')">🎤</button>
-            </div>
-            <div class="card l-border">
-                <span class="user-label l-label">LILIANA</span>
-                <textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea>
-                <button class="voice-btn" onclick="startVoice('pra-l')">🎤</button>
-            </div>
-
+            <div class="card m-border"><span class="user-label m-label">MASSIMO</span><textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><span class="user-label l-label">LILIANA</span><textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border">
-                <span class="user-label m-label">MASSIMO</span>
-                <textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea>
-                <button class="voice-btn" onclick="startVoice('cen-m')">🎤</button>
-            </div>
-            <div class="card l-border">
-                <span class="user-label l-label">LILIANA</span>
-                <textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea>
-                <button class="voice-btn" onclick="startVoice('cen-l')">🎤</button>
-            </div>
+            <div class="card m-border"><span class="user-label m-label">MASSIMO</span><textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border"><span class="user-label l-label">LILIANA</span><textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border"><label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI M.</label><button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button></div>
-            <div class="card l-border"><label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI L.</label><button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button></div>
+            <div class="card m-border">
+                <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI M.</label>
+                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button>
+            </div>
+            <div class="card l-border">
+                <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI L.</label>
+                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button>
+            </div>
             <div class="time-header">📅 CORSI DEL GIORNO</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
         <div id="tab-report" class="tab-content">
-            <div class="time-header">📈 PARAMETRI MASSIMO</div>
+            <div class="time-header">📈 PARAMETRI</div>
             <div class="card m-border">
-                <div class="input-group"><label>PESO (kg)</label><input type="number" id="peso-m" step="0.1" oninput="calcBMI('m')"></div>
-                <div class="input-group"><label>ALT. (cm)</label><input type="number" id="alt-m" oninput="calcBMI('m')"></div>
-                <div id="bmi-m" class="bmi-badge">BMI: --</div>
-                <div id="status-m" class="bmi-status"></div>
+                <span class="user-label m-label">MASSIMO</span>
+                <div class="input-group"><label>PESO</label><input type="number" id="peso-m" step="0.1" oninput="calcBMI('m')"></div>
+                <div class="input-group"><label>ALT.</label><input type="number" id="alt-m" oninput="calcBMI('m')"></div>
+                <div id="bmi-m" class="bmi-badge">BMI: --</div><div id="status-m" class="bmi-status"></div>
             </div>
-            <div class="time-header">📈 PARAMETRI LILIANA</div>
             <div class="card l-border">
-                <div class="input-group"><label>PESO (kg)</label><input type="number" id="peso-l" step="0.1" oninput="calcBMI('l')"></div>
-                <div class="input-group"><label>ALT. (cm)</label><input type="number" id="alt-l" oninput="calcBMI('l')"></div>
-                <div id="bmi-l" class="bmi-badge">BMI: --</div>
-                <div id="status-l" class="bmi-status"></div>
+                <span class="user-label l-label">LILIANA</span>
+                <div class="input-group"><label>PESO</label><input type="number" id="peso-l" step="0.1" oninput="calcBMI('l')"></div>
+                <div class="input-group"><label>ALT.</label><input type="number" id="alt-l" oninput="calcBMI('l')"></div>
+                <div id="bmi-l" class="bmi-badge">BMI: --</div><div id="status-l" class="bmi-status"></div>
             </div>
-            <div class="time-header">📊 TREND PESO (Ultimi 7)</div>
             <div class="card chart-box"><canvas id="weightChart"></canvas></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com')">🎧 SPOTIFY MASSIMO</button>
-            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=n1X3onJWT1G-zvQG4ZIR0w')">🎧 SPOTIFY LILIANA</button>
+            <div class="time-header">🎵 QUICK LINKS</div>
+            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('spotify:user:massimo')">🎧 SPOTIFY M.</button>
+            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('spotify:user:liliana')">🎧 SPOTIFY L.</button>
             <div class="time-header">🧘 WELLNESS</div>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout','_blank')">🩰 PILATES</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+meditation','_blank')">🧠 MINDFULNESS</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=ocean+waves+sound','_blank')">🌊 MARE</button>
+            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session')">🧘 YOGA</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=ocean+sounds')">🌊 RELAX SOUNDS</button>
         </div>
     </div>
 </div>
@@ -198,6 +174,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // --- PALINSESTO ORIGINALE PRESERVATO ---
     const palinsesto = {
         "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.)"}, {t:"12:00", c:"ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.)"}, {t:"13:00", c:"ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:00", c:"ACQUA GYM (Giulia)"}],
         "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola)"}, {t:"13:00", c:"ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff)"}, {t:"18:00", c:"ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
@@ -213,21 +190,6 @@
     let curKey = "";
     let dataCorrente = new Date();
     let weightChart = null;
-
-    function startVoice(targetId) {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'it-IT';
-        const btn = event.currentTarget;
-        recognition.onstart = () => btn.classList.add('recording');
-        recognition.onend = () => btn.classList.remove('recording');
-        recognition.onresult = (event) => {
-            const text = event.results[0][0].transcript;
-            const el = document.getElementById(targetId);
-            el.value = (el.value ? el.value + " " : "") + text;
-            salvaDato(el);
-        };
-        recognition.start();
-    }
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
@@ -249,22 +211,36 @@
         gL = gL.charAt(0).toUpperCase() + gL.slice(1);
         document.getElementById('modal-title').innerText = gL + " " + dataCorrente.getDate();
         document.getElementById('modal').style.display = 'flex';
+        
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
+            
             const buildList = (u) => corsi.map(c => {
                 const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,10).replace(/\s+/g,'').toLowerCase()}`;
                 return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b style="min-width:45px; margin-left:5px;">${c.t}</b><span>${c.c}</span></div>`;
             }).join("");
+
             document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
             document.getElementById('gym-list-l').innerHTML = buildList('l') || "Nessun corso";
+            
             const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','peso-l','alt-l'];
             ids.forEach(id => { document.getElementById(id).value = v[id] || ""; });
+            
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
+            
             calcBMI('m'); calcBMI('l');
             initChart();
         });
+    }
+
+    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
+    function salvaCheckV3(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); statusUpdate(); }
+    function statusUpdate() { 
+        const s = document.getElementById('sync-status');
+        s.innerText = "☁️..."; 
+        setTimeout(()=> s.innerText="✅ SINCRO", 600); 
     }
 
     function calcBMI(u) {
@@ -275,21 +251,15 @@
         if(p && a) {
             const res = (p / (a*a)).toFixed(1);
             bmiEl.innerText = "BMI: " + res;
-            let status = ""; let color = "";
-            if(res < 18.5) { status = "Sottopeso"; color = "#ff9800"; }
-            else if(res < 24.9) { status = "Normale"; color = "#4caf50"; }
-            else if(res < 29.9) { status = "Sovrappeso"; color = "#ff5722"; }
-            else { status = "Obesità"; color = "#f44336"; }
-            statusEl.innerText = status;
-            statusEl.style.color = color;
+            if(res < 18.5) { statusEl.innerText = "Sottopeso"; statusEl.style.color = "#ff9800"; }
+            else if(res < 24.9) { statusEl.innerText = "Normale"; statusEl.style.color = "#4caf50"; }
+            else { statusEl.innerText = "Sovrappeso"; statusEl.style.color = "#f44336"; }
             db.ref("dailyData/" + curKey + "/peso-" + u).set(p);
-            db.ref("dailyData/" + curKey + "/alt-" + u).set(document.getElementById(`alt-${u}`).value);
-        } else { bmiEl.innerText = "BMI: --"; statusEl.innerText = ""; }
-        statusUpdate();
+        }
     }
 
     function initChart() {
-        db.ref("dailyData").limitToLast(50).once('value', snapshot => {
+        db.ref("dailyData").limitToLast(30).once('value', snapshot => {
             const data = snapshot.val() || {};
             const labels = []; const wM = []; const wL = [];
             Object.keys(data).sort().forEach(k => {
@@ -315,9 +285,17 @@
         });
     }
 
-    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
-    function salvaCheckV3(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); statusUpdate(); }
-    function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
+    function startVoice(targetId) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'it-IT';
+        recognition.onresult = (e) => {
+            const el = document.getElementById(targetId);
+            el.value += " " + e.results[0][0].transcript;
+            salvaDato(el);
+        };
+        recognition.start();
+    }
+
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
