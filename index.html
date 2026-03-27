@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Massy e Lilly v41.6 - Full Fitness & Relax</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mio Menu">
+    <link rel="apple-touch-icon" href="icona.png">
+    <meta name="theme-color" content="#26a69a">
+
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -58,7 +66,6 @@
         #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; display: none; align-items: center; justify-content: center; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* Stile per il popup di avviso agenda */
         #alert-popup { 
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: #ff5252; color: white; padding: 15px 25px; border-radius: 20px;
@@ -156,7 +163,7 @@
             <div class="time-header">🎵 MUSICA</div>
             <div style="display:flex; gap:10px;">
                 <button class="btn-view" style="background:var(--massimo); flex:1;" onclick="window.open('spotify:','_blank')">🎧 SPOTY MASSY</button>
-                <button class="btn-view" style="background:var(--liliana); flex:1;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=f0LmNhV2Ru-hA3wkJCq59Q','_blank')">🎧 SPOTY LILLY</button>
+                <button class="btn-view" style="background:var(--liliana); flex:1;" onclick="window.open('spotify:','_blank')">🎧 SPOTY LILLY</button>
             </div>
             <div class="time-header">🎬 CORSI & RELAX</div>
             <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
@@ -257,7 +264,6 @@
         db.ref("dailyData").once('value', snapshot => {
             const allData = snapshot.val() || {};
             
-            // CONTROLLO POPUP APPUNTAMENTI OGGI (CON LETTURA TESTO)
             if(allData[todayKey]) {
                 const agM = allData[todayKey]['agenda-m'] || "";
                 const agL = allData[todayKey]['agenda-l'] || "";
@@ -341,7 +347,14 @@
         document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
         if(id === 'tab-report') setTimeout(initChart, 200);
     }
-    window.onload = () => renderCalendar();
+    
+    window.onload = () => {
+        renderCalendar();
+        // ATTIVAZIONE SERVICE WORKER PER PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => console.log("App Pronta"));
+        }
+    };
 </script>
 </body>
 </html>
