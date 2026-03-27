@@ -136,7 +136,7 @@
             </div>
             <div class="card l-border">
                 <input type="text" id="play-l" placeholder="Link Spotify Lilly..." oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://spotify.com','_blank')">🎧 APRI SPOTIFY LILLY</button>
+                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://spotify.com')">🎧 APRI SPOTIFY LILLY</button>
             </div>
             <div class="time-header">🧘 VIDEO GUIDATI</div>
             <div class="card" style="border-left: 5px solid var(--relax);">
@@ -182,40 +182,45 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // PALINSESTO AGGIORNATO DAL FILE EXCEL
+    // Palinsesto aggiornato basato sul file Excel fornito
     const palinsesto = {
         "Lunedì": [
             {t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, 
             {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, 
             {t:"16:00", c:"Body Fit", i:"Gianni"}, {t:"17:00", c:"Pilates", i:"Duilio"}, 
-            {t:"18:00", c:"Posturale", i:"Duilio"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Beppe"}
+            {t:"18:00", c:"S. Pump", i:"Vincenzo"}, {t:"19:00", c:"Spinning", i:"Beppe"}
         ],
         "Martedì": [
-            {t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"11:00", c:"Pilates", i:"Duilio"},
-            {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"14:00", c:"Latin Moove", i:"Osvaldo"},
-            {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"19:00", c:"TRX", i:"Vincenzo"}
+            {t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, 
+            {t:"11:00", c:"Pilates", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, 
+            {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"14:00", c:"Latin Moove", i:"Osvaldo"},
+            {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, 
+            {t:"19:00", c:"TRX", i:"Vincenzo"}, {t:"20:00", c:"Zumba", i:"Nicola"}
         ],
         "Mercoledì": [
-            {t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:00", c:"Tonificazione", i:"Roby"}, {t:"10:15", c:"Acqua Strong", i:"Francy"},
-            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"15:00", c:"Yoga", i:"Riccardo"},
-            {t:"16:00", c:"Tone Up", i:"Gianni"}, {t:"17:00", c:"Body Sculpture", i:"Duilio"}, 
-            {t:"18:00", c:"Functional Step", i:"Gianni"}, {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}
+            {t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:15", c:"Acqua Strong", i:"Francy"}, 
+            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Total Body", i:"Simone L."}, 
+            {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"16:00", c:"Tone Up", i:"Gianni"},
+            {t:"17:00", c:"Body Sculpture", i:"Duilio"}, {t:"18:00", c:"G.A.G", i:"Duilio"},
+            {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Vincenzo"}
         ],
         "Giovedì": [
-            {t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"11:00", c:"Tone Up", i:"Giuseppe"},
-            {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Power Yoga", i:"Domenico"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"},
-            {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"G.A.G", i:"Manuela"}, 
-            {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}
+            {t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, 
+            {t:"11:00", c:"Tone Up", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, 
+            {t:"13:30", c:"Fit Boxe", i:"Giancarlo"}, {t:"17:00", c:"Pilates", i:"Manuela"}, 
+            {t:"18:00", c:"G.A.G", i:"Manuela"}, {t:"19:00", c:"Spinning", i:"Beppe"}, 
+            {t:"20:00", c:"Body Cond.", i:"Beppe"}
         ],
         "Venerdì": [
-            {t:"09:00", c:"G.A.G", i:"Super Simo"}, {t:"10:00", c:"Circuit Training", i:"Super Simo"}, {t:"10:15", c:"Acqua Fit", i:"Francy"},
-            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"},
-            {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Total Body", i:"Franklin"}, 
-            {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"20:00", c:"Pump", i:"Beppe"}
+            {t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, 
+            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, 
+            {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Fit Dance", i:"Stefano P."}, 
+            {t:"19:00", c:"Tone Up", i:"Beppe"}
         ],
         "Sabato": [
-            {t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."},
-            {t:"12:00", c:"Fit Dance", i:"Stefano P."}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}
+            {t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, 
+            {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."},
+            {t:"13:00", c:"Latin Moove", i:"Osvaldo"}
         ],
         "Domenica": [
             {t:"10:00", c:"Sala Pesi Libera", i:"Staff"}
@@ -262,7 +267,12 @@
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
-            const createList = (u) => corsi.map((c, i) => `<div class="gym-row"><input type="checkbox" ${v['chk-'+u+'-'+i]?'checked':''} onchange="salvaCheckV3(this,'chk-${u}-${i}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`).join("");
+            
+            const createList = (u) => corsi.map((c, i) => {
+                const uniqueId = `chk-${u}-${c.t.replace(':','')}-${i}`;
+                return `<div class="gym-row"><input type="checkbox" ${v[uniqueId]?'checked':''} onchange="salvaCheckV3(this,'${uniqueId}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`
+            }).join("");
+            
             document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b>" + (createList('m') || "<br>Nessun corso");
             document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b>" + (createList('l') || "<br>Nessun corso");
 
@@ -290,7 +300,7 @@
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
 
     function getIMCStatus(val) {
-        if(val === "--") return "";
+        if(val === "--" || isNaN(val)) return "";
         if(val < 18.5) return " (🔵 Sottopeso)";
         if(val < 25) return " (🟢 Regolare)";
         if(val < 30) return " (🟡 Sovrappeso)";
