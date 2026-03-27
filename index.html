@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v39.1</title>
+    <title>Massy e Lilly v39.3</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,47 +12,41 @@
             --primary: #26a69a; --bg: #f4f7f6; --text: #2c3e50; 
             --massimo: #2196f3; --liliana: #e91e63;
             --relax: #9c27b0; --spotify: #1DB954;
+            --agenda: #ff9800;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: var(--text); }
         
+        /* Agenda Home */
+        .agenda-home { max-width: 900px; margin: 10px auto; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .agenda-card { background: white; border-radius: 15px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 4px solid #ccc; }
+        .agenda-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; padding: 12px; max-width: 900px; margin: auto; }
-        .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; }
+        .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 2px solid transparent; }
+        .day-dot.selected { background: #fffde7; border-color: var(--agenda); }
+        .day-dot.today { border-color: var(--primary); background: #e0f2f1; }
         .day-dot .num { font-size: 1.4rem; font-weight: 900; }
 
+        /* Modal & Tabs */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 95vh; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; }
+        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; overflow-x: auto; }
         .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
         .tab-content { flex-grow: 1; overflow-y: auto; padding: 15px; display: none; box-sizing: border-box; }
         .tab-content.active { display: block; }
 
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 15px; display: inline-block; margin: 15px 0 5px; text-transform: uppercase; }
         .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
-        .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
-        textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
-        
+        textarea, input { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
-        .instr { font-size: 0.65rem; color: #aaa; margin-left: auto; font-style: italic; }
-        
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
-        .btn-link { background: var(--relax); margin-bottom: 8px; }
-        .btn-spotify { background: var(--spotify); margin-bottom: 8px; }
-        .report-summary { background: #fff; border: 1px solid var(--primary); border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; }
-        .imc-legend { font-size: 0.65rem; margin-top: 8px; color: #777; line-height: 1.2; }
-        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 0; }
-        .modal-nav { display: flex; align-items: center; gap: 15px; }
-        .btn-nav-sm { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -68,17 +62,27 @@
     <button class="btn-nav" onclick="cambiaSett(7)">▶</button>
 </div>
 
+<div id="agenda-date-label" style="text-align:center; font-size:0.75rem; font-weight:900; margin-top:10px; color:var(--agenda); text-transform: uppercase;"></div>
+<div class="agenda-home">
+    <div class="agenda-card" style="border-color: var(--massimo);">
+        <div class="agenda-title" style="color:var(--massimo)">Massimo ♂</div>
+        <textarea id="agenda-m" rows="3" placeholder="Es: 15:30 Riunione" oninput="salvaDato(this)"></textarea>
+    </div>
+    <div class="agenda-card" style="border-color: var(--liliana);">
+        <div class="agenda-title" style="color:var(--liliana)">Liliana ♀</div>
+        <textarea id="agenda-l" rows="3" placeholder="Es: 10:00 Estetista" oninput="salvaDato(this)"></textarea>
+    </div>
+</div>
+
 <div class="calendar-grid" id="grid"></div>
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-nav">
-                <button class="btn-nav-sm" onclick="navigaGiorno(-1)">◀</button>
-                <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.2rem; min-width: 110px; text-align: center;"></h2>
-                <button class="btn-nav-sm" onclick="navigaGiorno(1)">▶</button>
-            </div>
-            <span style="font-size:1.8rem; color:#ccc; cursor:pointer; line-height: 1;" onclick="chiudi()">×</span>
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px;">
+            <button class="btn-nav" onclick="navigaGiorno(-1)">◀</button>
+            <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.2rem;"></h2>
+            <button class="btn-nav" onclick="navigaGiorno(1)">▶</button>
+            <span style="font-size:2rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
         </div>
 
         <div class="tab-bar">
@@ -90,87 +94,48 @@
 
         <div id="tab-menu" class="tab-content active">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="3" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">MASSY<textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border">LILLY<textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="pra-m" rows="3" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="pra-l" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">MASSY<textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border">LILLY<textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="cen-m" rows="3" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="cen-l" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">MASSY<textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border">LILLY<textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
             <div class="card m-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
+                <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
+                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button>
             </div>
             <div class="card l-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
+                <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
+                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button>
             </div>
-
-            <div class="time-header">📅 CORSI PALINSESTO COMPLETO</div>
+            <div class="time-header">📅 CORSI</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
-
-            <div class="time-header">🏃 ATTIVITÀ EXTRA</div>
-            <div class="card m-border">
-                <div class="user-title">MASSIMO - CORSA (Km/min)</div>
-                <input type="text" id="run-m" placeholder="Es: 10km in 50min" oninput="salvaDato(this)">
-                <div class="user-title" style="margin-top:10px;">MASSIMO - ALTRO</div>
-                <textarea id="altro-m" rows="2" placeholder="Note extra..." oninput="salvaDato(this)"></textarea>
-            </div>
-            <div class="card l-border">
-                <div class="user-title">LILIANA - ALTRO</div>
-                <textarea id="altro-l" rows="2" placeholder="Note extra..." oninput="salvaDato(this)"></textarea>
-            </div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 PLAYLIST SPOTIFY</div>
-            <div class="card m-border">
-                <input type="text" id="play-m" placeholder="Link Spotify Massy..." oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-m').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY MASSY</button>
-            </div>
-            <div class="card l-border">
-                <input type="text" id="play-l" placeholder="Link Spotify Lilly..." oninput="salvaDato(this)">
-                <button class="btn-view btn-spotify" onclick="window.open(document.getElementById('play-l').value || 'https://open.spotify.com','_blank')">🎧 APRI SPOTIFY LILLY</button>
-            </div>
-            <div class="time-header">🧘 VIDEO GUIDATI</div>
-            <div class="card" style="border-left: 5px solid var(--relax);">
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">🧘 YOGA</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=pilates+italiano','_blank')">🤸 PILATES</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=mindfulness+italiano','_blank')">🧠 MEDITAZIONE</button>
-                <button class="btn-view btn-link" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+relaxing','_blank')">🌊 RUMORE DEL MARE</button>
-            </div>
+            <div class="time-header">🎵 SPOTIFY</div>
+            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSIMO</button>
+            <button class="btn-view" style="background:var(--spotify); margin-top:15px;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg','_blank')">🎧 SPOTIFY LILIANA</button>
         </div>
 
         <div id="tab-report" class="tab-content">
-            <div class="time-header">⚖️ DATI FISICI</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border">M: Peso (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)">M: Alt (cm)<input type="number" id="alt-m" oninput="salvaDato(this)"></div>
-                <div class="card l-border">L: Peso (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)">L: Alt (cm)<input type="number" id="alt-l" oninput="salvaDato(this)"></div>
+                <div class="card m-border">Peso M (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
+                <div class="card l-border">Peso L (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
             </div>
-
-            <div class="time-header">📈 INDICE DI MASSA CORPOREA (IMC)</div>
-            <div id="bmi-display" class="report-summary">Calcolo...</div>
-            <div class="imc-legend">
-                🔵 < 18.5: Sottopeso | 🟢 18.5-24.9: Regolare | 🟡 25-29.9: Sovrappeso | 🔴 > 30: Obesità
-            </div>
-
-            <div class="time-header">📊 ANDAMENTO PESO (7gg)</div>
-            <div class="card"><canvas id="weightChart"></canvas></div>
-            
-            <div class="time-header">📝 NOTE</div>
-            <div class="card m-border"><textarea id="note-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="note-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <canvas id="weightChart"></canvas>
         </div>
     </div>
 </div>
 
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height:80%;"></div>
+<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%;"></div>
 
 <script>
     const firebaseConfig = {
@@ -183,181 +148,87 @@
     const db = firebase.database();
 
     const palinsesto = {
-        "Lunedì": [
-            {t:"09:00", c:"Tone Up", i:"Beppe"}, 
-            {t:"10:15", c:"Acqua Fit", i:"Francy"}, 
-            {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"12:00", c:"Acqua Gym", i:"Francesca"},
-            {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"13:00", c:"Acqua Bike", i:"Francesca"},
-            {t:"16:00", c:"Body Fit", i:"Gianni"}, {t:"17:00", c:"Pilates", i:"Duilio"}, 
-            {t:"18:00", c:"S. Pump", i:"Vincenzo"}, {t:"18:00", c:"Acqua Fit", i:"Giulia"},
-            {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"19:00", c:"Acqua Gym", i:"Giulia"}
-        ],
-        "Martedì": [
-            {t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, 
-            {t:"11:00", c:"Pilates", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, 
-            {t:"13:00", c:"Tone Up", i:"Nicola"}, {t:"13:00", c:"Acqua Tone", i:"Fabio"},
-            {t:"14:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Pilates", i:"Manuela"}, 
-            {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"18:00", c:"Acqua Gym", i:"Fabio"},
-            {t:"19:00", c:"TRX", i:"Vincenzo"}, {t:"19:15", c:"Acqua Bike", i:"Fabio"},
-            {t:"20:00", c:"Zumba", i:"Nicola"}
-        ],
-        "Mercoledì": [
-            {t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:00", c:"Tonificazione", i:"Roby"}, {t:"10:15", c:"Acqua Strong", i:"Francy"}, 
-            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"12:00", c:"Acqua Gym", i:"Super Simo"},
-            {t:"13:00", c:"Total Body", i:"Simone L."}, {t:"13:00", c:"Acqua Bike", i:"Super Simo"},
-            {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"16:00", c:"Tone Up", i:"Gianni"}, {t:"16:00", c:"Acqua Bike", i:"Fabio"},
-            {t:"17:00", c:"Body Sculpture", i:"Duilio"}, {t:"17:15", c:"Acqua Tone", i:"Giulia"},
-            {t:"18:00", c:"G.A.G", i:"Duilio"}, {t:"18:00", c:"Acqua Fit", i:"Giulia"},
-            {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"19:15", c:"Acqua Bike", i:"Giulia"},
-            {t:"20:00", c:"Pump", i:"Vincenzo"}
-        ],
-        "Giovedì": [
-            {t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, 
-            {t:"11:00", c:"Tone Up", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, 
-            {t:"13:00", c:"Power Yoga", i:"Domenico"}, {t:"13:15", c:"Acqua Gym", i:"Giulia"}, {t:"13:30", c:"Fit Boxe", i:"Giancarlo"},
-            {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"G.A.G", i:"Manuela"}, {t:"18:00", c:"Acqua Gym", i:"Giulia"},
-            {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"19:15", c:"Acqua Bike", i:"Giulia"},
-            {t:"20:00", c:"Body Cond.", i:"Beppe"}
-        ],
-        "Venerdì": [
-            {t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:00", c:"Circuit Training", i:"Simo"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, 
-            {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"13:00", c:"Acqua Gym", i:"Francy"}, {t:"13:00", c:"Spinning", i:"Michela"},
-            {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Fit Dance", i:"Stefano P."}, {t:"18:00", c:"Acqua Fit", i:"Francy"},
-            {t:"19:00", c:"Tone Up", i:"Beppe"}, {t:"19:15", c:"Acqua Bike", i:"Francy"}
-        ],
-        "Sabato": [
-            {t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, 
-            {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"11:30", c:"Acqua Bike", i:"Staff"},
-            {t:"12:00", c:"Fit Dance", i:"Stefano P."}, {t:"12:00", c:"Acqua Gym", i:"Katty"},
-            {t:"13:00", c:"Latin Moove", i:"Osvaldo"}
-        ],
-        "Domenica": [
-            {t:"10:00", c:"Sala Pesi Libera", i:"Staff"}
-        ]
+        "Lunedì": [{t:"09:00", c:"Tone Up", i:"Beppe"}, {t:"10:15", c:"Acqua Fit", i:"Francy"}, {t:"12:00", c:"Power & Functional", i:"Giorgio R."}, {t:"13:00", c:"Fat Burns", i:"Giorgio R."}, {t:"17:00", c:"Pilates", i:"Duilio"}, {t:"18:00", c:"S. Pump", i:"Vincenzo"}, {t:"19:00", c:"Spinning", i:"Beppe"}],
+        "Martedì": [{t:"09:00", c:"Gym Dance", i:"Giuseppe"}, {t:"10:00", c:"Tone Up", i:"Duilio"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"18:00", c:"Krav Maga", i:"Staff"}, {t:"19:00", c:"TRX", i:"Vincenzo"}, {t:"20:00", c:"Zumba", i:"Nicola"}],
+        "Mercoledì": [{t:"09:00", c:"Posturale", i:"Roby"}, {t:"10:00", c:"Tonificazione", i:"Roby"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"15:00", c:"Yoga", i:"Riccardo"}, {t:"17:00", c:"Body Sculpture", i:"Duilio"}, {t:"18:00", c:"G.A.G", i:"Duilio"}, {t:"20:00", c:"Pump", i:"Vincenzo"}],
+        "Giovedì": [{t:"09:00", c:"Tone Up", i:"Duilio"}, {t:"10:00", c:"Pilates", i:"Giuseppe"}, {t:"12:00", c:"Aero Dance", i:"Nicola"}, {t:"13:00", c:"Power Yoga", i:"Domenico"}, {t:"17:00", c:"Pilates", i:"Manuela"}, {t:"19:00", c:"Spinning", i:"Beppe"}, {t:"20:00", c:"Body Cond.", i:"Beppe"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:00", c:"Circuit Training", i:"Simo"}, {t:"12:00", c:"Total Body", i:"Franklin"}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}, {t:"17:00", c:"Yoga", i:"Riccardo"}, {t:"18:00", c:"Fit Dance", i:"Stefano P."}, {t:"19:00", c:"Tone Up", i:"Beppe"}],
+        "Sabato": [{t:"09:00", c:"Yoga", i:"Giancarlo"}, {t:"10:00", c:"Tone Up", i:"Giancarlo"}, {t:"11:00", c:"Mobility", i:"Simona B."}, {t:"12:00", c:"Fit Dance", i:"Stefano P."}, {t:"13:00", c:"Latin Moove", i:"Osvaldo"}],
+        "Domenica": [{t:"10:00", c:"Sala Pesi Libera", i:"Staff"}]
     };
 
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
-    let dataCorrenteVisualizzata = new Date();
-    let myChart = null;
-
-    function openTab(evt, tabId) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
-        evt.currentTarget.classList.add("active");
-        if(tabId === 'tab-report') generaReportEvoluto();
-    }
+    let dataSelezionata = new Date();
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         for(let i=0; i<7; i++){
             let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
             let dot = document.createElement('div');
-            dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''}`;
-            dot.onclick = () => apriDettaglio(new Date(d));
-            dot.innerHTML = `<span style="font-size:0.6rem; color:#999; font-weight:bold;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span>`;
+            dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''} ${d.toDateString()==dataSelezionata.toDateString()?'selected':''}`;
+            dot.onclick = () => selezionaGiorno(new Date(d));
+            dot.innerHTML = `<span style="font-size:0.6rem; color:#999;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span>`;
             grid.appendChild(dot);
         }
         document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
     }
 
-    function apriDettaglio(data) {
-        dataCorrenteVisualizzata = new Date(data);
-        curKey = `${dataCorrenteVisualizzata.getFullYear()}-${dataCorrenteVisualizzata.getMonth()+1}-${dataCorrenteVisualizzata.getDate()}`;
-        let gL = dataCorrenteVisualizzata.toLocaleDateString('it-IT', {weekday:'long'}); 
-        gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + dataCorrenteVisualizzata.getDate();
-        document.getElementById('modal').style.display = 'flex';
+    function selezionaGiorno(data) {
+        dataSelezionata = new Date(data);
+        curKey = `${dataSelezionata.getFullYear()}-${dataSelezionata.getMonth()+1}-${dataSelezionata.getDate()}`;
+        document.getElementById('agenda-date-label').innerText = dataSelezionata.toLocaleDateString('it-IT',{weekday:'long', day:'numeric', month:'long'});
+        db.ref("dailyData/" + curKey).once('value', snap => {
+            const v = snap.val() || {};
+            document.getElementById('agenda-m').value = v['agenda-m'] || "";
+            document.getElementById('agenda-l').value = v['agenda-l'] || "";
+        });
+        renderCalendar();
+    }
 
+    function apriDettaglio(data) {
+        selezionaGiorno(data);
+        let gL = dataSelezionata.toLocaleDateString('it-IT', {weekday:'long'});
+        gL = gL.charAt(0).toUpperCase() + gL.slice(1);
+        document.getElementById('modal-title').innerText = gL + " " + dataSelezionata.getDate();
+        document.getElementById('modal').style.display = 'flex';
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
-            
-            const createList = (u) => corsi.map((c) => {
-                const safeId = c.c.replace(/\s+/g, '').toLowerCase(); 
-                const uniqueId = `chk-${u}-${c.t.replace(':','')}-${safeId}`;
-                return `<div class="gym-row"><input type="checkbox" ${v[uniqueId]?'checked':''} onchange="salvaCheckV3(this,'${uniqueId}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`
+            const buildList = (u) => corsi.map(c => {
+                const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.replace(/\s+/g,'').toLowerCase()}`;
+                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b>${c.t}</b> ${c.c}</div>`;
             }).join("");
-            
-            document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b><br>" + (createList('m') || "Nessun corso");
-            document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b><br>" + (createList('l') || "Nessun corso");
-
-            const fields = ['peso-m','peso-l','alt-m','alt-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','note-m','note-l','run-m','altro-m','altro-l','play-m','play-l'];
-            fields.forEach(id => { 
+            document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
+            document.getElementById('gym-list-l').innerHTML = buildList('l') || "Nessun corso";
+            ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','peso-m','peso-l'].forEach(id => {
                 if(document.getElementById(id)) document.getElementById(id).value = v[id] || "";
             });
-
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
-            if(document.getElementById('tab-report').classList.contains('active')) calcolaBMI();
         });
     }
 
-    function navigaGiorno(n) {
-        dataCorrenteVisualizzata.setDate(dataCorrenteVisualizzata.getDate() + n);
-        apriDettaglio(new Date(dataCorrenteVisualizzata));
-    }
+    document.addEventListener('click', e => {
+        if(e.target.closest('.day-dot')?.classList.contains('selected')) apriDettaglio(dataSelezionata);
+    });
 
-    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); if(el.id.includes('peso') || el.id.includes('alt')) calcolaBMI(); }
-    function salvaCheckV3(el, cid) { db.ref("dailyData/" + curKey + "/" + (cid || el.id)).set(el.checked); statusUpdate(); }
-    function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
-
-    function getIMCStatus(val) {
-        if(val === "--" || isNaN(val)) return "";
-        if(val < 18.5) return " (🔵 Sottopeso)";
-        if(val < 25) return " (🟢 Regolare)";
-        if(val < 30) return " (🟡 Sovrappeso)";
-        return " (🔴 Obesità)";
-    }
-
-    function calcolaBMI() {
-        const pm = parseFloat(document.getElementById('peso-m').value);
-        const am = parseFloat(document.getElementById('alt-m').value) / 100;
-        const pl = parseFloat(document.getElementById('peso-l').value);
-        const al = parseFloat(document.getElementById('alt-l').value) / 100;
-        let resM = (pm && am) ? (pm / (am * am)).toFixed(1) : "--";
-        let resL = (pl && al) ? (pl / (al * al)).toFixed(1) : "--";
-        document.getElementById('bmi-display').innerHTML = `<b>MASSIMO IMC:</b> ${resM}${getIMCStatus(resM)}<br><b>LILIANA IMC:</b> ${resL}${getIMCStatus(resL)}`;
-    }
-
-    async function generaReportEvoluto() {
-        let labels = [], pM = [], pL = [];
-        for(let i=0; i<7; i++){
-            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
-            let k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-            labels.push(d.getDate());
-            const snap = await db.ref("dailyData/" + k).once('value');
-            const v = snap.val() || {};
-            pM.push(parseFloat(v['peso-m']) || null);
-            pL.push(parseFloat(v['peso-l']) || null);
-        }
-        renderChart(labels, pM, pL);
-        calcolaBMI();
-    }
-
-    function renderChart(labels, dataM, dataL) {
-        if(myChart) myChart.destroy();
-        const ctx = document.getElementById('weightChart').getContext('2d');
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Massimo', data: dataM, borderColor: '#2196f3', tension: 0.3, spanGaps: true },
-                    { label: 'Liliana', data: dataL, borderColor: '#e91e63', tension: 0.3, spanGaps: true }
-                ]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-    }
-
+    function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
+    function salvaCheckV3(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); statusUpdate(); }
     function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
-    window.onload = renderCalendar;
-</script>
+    function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
+    function navigaGiorno(n) { dataSelezionata.setDate(dataSelezionata.getDate()+n); apriDettaglio(new Date(dataSelezionata)); }
+    function openTab(e, id) { 
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        e.currentTarget.classList.add('active');
+    }
 
+    window.onload = () => { selezionaGiorno(new Date()); renderCalendar(); };
+</script>
 </body>
 </html>
