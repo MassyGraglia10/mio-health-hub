@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v40.2</title>
+    <title>Massy e Lilly v40.3 - Voice Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,12 +34,16 @@
         .tab-content.active { display: block; }
 
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 15px; display: inline-block; margin: 15px 0 5px; text-transform: uppercase; }
-        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
+        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; position: relative; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
         
+        .voice-btn { position: absolute; right: 10px; top: 10px; background: #f0f0f0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .voice-btn.recording { background: #ff5252; color: white; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .input-group label { font-size: 0.7rem; font-weight: bold; width: 60px; }
-        input[type="number"], textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; font-family: inherit; }
+        input[type="number"], textarea { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; padding-right: 40px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; font-family: inherit; }
         
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.75rem; }
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
@@ -87,20 +91,48 @@
 
         <div id="tab-agenda" class="tab-content active">
             <div class="time-header">📌 IMPEGNI</div>
-            <div class="card m-border"><div style="font-size:0.7rem; font-weight:900; color:var(--massimo)">MASSIMO</div><textarea id="agenda-m" rows="4" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div style="font-size:0.7rem; font-weight:900; color:var(--liliana)">LILIANA</div><textarea id="agenda-l" rows="4" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">
+                <div style="font-size:0.7rem; font-weight:900; color:var(--massimo)">MASSIMO</div>
+                <textarea id="agenda-m" rows="3" oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('agenda-m')">🎤</button>
+            </div>
+            <div class="card l-border">
+                <div style="font-size:0.7rem; font-weight:900; color:var(--liliana)">LILIANA</div>
+                <textarea id="agenda-l" rows="3" oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('agenda-l')">🎤</button>
+            </div>
         </div>
 
         <div id="tab-menu" class="tab-content">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border"><textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">
+                <textarea id="col-m" rows="2" placeholder="Massimo..." oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('col-m')">🎤</button>
+            </div>
+            <div class="card l-border">
+                <textarea id="col-l" rows="2" placeholder="Liliana..." oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('col-l')">🎤</button>
+            </div>
+
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border"><textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">
+                <textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('pra-m')">🎤</button>
+            </div>
+            <div class="card l-border">
+                <textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('pra-l')">🎤</button>
+            </div>
+
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border"><textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">
+                <textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('cen-m')">🎤</button>
+            </div>
+            <div class="card l-border">
+                <textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea>
+                <button class="voice-btn" onclick="startVoice('cen-l')">🎤</button>
+            </div>
         </div>
 
         <div id="tab-gym" class="tab-content">
@@ -128,15 +160,13 @@
                 <div id="status-l" class="bmi-status"></div>
             </div>
             <div class="time-header">📊 TREND PESO (Ultimi 7)</div>
-            <div class="card chart-box">
-                <canvas id="weightChart"></canvas>
-            </div>
+            <div class="card chart-box"><canvas id="weightChart"></canvas></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
             <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/')">🎧 SPOTIFY MASSIMO</button>
-            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com/')">🎧 SPOTIFY LILIANA</button>
+            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com')">🎧 SPOTIFY MASSIMO</button>
+            <button class="btn-view" style="background:var(--spotify); margin-top:10px;" onclick="window.open('https://open.spotify.com')">🎧 SPOTIFY LILIANA</button>
             <div class="time-header">🧘 WELLNESS</div>
             <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session','_blank')">🧘 YOGA</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout','_blank')">🩰 PILATES</button>
@@ -174,23 +204,35 @@
     let dataCorrente = new Date();
     let weightChart = null;
 
-    // --- LOGICA NOTIFICA SOLO ALL'APERTURA ---
-    function checkAlertOggi() {
-        // Se in questa sessione abbiamo già mostrato l'alert, non fare nulla
-        if (sessionStorage.getItem('alertMostrato')) return;
+    // --- LOGICA VOCALE ---
+    function startVoice(targetId) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'it-IT';
+        const btn = event.currentTarget;
+        
+        recognition.onstart = () => btn.classList.add('recording');
+        recognition.onend = () => btn.classList.remove('recording');
+        
+        recognition.onresult = (event) => {
+            const text = event.results[0][0].transcript;
+            const el = document.getElementById(targetId);
+            el.value = (el.value ? el.value + " " : "") + text;
+            salvaDato(el);
+        };
+        recognition.start();
+    }
 
+    function checkAlertOggi() {
+        if (sessionStorage.getItem('alertMostrato')) return;
         const oggi = new Date();
         const k = `${oggi.getFullYear()}-${oggi.getMonth()+1}-${oggi.getDate()}`;
-        
         db.ref("dailyData/" + k).once('value', snapshot => {
             const v = snapshot.val() || {};
-            let impegni = "";
-            if (v['agenda-m'] && v['agenda-m'].trim() !== "") impegni += "🔹 MASSIMO: " + v['agenda-m'] + "\n";
-            if (v['agenda-l'] && v['agenda-l'].trim() !== "") impegni += "🔸 LILIANA: " + v['agenda-l'] + "\n";
-            
-            if (impegni !== "") {
-                alert("✨ PROMEMORIA DI OGGI ✨\n\n" + impegni);
-                // Segna come mostrato per questa sessione
+            let msg = "";
+            if (v['agenda-m'] && v['agenda-m'].trim() !== "") msg += "🔹 MASSIMO: " + v['agenda-m'] + "\n";
+            if (v['agenda-l'] && v['agenda-l'].trim() !== "") msg += "🔸 LILIANA: " + v['agenda-l'] + "\n";
+            if (msg !== "") {
+                alert("✨ PROMEMORIA ✨\n\n" + msg);
                 sessionStorage.setItem('alertMostrato', 'true');
             }
         });
@@ -216,7 +258,6 @@
         gL = gL.charAt(0).toUpperCase() + gL.slice(1);
         document.getElementById('modal-title').innerText = gL + " " + dataCorrente.getDate();
         document.getElementById('modal').style.display = 'flex';
-
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
@@ -299,7 +340,7 @@
     
     window.onload = () => {
         renderCalendar();
-        checkAlertOggi(); // Esegue il controllo intelligente
+        checkAlertOggi();
     };
 </script>
 </body>
