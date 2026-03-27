@@ -40,7 +40,6 @@
         .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; position: relative; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
         
-        /* BMI STYLES */
         .bmi-badge { padding: 8px; border-radius: 10px; font-weight: bold; font-size: 0.8rem; margin-top: 5px; color: white; text-align: center; }
 
         .action-btns { position: absolute; right: 10px; top: 10px; display: flex; gap: 5px; }
@@ -58,6 +57,15 @@
         
         #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; display: none; align-items: center; justify-content: center; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Stile per il popup di avviso agenda */
+        #alert-popup { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #ff5252; color: white; padding: 15px 25px; border-radius: 50px;
+            font-weight: bold; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: none; animation: slideDown 0.5s ease;
+        }
+        @keyframes slideDown { from { top: -60px; } to { top: 20px; } }
     </style>
 </head>
 <body>
@@ -145,7 +153,10 @@
 
         <div id="tab-relax" class="tab-content">
             <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--spotify)" onclick="window.open('spotify:','_blank')">🎧 SPOTIFY</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-view" style="background:var(--massimo); flex:1;" onclick="window.open('spotify:','_blank')">🎧 SPOTY MASSY</button>
+                <button class="btn-view" style="background:var(--liliana); flex:1;" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=f0LmNhV2Ru-hA3wkJCq59Q','_blank')">🎧 SPOTY LILLY</button>
+            </div>
             <div class="time-header">🎬 CORSI & RELAX</div>
             <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session+italiano','_blank')">🧘 YOGA</button>
@@ -162,7 +173,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // PALINSESTO INTEGRALE v41.6
     const palinsesto = {
         "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.)"}, {t:"12:00", c:"ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.)"}, {t:"13:00", c:"ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:00", c:"ACQUA GYM (Giulia)"}],
         "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola)"}, {t:"13:00", c:"ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff)"}, {t:"18:00", c:"ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
@@ -190,7 +200,6 @@
                 <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-l')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-l')">🎤</button></div></div>`;
     });
 
-    // BMI CON COLORI
     function calcBMI(u) {
         const p = parseFloat(document.getElementById(`peso-${u}`).value);
         const a = parseFloat(document.getElementById(`alt-${u}`).value) / 100;
@@ -241,8 +250,20 @@
 
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
+        const today = new Date();
+        const todayKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+
         db.ref("dailyData").once('value', snapshot => {
             const allData = snapshot.val() || {};
+            
+            // CONTROLLO POPUP APPUNTAMENTI OGGI
+            if(allData[todayKey] && (allData[todayKey]['agenda-m'] || allData[todayKey]['agenda-l'])) {
+                const popup = document.getElementById('alert-popup');
+                popup.innerText = "🔔 OGGI AVETE APPUNTAMENTI!";
+                popup.style.display = 'block';
+                setTimeout(() => { popup.style.display = 'none'; }, 5000);
+            }
+
             for(let i=0; i<7; i++){
                 let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
                 let k = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
