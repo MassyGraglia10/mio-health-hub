@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v40.0</title>
+    <title>Massy e Lilly v41.0</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,13 +19,15 @@
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: var(--text); }
         
-        /* Sezione Agenda in Home */
-        .agenda-container { max-width: 900px; margin: 10px auto; padding: 0 12px; }
-        .agenda-card { background: white; border-radius: 15px; padding: 15px; border-left: 5px solid var(--agenda); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .agenda-title { font-size: 0.8rem; font-weight: 900; color: var(--agenda); margin-bottom: 8px; display: flex; justify-content: space-between; }
+        /* Doppia Agenda Home */
+        .agenda-container { max-width: 900px; margin: 10px auto; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .agenda-card { background: white; border-radius: 15px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.3s; }
+        .agenda-m { border-left: 5px solid var(--massimo); }
+        .agenda-l { border-left: 5px solid var(--liliana); }
+        .agenda-title { font-size: 0.65rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; display: flex; justify-content: space-between; }
 
-        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; padding: 12px; max-width: 900px; margin: auto; }
-        .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; padding: 12px; max-width: 900px; margin: auto; }
+        .day-dot { background: white; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .day-dot.selected { background: #fffde7; border: 2px solid var(--agenda); }
         .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; }
         .day-dot .num { font-size: 1.4rem; font-weight: 900; }
@@ -33,7 +35,7 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; justify-content: center; align-items: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; width: 100%; max-width: 600px; height: 95vh; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; overflow: hidden; }
         
-        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; }
+        .tab-bar { display: flex; background: #f0f0f0; margin: 10px 15px; border-radius: 12px; padding: 4px; flex-shrink: 0; overflow-x: auto; gap: 4px; }
         .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; cursor: pointer; background: transparent; color: #777; white-space: nowrap; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
@@ -43,20 +45,13 @@
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.65rem; font-weight: 800; padding: 4px 10px; border-radius: 15px; display: inline-block; margin: 15px 0 5px; text-transform: uppercase; }
         .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 12px; }
         .m-border { border-left: 5px solid var(--massimo); } .l-border { border-left: 5px solid var(--liliana); }
-        .user-title { font-size: 0.7rem; font-weight: 900; margin-bottom: 5px; }
         
-        textarea, input[type="text"], input[type="number"] { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.95rem; background: #fafafa; box-sizing: border-box; resize: none; }
-        
+        textarea, input { width: 100%; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; font-size: 0.9rem; background: #fafafa; box-sizing: border-box; resize: none; }
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.8rem; }
         .instr { font-size: 0.65rem; color: #aaa; margin-left: auto; font-style: italic; }
-        
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
-        .btn-link { background: var(--relax); margin-bottom: 8px; }
-        .btn-spotify { background: var(--spotify); margin-bottom: 8px; }
         
-        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 0; }
-        .btn-nav-sm { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        #img-viewer { position: fixed; inset: 0; background: black; z-index: 2000; display: none; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -72,13 +67,15 @@
     <button class="btn-nav" onclick="cambiaSett(7)">▶</button>
 </div>
 
+<div id="agenda-date-label" style="text-align:center; font-size:0.7rem; font-weight:bold; margin-top:10px; color:var(--agenda)"></div>
 <div class="agenda-container">
-    <div class="agenda-card">
-        <div class="agenda-title">
-            <span>📅 AGENDA APPUNTAMENTI</span>
-            <span id="agenda-date-label" style="font-size: 0.6rem; opacity: 0.7;">Seleziona un giorno</span>
-        </div>
-        <textarea id="agenda-text" rows="3" placeholder="Scrivi qui gli impegni di oggi... (es: Dentista ore 16)" oninput="salvaAgenda(this)"></textarea>
+    <div class="agenda-card agenda-m">
+        <div class="agenda-title" style="color:var(--massimo)">Massimo ♂</div>
+        <textarea id="agenda-m" rows="3" placeholder="Es: 15:30 Banca" oninput="salvaDato(this)"></textarea>
+    </div>
+    <div class="agenda-card agenda-l">
+        <div class="agenda-title" style="color:var(--liliana)">Liliana ♀</div>
+        <textarea id="agenda-l" rows="3" placeholder="Es: 10:00 Yoga" oninput="salvaDato(this)"></textarea>
     </div>
 </div>
 
@@ -86,13 +83,11 @@
 
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <div style="display:flex; align-items:center; gap:15px;">
-                <button class="btn-nav-sm" onclick="navigaGiorno(-1)">◀</button>
-                <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.2rem; min-width:110px; text-align:center;"></h2>
-                <button class="btn-nav-sm" onclick="navigaGiorno(1)">▶</button>
-            </div>
-            <span style="font-size:1.8rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px;">
+            <button class="btn-nav" onclick="navigaGiorno(-1)">◀</button>
+            <h2 id="modal-title" style="margin:0; color:var(--primary); font-size: 1.1rem;"></h2>
+            <button class="btn-nav" onclick="navigaGiorno(1)">▶</button>
+            <span style="font-size:2rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
         </div>
 
         <div class="tab-bar">
@@ -104,49 +99,36 @@
 
         <div id="tab-menu" class="tab-content active">
             <div class="time-header">☕ COLAZIONE</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="col-m" rows="3" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="col-l" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">MASSIMO<textarea id="col-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border">LILIANA<textarea id="col-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥗 PRANZO</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="pra-m" rows="3" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="pra-l" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">MASSIMO<textarea id="pra-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border">LILIANA<textarea id="pra-l" rows="2" oninput="salvaDato(this)"></textarea></div>
             <div class="time-header">🥩 CENA</div>
-            <div class="card m-border"><div class="user-title" style="color:var(--massimo)">MASSIMO</div><textarea id="cen-m" rows="3" oninput="salvaDato(this)"></textarea></div>
-            <div class="card l-border"><div class="user-title" style="color:var(--liliana)">LILIANA</div><textarea id="cen-l" rows="3" oninput="salvaDato(this)"></textarea></div>
+            <div class="card m-border">MASSIMO<textarea id="cen-m" rows="2" oninput="salvaDato(this)"></textarea></div>
+            <div class="card l-border">LILIANA<textarea id="cen-l" rows="2" oninput="salvaDato(this)"></textarea></div>
         </div>
 
         <div id="tab-gym" class="tab-content">
             <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label>
-                <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 VEDI SCHEDA</button>
-            </div>
-            <div class="card l-border">
-                <label style="font-weight:bold; font-size:0.75rem;"><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label>
-                <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 VEDI SCHEDA</button>
-            </div>
-            <div class="time-header">📅 CORSI OGGI</div>
+            <div class="card m-border"><label><input type="checkbox" id="check-pesi-m" onchange="salvaCheckV3(this)"> SALA PESI MASSIMO</label><button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA</button></div>
+            <div class="card l-border"><label><input type="checkbox" id="check-pesi-l" onchange="salvaCheckV3(this)"> SALA PESI LILIANA</label><button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA</button></div>
+            <div class="time-header">📅 CORSI DEL GIORNO</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 PLAYLIST FISSE</div>
-            <div class="card m-border">
-                <button class="btn-view btn-spotify" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSY</button>
-            </div>
-            <div class="card l-border">
-                <button class="btn-view btn-spotify" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=zHUOKzBqTPO4E-QUegF-Tg.......Poi','_blank')">🎧 SPOTIFY LILLY</button>
-            </div>
+            <div class="card m-border"><button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY MASSIMO</button></div>
+            <div class="card l-border"><button class="btn-view" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com','_blank')">🎧 SPOTIFY LILIANA</button></div>
         </div>
 
         <div id="tab-report" class="tab-content">
-            <div class="time-header">⚖️ PESO E IMC</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="card m-border">M (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
-                <div class="card l-border">L (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
+                <div class="card m-border">Peso M (kg)<input type="number" id="peso-m" step="0.1" oninput="salvaDato(this)"></div>
+                <div class="card l-border">Peso L (kg)<input type="number" id="peso-l" step="0.1" oninput="salvaDato(this)"></div>
             </div>
-            <div id="bmi-display" class="card" style="font-size:0.8rem; font-weight:bold; text-align:center;"></div>
-            <canvas id="weightChart" style="max-height:200px;"></canvas>
+            <canvas id="weightChart"></canvas>
         </div>
     </div>
 </div>
@@ -177,17 +159,38 @@
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
     let dataSelezionata = new Date();
-    let myChart = null;
 
+    // NOTIFICHE
+    function richiediPermessoNotifiche() {
+        if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission();
+    }
+
+    function controllaAppuntamenti() {
+        const ora = new Date();
+        const HHMM = ora.getHours().toString().padStart(2, '0') + ":" + ora.getMinutes().toString().padStart(2, '0');
+        ['m', 'l'].forEach(u => {
+            const testo = document.getElementById('agenda-' + u).value;
+            if (!testo) return;
+            const regex = /(\d{2}[:.]\d{2})/g;
+            const match = testo.match(regex);
+            if (match && match.includes(HHMM)) {
+                new Notification("SVEGLIA " + (u=='m'?'MASSY':'LILLY'), { body: "Appuntamento alle " + HHMM });
+            } else if (HHMM === "09:00") {
+                new Notification("Buongiorno!", "Oggi hai degli impegni segnati.");
+            }
+        });
+    }
+    setInterval(controllaAppuntamenti, 60000);
+
+    // CALENDARIO
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         for(let i=0; i<7; i++){
             let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
             let dot = document.createElement('div');
-            let isSelected = d.toDateString() === dataSelezionata.toDateString();
-            dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''} ${isSelected?'selected':''}`;
+            dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''} ${d.toDateString()==dataSelezionata.toDateString()?'selected':''}`;
             dot.onclick = () => selezionaGiorno(new Date(d));
-            dot.innerHTML = `<span style="font-size:0.6rem; color:#999; font-weight:bold;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span>`;
+            dot.innerHTML = `<span style="font-size:0.6rem; color:#999;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span><span class="num">${d.getDate()}</span>`;
             grid.appendChild(dot);
         }
         document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
@@ -196,83 +199,57 @@
     function selezionaGiorno(data) {
         dataSelezionata = new Date(data);
         curKey = `${dataSelezionata.getFullYear()}-${dataSelezionata.getMonth()+1}-${dataSelezionata.getDate()}`;
-        
-        let gL = dataSelezionata.toLocaleDateString('it-IT', {weekday:'long'}); 
-        gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        
-        document.getElementById('agenda-date-label').innerText = gL + " " + dataSelezionata.getDate();
-        
-        // Carica Agenda
-        db.ref("dailyData/" + curKey + "/agenda").once('value', snap => {
-            document.getElementById('agenda-text').value = snap.val() || "";
+        document.getElementById('agenda-date-label').innerText = dataSelezionata.toLocaleDateString('it-IT',{weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+        db.ref("dailyData/" + curKey).once('value', snap => {
+            const v = snap.val() || {};
+            document.getElementById('agenda-m').value = v['agenda-m'] || "";
+            document.getElementById('agenda-l').value = v['agenda-l'] || "";
         });
         renderCalendar();
     }
 
-    function salvaAgenda(el) {
-        db.ref("dailyData/" + curKey + "/agenda").set(el.value);
-        statusUpdate();
-    }
-
     function apriDettaglio(data) {
         selezionaGiorno(data);
-        let gL = dataSelezionata.toLocaleDateString('it-IT', {weekday:'long'}); 
+        let gL = dataSelezionata.toLocaleDateString('it-IT', {weekday:'long'});
         gL = gL.charAt(0).toUpperCase() + gL.slice(1);
         document.getElementById('modal-title').innerText = gL + " " + dataSelezionata.getDate();
         document.getElementById('modal').style.display = 'flex';
-
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
             const corsi = palinsesto[gL] || [];
-            const createList = (u) => corsi.map((c) => {
-                const uniqueId = `chk-${u}-${c.t.replace(':','')}-${c.c.replace(/\s+/g, '').toLowerCase()}`;
-                return `<div class="gym-row"><input type="checkbox" ${v[uniqueId]?'checked':''} onchange="salvaCheckV3(this,'${uniqueId}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`
+            const buildList = (u) => corsi.map(c => {
+                const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.replace(/\s+/g,'').toLowerCase()}`;
+                return `<div class="gym-row"><input type="checkbox" ${v[uid]?'checked':''} onchange="salvaCheckV3(this,'${uid}')"><b>${c.t}</b> ${c.c} <span class="instr">${c.i}</span></div>`;
             }).join("");
-            document.getElementById('gym-list-m').innerHTML = createList('m') || "Nessun corso";
-            document.getElementById('gym-list-l').innerHTML = createList('l') || "Nessun corso";
-            ['peso-m','peso-l','col-m','col-l','pra-m','pra-l','cen-m','cen-l','run-m','altro-m','altro-l'].forEach(id => {
-                if(document.getElementById(id)) document.getElementById(id).value = v[id] || "";
+            document.getElementById('gym-list-m').innerHTML = buildList('m') || "Nessun corso";
+            document.getElementById('gym-list-l').innerHTML = buildList('l') || "Nessun corso";
+            ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','peso-m','peso-l'].forEach(id => {
+                document.getElementById(id).value = v[id] || "";
             });
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
         });
     }
 
-    // Funzione per il pallino nel calendario (modificata per aprire il dettaglio col doppio click o simile)
-    document.addEventListener('click', function(e){
-        if(e.target.closest('.day-dot')){
-            const dot = e.target.closest('.day-dot');
-            // Se riclicco il giorno già selezionato, apro il dettaglio
-            if(dot.classList.contains('selected')) {
-                apriDettaglio(dataSelezionata);
-            }
-        }
+    document.addEventListener('click', e => {
+        if(e.target.closest('.day-dot')?.classList.contains('selected')) apriDettaglio(dataSelezionata);
     });
 
-    function openTab(evt, tabId) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
-        evt.currentTarget.classList.add("active");
-        if(tabId === 'tab-report') generaReportEvoluto();
-    }
-
-    function navigaGiorno(n) {
-        dataSelezionata.setDate(dataSelezionata.getDate() + n);
-        apriDettaglio(new Date(dataSelezionata));
-    }
-
     function salvaDato(el) { db.ref("dailyData/" + curKey + "/" + el.id).set(el.value); statusUpdate(); }
-    function salvaCheckV3(el, cid) { db.ref("dailyData/" + curKey + "/" + (cid || el.id)).set(el.checked); statusUpdate(); }
+    function salvaCheckV3(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); statusUpdate(); }
     function statusUpdate() { document.getElementById('sync-status').innerText = "☁️..."; setTimeout(()=>document.getElementById('sync-status').innerText="✅ SINCRO", 600); }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg") + "?v=" + Date.now(); document.getElementById('img-viewer').style.display = 'flex'; }
-    
-    window.onload = () => {
-        selezionaGiorno(new Date());
-        renderCalendar();
-    };
+    function navigaGiorno(n) { dataSelezionata.setDate(dataSelezionata.getDate()+n); apriDettaglio(new Date(dataSelezionata)); }
+    function openTab(e, id) { 
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        e.currentTarget.classList.add('active');
+    }
+
+    window.onload = () => { selezionaGiorno(new Date()); renderCalendar(); richiediPermessoNotifiche(); };
 </script>
 </body>
 </html>
