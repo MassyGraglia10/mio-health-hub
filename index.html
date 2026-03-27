@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy e Lilly v41.5 - Smart Alerts</title>
+    <title>Massy e Lilly v41.6 - Photo Edit</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -46,9 +46,11 @@
         .icon-btn { background: #f0f0f0; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         .icon-btn.recording { background: #ff5252; color: white; animation: pulse 1.5s infinite; }
 
-        /* --- FOTO --- */
-        .thumb-pasto { width: 100%; height: 110px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #ddd; }
-        .thumb-pasto.visible { display: block; }
+        /* --- FOTO AGGIORNATE --- */
+        .photo-container { position: relative; width: 60px; height: 60px; margin-top: 10px; display: none; }
+        .photo-container.visible { display: inline-block; }
+        .thumb-pasto { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
+        .btn-del-photo { position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; font-weight: bold; }
 
         /* --- POPUP APPUNTAMENTI --- */
         #alert-popup { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #ff9800; color: white; padding: 12px 20px; border-radius: 15px; font-size: 0.85rem; font-weight: bold; z-index: 5000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; animation: slideDown 0.4s ease; text-align: center; min-width: 250px; }
@@ -58,7 +60,7 @@
         .gym-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.75rem; }
         .btn-view { border: none; padding: 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-top: 8px; color: white; text-align: center; text-decoration: none; }
         
-        #img-viewer { position: fixed; inset: 0; background: black; z-index: 6000; display: none; align-items: center; justify-content: center; }
+        #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; display: none; align-items: center; justify-content: center; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -154,7 +156,7 @@
     </div>
 </div>
 
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; border-radius:10px;"></div>
+<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src" style="max-width:95%; max-height: 80vh; border-radius:10px; border: 3px solid white;"></div>
 
 <script>
     const firebaseConfig = {
@@ -166,7 +168,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // PALINSESTO ORIGINALE COMPLETO
     const palinsesto = {
         "Lunedì": [{t:"09:00", c:"TONE UP (Beppe)"}, {t:"10:15", c:"ACQUA FIT (Francy)"}, {t:"12:00", c:"POWER & FUNCTIONAL (Giorgio R.)"}, {t:"12:00", c:"ACQUA GYM (Francesca)"}, {t:"13:00", c:"FAT BURNS (Giorgio R.)"}, {t:"13:00", c:"ACQUA BIKE (Francesca)"}, {t:"16:00", c:"BODY FIT (Gianni)"}, {t:"17:00", c:"PILATES (Duilio)"}, {t:"18:00", c:"S. PUMP (Vincenzo)"}, {t:"18:00", c:"ACQUA FIT (Giulia)"}, {t:"19:00", c:"SPINNING (Beppe)"}, {t:"19:00", c:"ACQUA GYM (Giulia)"}],
         "Martedì": [{t:"09:00", c:"GYM DANCE (Giuseppe)"}, {t:"10:00", c:"TONE UP (Duilio)"}, {t:"11:00", c:"PILATES (Duilio)"}, {t:"12:00", c:"AERO DANCE (Nicola)"}, {t:"13:00", c:"TONE UP (Nicola)"}, {t:"13:00", c:"ACQUA TONE (Fabio)"}, {t:"14:00", c:"LATIN MOOVE (Osvaldo)"}, {t:"17:00", c:"PILATES (Manuela)"}, {t:"18:00", c:"KRAV MAGA (Staff)"}, {t:"18:00", c:"ACQUA GYM (Fabio)"}, {t:"19:00", c:"TRX (Vincenzo)"}, {t:"19:15", c:"ACQUA BIKE (Fabio)"}, {t:"20:00", c:"ZUMBA (Nicola)"}],
@@ -189,12 +190,18 @@
             <div class="time-header">${s.n}</div>
             <div class="card m-border"><span class="user-label" style="color:var(--massimo)">MASSIMO</span>
                 <textarea id="${s.id}-m" rows="2" oninput="salvaDato(this)"></textarea>
-                <img id="img-${s.id}-m" class="thumb-pasto" onclick="zoomImg(this.src)">
+                <div id="cont-img-${s.id}-m" class="photo-container">
+                    <img id="img-${s.id}-m" class="thumb-pasto" onclick="zoomImg(this.src)">
+                    <button class="btn-del-photo" onclick="deletePhoto('${s.id}-m')">×</button>
+                </div>
                 <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-m')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-m')">🎤</button></div>
             </div>
             <div class="card l-border"><span class="user-label" style="color:var(--liliana)">LILIANA</span>
                 <textarea id="${s.id}-l" rows="2" oninput="salvaDato(this)"></textarea>
-                <img id="img-${s.id}-l" class="thumb-pasto" onclick="zoomImg(this.src)">
+                <div id="cont-img-${s.id}-l" class="photo-container">
+                    <img id="img-${s.id}-l" class="thumb-pasto" onclick="zoomImg(this.src)">
+                    <button class="btn-del-photo" onclick="deletePhoto('${s.id}-l')">×</button>
+                </div>
                 <div class="action-btns"><button class="icon-btn" onclick="takePhoto('${s.id}-l')">📸</button><button class="icon-btn" onclick="startVoice('${s.id}-l')">🎤</button></div>
             </div>`;
     });
@@ -204,33 +211,46 @@
         const popup = document.getElementById('alert-popup');
         const m = data['agenda-m'] || "";
         const l = data['agenda-l'] || "";
-        
         if(m.trim() !== "" || l.trim() !== "") {
             let msg = "<b>⚠️ APPUNTAMENTI OGGI:</b><br>";
             if(m) msg += "M: " + m.substring(0,30) + (m.length>30?'...':'') + "<br>";
             if(l) msg += "L: " + l.substring(0,30) + (l.length>30?'...':'');
-            popup.innerHTML = msg;
-            popup.style.display = 'block';
+            popup.innerHTML = msg; popup.style.display = 'block';
             setTimeout(() => popup.style.display = 'none', 5000);
-        } else {
-            popup.style.display = 'none';
-        }
+        } else { popup.style.display = 'none'; }
     }
 
-    // --- FOTOCAMERA ---
+    // --- GESTIONE FOTO AGGIORNATA ---
     let photoTarget = "";
     function takePhoto(id) { photoTarget = id; document.getElementById('cameraInput').click(); }
+    
     document.getElementById('cameraInput').onchange = function(e) {
         const file = e.target.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = function(event) {
             const base64 = event.target.result;
             db.ref("dailyData/" + curKey + "/img-" + photoTarget).set(base64);
-            const img = document.getElementById("img-" + photoTarget);
-            img.src = base64; img.classList.add('visible');
+            aggiornaUIFoto(photoTarget, base64);
         };
         reader.readAsDataURL(file);
     };
+
+    function deletePhoto(id) {
+        if(confirm("Vuoi cancellare questa foto?")) {
+            db.ref("dailyData/" + curKey + "/img-" + id).remove();
+            aggiornaUIFoto(id, null);
+        }
+    }
+
+    function aggiornaUIFoto(id, src) {
+        const container = document.getElementById("cont-img-" + id);
+        const img = document.getElementById("img-" + id);
+        if(src) {
+            img.src = src; container.classList.add('visible');
+        } else {
+            img.src = ""; container.classList.remove('visible');
+        }
+    }
 
     function startVoice(targetId) {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -261,8 +281,6 @@
                 dot.innerHTML = `<span style="font-size:0.6rem; color:#999; font-weight:bold;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</span>
                                  <span class="num">${d.getDate()}</span><div class="event-indicator"></div>`;
                 grid.appendChild(dot);
-                
-                // Se è oggi, attiva il popup subito
                 if(d.toDateString() == new Date().toDateString()) checkAgendaAlert(allData[k] || {});
             }
         });
@@ -279,21 +297,17 @@
         
         db.ref("dailyData/" + curKey).once('value', snapshot => {
             const v = snapshot.val() || {};
-            checkAgendaAlert(v); // Controlla agenda ogni volta che cambi giorno
+            checkAgendaAlert(v);
             
-            // Testi e Foto
             const ids = ['col-m','col-l','pra-m','pra-l','cen-m','cen-l','agenda-m','agenda-l','peso-m','alt-m','peso-l','alt-l'];
             ids.forEach(id => { document.getElementById(id).value = v[id] || ""; });
             
             ['col','pra','cen'].forEach(p => {
                 ['m','l'].forEach(u => {
-                    const img = document.getElementById(`img-${p}-${u}`);
-                    if(v[`img-${p}-${u}`]) { img.src = v[`img-${p}-${u}`]; img.classList.add('visible'); }
-                    else { img.classList.remove('visible'); }
+                    aggiornaUIFoto(`${p}-${u}`, v[`img-${p}-${u}`]);
                 });
             });
 
-            // Gym
             const corsi = palinsesto[gL] || [];
             const buildList = (u) => corsi.map(c => {
                 const uid = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,10).replace(/\s+/g,'').toLowerCase()}`;
