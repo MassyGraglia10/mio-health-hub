@@ -72,3 +72,21 @@ function apriScheda(u) {
 }
 
 window.onload = renderCalendar;
+function openTab(e, id) {
+    // Nascondi tutti i contenuti
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    // Rimuovi stato attivo dai bottoni
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    // Mostra quello selezionato
+    document.getElementById(id).classList.add('active');
+    e.currentTarget.classList.add('active');
+}
+
+// Modifica la funzione chiudi per resettare sulla prima tab quando riapri
+function chiudi() {
+    document.getElementById('modal').style.display = 'none';
+    // Opzionale: riporta alla tab Gym per la prossima apertura
+    const firstTab = document.querySelector('.tab-btn');
+    if(firstTab) firstTab.click(); 
+}
