@@ -1,36 +1,48 @@
-ho questo app. Vorrei poter chieder 2 cose : <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Massy & Lilly Gym</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.jsscript>
+    https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js
+
     <style>
         :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #2c3e50; }
+
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 12px; }
         .day-dot { background: white; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .day-dot.today { border: 2px solid var(--primary); background: #e0f2f1; }
+
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; height: 90vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
+
         .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; }
         .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; background: transparent; color: #888; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+
         .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #ccc; }
         .m-border { border-left-color: var(--massimo); }
         .l-border { border-left-color: var(--liliana); }
+
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.7rem; font-weight: 800; padding: 5px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; text-transform: uppercase; }
+
         .btn-view { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
+
         #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; align-items: center; justify-content: center; }
         #img-viewer img { max-width: 95%; max-height: 85%; border: 3px solid white; border-radius: 10px; }
     </style>
 </head>
+
 <body>
 
 <div class="header">
@@ -46,8 +58,10 @@ ho questo app. Vorrei poter chieder 2 cose : <!DOCTYPE html>
 
 <div class="calendar-grid" id="grid"></div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
+
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h2 id="modal-title" style="color:var(--primary); margin:0;"></h2>
             <span style="font-size:2.5rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
@@ -58,40 +72,74 @@ ho questo app. Vorrei poter chieder 2 cose : <!DOCTYPE html>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
 
+        <!-- TAB GYM -->
         <div id="tab-gym" class="tab-content active">
+
+            <!-- AGENDA / NOTE -->
+            <div class="time-header">📝 APPUNTAMENTI / NOTE</div>
+
+            <textarea id="daily-note"
+                placeholder="Scrivi un appuntamento o una nota..."
+                style="width:100%; height:90px; padding:10px; border-radius:10px; border:1px solid #ccc; font-size:1rem;">
+            </textarea>
+
+            <button class="btn-view"
+                    style="background:var(--primary); margin-top:10px;"
+                    onclick="salvaNota()">
+                💾 SALVA NOTA
+            </button>
+
+            <button class="btn-view"
+                    style="background:#0077cc; margin-top:10px;"
+                    onclick="aggiungiCalendario()">
+                📅 AGGIUNGI AL CALENDARIO
+            </button>
+
             <div class="time-header">🏋️ SALA PESI</div>
+
             <div class="card m-border">
                 <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheck(this)"> SALA PESI M.</label>
                 <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA MASSY</button>
             </div>
+
             <div class="card l-border">
                 <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheck(this)"> SALA PESI L.</label>
                 <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA LILLY</button>
             </div>
+
             <div class="time-header">📅 CORSI</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
 
+        <!-- TAB RELAX -->
         <div id="tab-relax" class="tab-content">
             <div class="time-header">🎵 MUSICA</div>
             <div style="display:flex; gap:10px;">
                 <button class="btn-view" style="background:var(--massimo); flex:1" onclick="window.open('spotify:','_blank')">🎧 MASSY</button>
                 <button class="btn-view" style="background:var(--liliana); flex:1" onclick="window.open('spotify:','_blank')">🎧 LILLY</button>
             </div>
+
             <div class="time-header">🎬 VIDEO RELAX</div>
             <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session+italiano','_blank')">🧘 YOGA</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata','_blank')">🧠 MEDITAZIONE</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+rilassante','_blank')">🌊 MARE</button>
         </div>
+
     </div>
 </div>
 
 <div id="img-viewer" onclick="this.style.display='none'"><img id="view-src"></div>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc",
+        authDomain: "miomenu-e2e51.firebaseapp.com",
+        databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "miomenu-e2e51"
+    };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -110,48 +158,134 @@ ho questo app. Vorrei poter chieder 2 cose : <!DOCTYPE html>
     let curKey = "";
 
     function renderCalendar() {
-        const grid = document.getElementById('grid'); grid.innerHTML = "";
+        const grid = document.getElementById('grid');
+        grid.innerHTML = "";
+
         for(let i=0; i<7; i++){
-            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
+            let d = new Date(dataInizio);
+            d.setDate(dataInizio.getDate()+i);
+
             let dot = document.createElement('div');
             dot.className = `day-dot ${d.toDateString()==new Date().toDateString()?'today':''}`;
             dot.onclick = () => apriDettaglio(new Date(d));
-            dot.innerHTML = `<div style="font-size:0.6rem; color:#888;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</div><b style="font-size:1.2rem;">${d.getDate()}</b>`;
+
+            dot.innerHTML = `
+                <div style="font-size:0.6rem; color:#888;">
+                    ${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}
+                </div>
+                <b style="font-size:1.2rem;">${d.getDate()}</b>
+            `;
+
             grid.appendChild(dot);
         }
-        document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+
+        document.getElementById('week-label').innerText =
+            dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'})
+            + " - " +
+            new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6))
+            .toLocaleDateString('it-IT',{day:'numeric',month:'short'});
     }
 
     function apriDettaglio(data) {
         curKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
+
+        let gL = data.toLocaleDateString('it-IT', {weekday:'long'});
+        gL = gL.charAt(0).toUpperCase() + gL.slice(1);
+
         document.getElementById('modal-title').innerText = gL + " " + data.getDate();
         document.getElementById('modal').style.display = 'flex';
+
         db.ref("dailyData/" + curKey).once('value', snap => {
             const v = snap.val() || {};
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
+
             const build = (u) => (palinsesto[gL] || []).map(c => {
                 const id = `chk-${u}-${c.t.replace(':','')}`;
-                return `<div style="padding:5px 0;"><input type="checkbox" ${v[id]?'checked':''} onchange="salvaCheck(this,'${id}')"> ${c.t} - ${c.c}</div>`;
+                return `
+                    <div style="padding:5px 0;">
+                        <input type="checkbox" ${v[id]?'checked':''} onchange="salvaCheck(this,'${id}')"> 
+                        ${c.t} - ${c.c}
+                    </div>`;
             }).join("");
+
             document.getElementById('gym-list-m').innerHTML = "<b>M:</b>" + build('m');
             document.getElementById('gym-list-l').innerHTML = "<b>L:</b>" + build('l');
         });
+
+        // CARICO LE NOTE
+        db.ref("dailyNotes/" + curKey).once("value", snap => {
+            document.getElementById("daily-note").value = snap.val() || "";
+        });
+    }
+
+    function salvaCheck(el, id) {
+        db.ref("dailyData/" + curKey + "/" + (id || el.id)).set(el.checked);
+    }
+
+    function salvaNota() {
+        const txt = document.getElementById("daily-note").value;
+        db.ref("dailyNotes/" + curKey).set(txt);
+    }
+
+    function aggiungiCalendario() {
+        let nota = document.getElementById("daily-note").value.trim();
+        if (!nota) {
+            alert("Scrivi una nota prima!");
+            return;
+        }
+
+        let parts = curKey.split("-");
+        let yyyy = parts[0];
+        let mm = parts[1].padStart(2, "0");
+        let dd = parts[2].padStart(2, "0");
+        let date = `${yyyy}${mm}${dd}`;
+
+        let ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${nota}
+DTSTART:${date}
+END:VEVENT
+END:VCALENDAR`;
+
+        let blob = new Blob([ics], { type: "text/calendar" });
+        let url = URL.createObjectURL(blob);
+
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "appuntamento.ics";
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    function chiudi() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    function cambiaSett(n) {
+        dataInizio.setDate(dataInizio.getDate()+n);
+        renderCalendar();
+    }
+
+    function apriScheda(u) {
+        document.getElementById('view-src').src =
+            (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg");
+        document.getElementById('img-viewer').style.display = 'flex';
     }
 
     function openTab(e, id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
-    }
 
-    function salvaCheck(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); }
-    function chiudi() { document.getElementById('modal').style.display = 'none'; }
-    function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
-    function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
+        document.getElementById(id).classList.add('active');
+        e.currentTarget.classList.add('active');
+    }
 
     window.onload = renderCalendar;
 </script>
+
 </body>
 </html>
