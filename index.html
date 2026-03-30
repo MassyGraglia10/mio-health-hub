@@ -82,6 +82,7 @@
             <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
+        
         <div id="tab-gym" class="tab-content active">
             <div class="time-header">🏋️ SALA PESI</div>
             <div class="card m-border">
@@ -92,13 +93,22 @@
                 <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheck(this)"> SALA PESI L.</label>
                 <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA LILLY</button>
             </div>
-            <div class="time-header">📅 CORSI</div>
+            <div class="time-header">📅 CORSI PALESTRA</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
+
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 MUSICA</div>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata','_blank')">🧠 MEDITAZIONE</button>
+            <div class="time-header">🎵 MUSICA & ATMOSFERA</div>
+            <button class="btn-view" style="background:var(--massimo)" onclick="window.open('spotify:','_blank')">🎧 SPOTIFY MASSY</button>
+            <button class="btn-view" style="background:var(--liliana); margin-top:10px;" onclick="window.open('spotify:','_blank')">🎧 SPOTIFY LILLY</button>
+            
+            <div class="time-header">🎬 VIDEO GUIDATI</div>
+            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+vinyasa+italiano','_blank')">🧘 YOGA</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata+ansia+stress','_blank')">🧠 MEDITAZIONE</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+4k','_blank')">🌊 ONDE DEL MARE</button>
+            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=musica+rilassante+pianoforte','_blank')">🎹 PIANO RELAX</button>
         </div>
     </div>
 </div>
@@ -110,14 +120,15 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ORARIO CORSI COMPLETO (Ripristinato)
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP"}, {t:"12:00", c:"POWER & FUNCTIONAL"}, {t:"18:00", c:"S. PUMP"}],
-        "Martedì": [{t:"10:00", c:"TONE UP"}, {t:"13:00", c:"TONE UP"}, {t:"19:00", c:"TRX"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE"}, {t:"13:00", c:"TOTAL BODY"}, {t:"18:00", c:"G.A.G"}],
-        "Giovedì": [{t:"10:00", c:"PILATES"}, {t:"13:00", c:"POWER YOGA"}, {t:"19:00", c:"SPINNING"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G"}, {t:"12:00", c:"TOTAL BODY"}, {t:"18:00", c:"FIT DANCE"}],
-        "Sabato": [{t:"09:00", c:"YOGA"}, {t:"12:00", c:"FIT DANCE"}],
-        "Domenica": [{t:"10:00", c:"SALA PESI"}]
+        "Lunedì": [{t:"09:00", c:"TONE UP"}, {t:"10:00", c:"ACQUA FIT"}, {t:"12:00", c:"POWER & FUNCTIONAL"}, {t:"13:00", c:"FAT BURNS"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"S. PUMP"}, {t:"19:00", c:"TOTAL BODY"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE"}, {t:"10:00", c:"TONE UP"}, {t:"11:00", c:"PILATES"}, {t:"13:00", c:"TONE UP"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"G.A.G"}, {t:"19:00", c:"TRX"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE"}, {t:"10:00", c:"TONIFICAZIONE"}, {t:"12:00", c:"TOTAL BODY"}, {t:"13:00", c:"TOTAL BODY"}, {t:"16:00", c:"TONE UP"}, {t:"18:00", c:"G.A.G"}, {t:"19:00", c:"POWER YOGA"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP"}, {t:"10:00", c:"PILATES"}, {t:"11:00", c:"TONE UP"}, {t:"13:00", c:"POWER YOGA"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"S. PUMP"}, {t:"19:00", c:"SPINNING"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G"}, {t:"10:00", c:"CIRCUIT TRAINING"}, {t:"12:00", c:"TOTAL BODY"}, {t:"13:00", c:"LATIN MOOVE"}, {t:"17:00", c:"YOGA"}, {t:"18:00", c:"FIT DANCE"}, {t:"19:00", c:"TOTAL BODY"}],
+        "Sabato": [{t:"09:00", c:"YOGA"}, {t:"10:00", c:"TONE UP"}, {t:"11:00", c:"MOBILITY"}, {t:"12:00", c:"FIT DANCE"}, {t:"13:00", c:"LATIN MOOVE"}],
+        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA"}]
     };
 
     let dataInizio = new Date();
@@ -153,8 +164,6 @@
         const m = (dataObj.getMonth() + 1).toString().padStart(2, '0');
         const d = dataObj.getDate().toString().padStart(2, '0');
         const dataFormattata = `${y}${m}${d}`;
-        // Link Google Calendar: crea un evento tutto il giorno. 
-        // Nota: Assicurati che nelle impostazioni del calendario sul telefono sia attivo l'avviso predefinito "1 giorno prima".
         return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titolo)}&dates=${dataFormattata}/${dataFormattata}&details=Promemoria+Massy+Lilly+Gym&sf=true&output=xml`;
     }
 
@@ -174,7 +183,7 @@
                 div.className = "appuntamento-item";
                 div.innerHTML = `
                     <div style="display:flex; align-items:center;">
-                        <a href="${linkCal}" target="_blank" class="cal-link" title="Aggiungi al calendario del telefono">📅</a>
+                        <a href="${linkCal}" target="_blank" class="cal-link">📅</a>
                         <span>${item.testo}</span>
                     </div>
                     <span class="btn-del" onclick="eliminaAppuntamento('${id}')">×</span>`;
