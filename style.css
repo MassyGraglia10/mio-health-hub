@@ -36,3 +36,13 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; co
 
 #img-viewer { position: fixed; inset: 0; background: black; display: none; z-index: 2000; align-items: center; justify-content: center; }
 #img-viewer img { max-width: 98%; max-height: 90%; border-radius: 5px; }
+/* Gestione Tab */
+.tab-bar { display: flex; background: #eee; border-radius: 12px; padding: 4px; margin-bottom: 15px; }
+.tab-btn { flex: 1; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; background: transparent; color: #777; transition: 0.3s; }
+.tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Spaziatura bottoni relax */
+#tab-relax .btn-view { margin-bottom: 10px; text-align: left; padding-left: 20px; }
