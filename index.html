@@ -1,67 +1,41 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy & Lilly Gym</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-</head>
-<body>
+<div class="modal-content">
+    <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <span class="close-btn" onclick="chiudi()">×</span>
+    </div>
 
-<div class="header">
-    <h2>🏋️ Massy & Lilly Gym</h2>
-    <div id="sync-status">✅ SINCRO</div>
-</div>
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
+    </div>
 
-<div class="nav-bar">
-    <button onclick="cambiaSett(-7)">◀</button>
-    <div id="week-label">...</div>
-    <button onclick="cambiaSett(7)">▶</button>
-</div>
-
-<div class="calendar-grid" id="grid"></div>
-
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modal-title"></h2>
-            <span class="close-btn" onclick="chiudi()">×</span>
+    <div id="tab-gym" class="tab-content active">
+        <div class="time-header">🏋️ SALA PESI</div>
+        <div class="card m-border">
+            <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheck(this)"> SALA PESI M.</label>
+            <button class="btn-view bg-massimo" onclick="apriScheda('m')">SCHEDA MASSIMO</button>
+        </div>
+        <div class="card l-border">
+            <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheck(this)"> SALA PESI L.</label>
+            <button class="btn-view bg-liliana" onclick="apriScheda('l')">SCHEDA LILIANA</button>
         </div>
 
-        <section>
-            <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border">
-                <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheck(this)"> SALA PESI M.</label>
-                <button class="btn-view bg-massimo" onclick="apriScheda('m')">SCHEDA MASSIMO</button>
-            </div>
-            <div class="card l-border">
-                <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheck(this)"> SALA PESI L.</label>
-                <button class="btn-view bg-liliana" onclick="apriScheda('l')">SCHEDA LILIANA</button>
-            </div>
-        </section>
+        <div class="time-header">📅 CORSI DEL GIORNO</div>
+        <div id="gym-list-m" class="card m-border"></div>
+        <div id="gym-list-l" class="card l-border"></div>
+    </div>
 
-        <section>
-            <div class="time-header">📅 CORSI DEL GIORNO</div>
-            <div id="gym-list-m" class="card m-border"></div>
-            <div id="gym-list-l" class="card l-border"></div>
-        </section>
+    <div id="tab-relax" class="tab-content">
+        <div class="time-header">🎵 MUSICA & SPOTIFY</div>
+        <div class="flex-group">
+            <button class="btn-view bg-massimo" onclick="window.open('spotify:','_blank')">🎧 SPOTY MASSY</button>
+            <button class="btn-view bg-liliana" onclick="window.open('spotify:','_blank')">🎧 SPOTY LILLY</button>
+        </div>
 
-        <section>
-            <div class="time-header">🧘 RELAX & SPOTIFY</div>
-            <div class="flex-group">
-                <button class="btn-view bg-relax" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano','_blank')">YOGA</button>
-                <button class="btn-view bg-primary" onclick="window.open('spotify:','_blank')">SPOTIFY</button>
-            </div>
-        </section>
+        <div class="time-header">🎬 VIDEO & BENESSERE</div>
+        <button class="btn-view bg-relax" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
+        <button class="btn-view bg-relax" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session+italiano','_blank')">🧘 YOGA</button>
+        <button class="btn-view bg-relax" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata','_blank')">🧠 MEDITAZIONE</button>
+        <button class="btn-view bg-relax" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+rilassante','_blank')">🌊 MARE RILASSANTE</button>
     </div>
 </div>
-
-<div id="img-viewer" onclick="this.style.display='none'">
-    <img id="view-src">
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
