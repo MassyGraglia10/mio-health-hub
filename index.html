@@ -39,6 +39,9 @@
         .l-border { border-left-color: var(--liliana); }
         .time-header { background: #eceff1; color: #546e7a; font-size: 0.7rem; font-weight: 800; padding: 5px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; text-transform: uppercase; }
         .btn-view { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
+        
+        textarea.extra-notes { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; resize: none; box-sizing: border-box; }
+
         #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; align-items: center; justify-content: center; }
         #img-viewer img { max-width: 95%; max-height: 85%; border: 3px solid white; border-radius: 10px; }
     </style>
@@ -93,6 +96,12 @@
                 <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheck(this)"> SALA PESI L.</label>
                 <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA LILLY</button>
             </div>
+
+            <div class="time-header">📝 ALTRO ALLENAMENTO</div>
+            <div class="card" style="border-left-color:#607d8b">
+                <textarea id="extra-notes" class="extra-notes" placeholder="Esempio: 5km corsa, piscina, bici..." rows="3" oninput="salvaExtra(this.value)"></textarea>
+            </div>
+
             <div class="time-header">📅 CORSI PALESTRA</div>
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
@@ -108,7 +117,6 @@
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+vinyasa+italiano','_blank')">🧘 YOGA</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata+ansia+stress','_blank')">🧠 MEDITAZIONE</button>
             <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+4k','_blank')">🌊 ONDE DEL MARE</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=musica+rilassante+pianoforte','_blank')">🎹 PIANO RELAX</button>
         </div>
     </div>
 </div>
@@ -120,15 +128,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ORARIO CORSI COMPLETO (Ripristinato)
     const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP"}, {t:"10:00", c:"ACQUA FIT"}, {t:"12:00", c:"POWER & FUNCTIONAL"}, {t:"13:00", c:"FAT BURNS"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"S. PUMP"}, {t:"19:00", c:"TOTAL BODY"}],
-        "Martedì": [{t:"09:00", c:"GYM DANCE"}, {t:"10:00", c:"TONE UP"}, {t:"11:00", c:"PILATES"}, {t:"13:00", c:"TONE UP"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"G.A.G"}, {t:"19:00", c:"TRX"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE"}, {t:"10:00", c:"TONIFICAZIONE"}, {t:"12:00", c:"TOTAL BODY"}, {t:"13:00", c:"TOTAL BODY"}, {t:"16:00", c:"TONE UP"}, {t:"18:00", c:"G.A.G"}, {t:"19:00", c:"POWER YOGA"}],
-        "Giovedì": [{t:"09:00", c:"TONE UP"}, {t:"10:00", c:"PILATES"}, {t:"11:00", c:"TONE UP"}, {t:"13:00", c:"POWER YOGA"}, {t:"17:00", c:"PILATES"}, {t:"18:00", c:"S. PUMP"}, {t:"19:00", c:"SPINNING"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G"}, {t:"10:00", c:"CIRCUIT TRAINING"}, {t:"12:00", c:"TOTAL BODY"}, {t:"13:00", c:"LATIN MOOVE"}, {t:"17:00", c:"YOGA"}, {t:"18:00", c:"FIT DANCE"}, {t:"19:00", c:"TOTAL BODY"}],
-        "Sabato": [{t:"09:00", c:"YOGA"}, {t:"10:00", c:"TONE UP"}, {t:"11:00", c:"MOBILITY"}, {t:"12:00", c:"FIT DANCE"}, {t:"13:00", c:"LATIN MOOVE"}],
-        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA"}]
+        "Lunedì": [{t:"09:00", c:"TONE UP", i:"Beppe"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"POWER & FUNCTIONAL", i:"Giorgio R."}, {t:"12:00", c:"ACQUA GYM", i:"Francesca"}, {t:"13:00", c:"FAT BURNS", i:"Giorgio R."}, {t:"13:00", c:"ACQUA BIKE", i:"Francesca"}, {t:"17:00", c:"PILATES", i:"Duilio"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE", i:"Giuseppe"}, {t:"10:00", c:"TONE UP", i:"Duilio"}, {t:"11:00", c:"PILATES", i:"Duilio"}, {t:"13:00", c:"TONE UP", i:"Nicola"}, {t:"13:00", c:"ACQUA TONE", i:"Fabio"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"TRX", i:"Beppe"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE", i:"Roby"}, {t:"10:00", c:"TONIFICAZIONE", i:"Roby"}, {t:"10:15", c:"ACQUA STRONG", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"12:00", c:"ACQUA GYM", i:"Simo"}, {t:"13:00", c:"TOTAL BODY", i:"Simone L."}, {t:"13:00", c:"ACQUA BIKE", i:"Simo"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"POWER YOGA", i:"Domenico"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP", i:"Duilio"}, {t:"10:00", c:"PILATES", i:"Giuseppe"}, {t:"11:00", c:"TONE UP", i:"Giuseppe"}, {t:"13:00", c:"POWER YOGA", i:"Domenico"}, {t:"13:30", c:"FIT BOXE", i:"Giancarlo"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"19:00", c:"SPINNING", i:"Michela"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:00", c:"CIRCUIT TRAINING", i:"Simo"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}, {t:"13:00", c:"ACQUA GYM", i:"Francy"}, {t:"17:00", c:"YOGA", i:"Riccardo"}, {t:"18:00", c:"FIT DANCE", i:"Stefano P."}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}],
+        "Sabato": [{t:"09:00", c:"YOGA", i:"Giancarlo"}, {t:"10:00", c:"TONE UP", i:"Giancarlo"}, {t:"11:00", c:"MOBILITY", i:"Simona B."}, {t:"11:30", c:"ACQUA BIKE", i:"-"}, {t:"12:00", c:"FIT DANCE", i:"Stefano P."}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}],
+        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA", i:"-"}]
     };
 
     let dataInizio = new Date();
@@ -209,12 +216,15 @@
             const v = snap.val() || {};
             document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
             document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
+            document.getElementById('extra-notes').value = v['extra-notes'] || "";
+            
             const build = (u) => (palinsesto[gL] || []).map(c => {
-                const id = `chk-${u}-${c.t.replace(':','')}`;
-                return `<div style="padding:5px 0;"><input type="checkbox" ${v[id]?'checked':''} onchange="salvaCheck(this,'${id}')"> ${c.t} - ${c.c}</div>`;
+                const id = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,3)}`;
+                return `<div style="padding:6px 0; border-bottom:1px solid #f9f9f9;"><input type="checkbox" ${v[id]?'checked':''} onchange="salvaCheck(this,'${id}')"> <b>${c.t}</b> - ${c.c} <small style="color:#888">(${c.i})</small></div>`;
             }).join("");
-            document.getElementById('gym-list-m').innerHTML = "<b>M:</b>" + build('m');
-            document.getElementById('gym-list-l').innerHTML = "<b>L:</b>" + build('l');
+            
+            document.getElementById('gym-list-m').innerHTML = "<div style='color:var(--massimo); font-weight:bold; margin-bottom:5px;'>Corsi Massimo:</div>" + build('m');
+            document.getElementById('gym-list-l').innerHTML = "<div style='color:var(--liliana); font-weight:bold; margin-bottom:5px;'>Corsi Liliana:</div>" + build('l');
         });
     }
 
@@ -225,6 +235,7 @@
     }
 
     function salvaCheck(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); }
+    function salvaExtra(val) { db.ref("dailyData/" + curKey + "/extra-notes").set(val); }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
