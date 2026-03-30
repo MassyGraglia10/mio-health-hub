@@ -17,15 +17,16 @@
         .day-dot.selected { background: var(--primary); color: white; }
         .day-dot.today { border: 2px solid var(--primary); }
         
-        /* Sezione Agenda */
         .agenda-section { padding: 15px; margin: 0 12px 20px; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .agenda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-add { background: var(--primary); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
         .appuntamento-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
         .appuntamento-item:last-child { border-bottom: none; }
-        .btn-del { color: #ff5252; font-weight: bold; padding: 5px; cursor: pointer; }
+        .cal-link { text-decoration: none; font-size: 1.2rem; margin-right: 10px; filter: grayscale(1); transition: 0.2s; }
+        .cal-link:hover { filter: grayscale(0); }
+        .btn-del { color: #ff5252; font-weight: bold; padding: 5px; cursor: pointer; font-size: 1.2rem; }
 
-        /* Modale e Tab */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; height: 90vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
         .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; }
@@ -63,12 +64,12 @@
         <button class="btn-add" onclick="aggiungiAppuntamento()">+</button>
     </div>
     <div id="lista-appuntamenti">
-        <div style="color:#bbb; text-align:center; padding:10px;">Caricamento...</div>
+        <div style="color:#bbb; text-align:center; padding:10px;">Seleziona un giorno...</div>
     </div>
 </div>
 
 <div style="padding: 0 15px;">
-    <button class="btn-view" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI ALLENAMENTO GIORNO</button>
+    <button class="btn-view" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI ALLENAMENTO</button>
 </div>
 
 <div class="modal" id="modal">
@@ -77,12 +78,10 @@
             <h2 id="modal-title" style="color:var(--primary); margin:0;"></h2>
             <span style="font-size:2.5rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
         </div>
-
         <div class="tab-bar">
             <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
-
         <div id="tab-gym" class="tab-content active">
             <div class="time-header">🏋️ SALA PESI</div>
             <div class="card m-border">
@@ -97,17 +96,9 @@
             <div id="gym-list-m" class="card m-border"></div>
             <div id="gym-list-l" class="card l-border"></div>
         </div>
-
         <div id="tab-relax" class="tab-content">
             <div class="time-header">🎵 MUSICA</div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-view" style="background:var(--massimo); flex:1" onclick="window.open('spotify:','_blank')">🎧 MASSY</button>
-                <button class="btn-view" style="background:var(--liliana); flex:1" onclick="window.open('spotify:','_blank')">🎧 LILLY</button>
-            </div>
-            <div class="time-header">🎬 VIDEO RELAX</div>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+session+italiano','_blank')">🧘 YOGA</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata','_blank')">🧠 MEDITAZIONE</button>
+            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata','_blank')">🧠 MEDITAZIONE</button>
         </div>
     </div>
 </div>
@@ -115,7 +106,6 @@
 <div id="img-viewer" onclick="this.style.display='none'"><img id="view-src"></div>
 
 <script>
-    // Configurazione Firebase
     const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -142,7 +132,6 @@
             let dot = document.createElement('div');
             const isToday = d.toDateString() == new Date().toDateString();
             const isSelected = d.toDateString() == curDate.toDateString();
-            
             dot.className = `day-dot ${isToday?'today':''} ${isSelected?'selected':''}`;
             dot.onclick = () => selezionaGiorno(new Date(d));
             dot.innerHTML = `<div style="font-size:0.6rem;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</div><b style="font-size:1.2rem;">${d.getDate()}</b>`;
@@ -159,40 +148,50 @@
         caricaAgenda();
     }
 
-    // --- FUNZIONI AGENDA ---
+    function generaLinkCalendario(titolo, dataObj) {
+        const y = dataObj.getFullYear();
+        const m = (dataObj.getMonth() + 1).toString().padStart(2, '0');
+        const d = dataObj.getDate().toString().padStart(2, '0');
+        const dataFormattata = `${y}${m}${d}`;
+        // Link Google Calendar: crea un evento tutto il giorno. 
+        // Nota: Assicurati che nelle impostazioni del calendario sul telefono sia attivo l'avviso predefinito "1 giorno prima".
+        return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titolo)}&dates=${dataFormattata}/${dataFormattata}&details=Promemoria+Massy+Lilly+Gym&sf=true&output=xml`;
+    }
+
     function caricaAgenda() {
         const lista = document.getElementById('lista-appuntamenti');
         db.ref("agenda/" + curKey).on('value', snap => {
             const dati = snap.val();
             lista.innerHTML = "";
             if (!dati) {
-                lista.innerHTML = "<div style='color:#ccc; font-style:italic; font-size:0.8rem; text-align:center; padding:10px;'>Nessun impegno per oggi</div>";
+                lista.innerHTML = "<div style='color:#ccc; font-style:italic; font-size:0.8rem; text-align:center; padding:10px;'>Nessun impegno salvato</div>";
                 return;
             }
             Object.keys(dati).forEach(id => {
                 const item = dati[id];
+                const linkCal = generaLinkCalendario(item.testo, curDate);
                 const div = document.createElement('div');
                 div.className = "appuntamento-item";
-                div.innerHTML = `<span>${item.testo}</span><span class="btn-del" onclick="eliminaAppuntamento('${id}')">×</span>`;
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center;">
+                        <a href="${linkCal}" target="_blank" class="cal-link" title="Aggiungi al calendario del telefono">📅</a>
+                        <span>${item.testo}</span>
+                    </div>
+                    <span class="btn-del" onclick="eliminaAppuntamento('${id}')">×</span>`;
                 lista.appendChild(div);
             });
         });
     }
 
     function aggiungiAppuntamento() {
-        const testo = prompt("Cosa c'è in programma? (es. 15:00 Dentista)");
-        if (testo) {
-            db.ref("agenda/" + curKey).push({ testo: testo });
-        }
+        const testo = prompt("Cosa c'è in programma?");
+        if (testo) db.ref("agenda/" + curKey).push({ testo: testo });
     }
 
     function eliminaAppuntamento(id) {
-        if(confirm("Eliminare questo impegno?")) {
-            db.ref("agenda/" + curKey + "/" + id).remove();
-        }
+        if(confirm("Eliminare l'impegno?")) db.ref("agenda/" + curKey + "/" + id).remove();
     }
 
-    // --- FUNZIONI ALLENAMENTO ---
     function apriDettaglio(data) {
         let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
         document.getElementById('modal-title').innerText = gL + " " + data.getDate();
@@ -221,9 +220,7 @@
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
 
-    window.onload = () => {
-        selezionaGiorno(new Date());
-    };
+    window.onload = () => { selezionaGiorno(new Date()); };
 </script>
 </body>
 </html>
