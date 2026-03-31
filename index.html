@@ -7,7 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; }
+        :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; --spotify: #1DB954; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #2c3e50; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
@@ -125,7 +125,12 @@
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div style="font-size:0.7rem; font-weight:800; color:#888; margin-bottom:10px;">VIDEO E PLAYLIST</div>
+            <div style="font-size:0.7rem; font-weight:800; color:#888; margin-bottom:10px;">PLAYLIST SPOTIFY</div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/section/0JQ5DAqc9uipYp07uN7YI7')">🎧 SPOTY MASSY</button>
+                <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/section/0JQ5DAqc9uipYp07uN7YI7')">🎧 SPOTY LILLY</button>
+            </div>
+            <div style="font-size:0.7rem; font-weight:800; color:#888; margin-bottom:10px;">VIDEO RELAX</div>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+4k+relax')">🌊 RUMORE DEL MARE</button>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano')">🧘 PILATES</button>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano')">🧘 YOGA</button>
@@ -179,7 +184,6 @@
         loadAgenda();
     }
 
-    // AGENDA VOCALE OTTIMIZZATA
     function startVoiceApt(u) {
         const btn = document.getElementById('mic-' + u);
         btn.classList.add('listening');
@@ -200,10 +204,17 @@
         if (text) db.ref("agenda/" + curKey).push({ t: text, u: u });
     }
 
-    // COLLEGAMENTO CALENDARIO PER NOTIFICHE
+    // MODIFICATA PER NOTIFICA GIORNO PRIMA
     function addToCalendar(text) {
-        const dateStr = curKey.replace(/-/g, ''); // YYYYMMDD
-        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(text)}&dates=${dateStr}/${dateStr}&details=Aggiunto via MassyLillyHub`;
+        const date = new Date(curDate);
+        const dayBefore = new Date(date);
+        dayBefore.setDate(date.getDate() - 1);
+        
+        const format = (d) => d.toISOString().replace(/-|:|\.\d+/g, '');
+        const start = format(dayBefore).split('T')[0] + "T090000Z";
+        const end = format(dayBefore).split('T')[0] + "T093000Z";
+
+        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Domani appuntamento: " + text)}&dates=${start}/${end}&details=Promemoria generato da MassyLillyHub`;
         window.open(url, '_blank');
     }
 
@@ -256,7 +267,7 @@
                                 <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)">${val[tid]||''}</textarea>
                                 <button class="action-btn" onclick="startVoiceFood('${tid}')">🎤</button>
                                 <button class="action-btn" onclick="document.getElementById('file-${iid}').click()">📸</button>
-                                <input type="file" id="file-${iid}" accept="image/*" capture="environment" style="display:none" onchange="uploadFile(this, '${iid}')">
+                                <input type="file" id="file-${iid}" accept="image/*" style="display:none" onchange="uploadFile(this, '${iid}')">
                             </div>
                             <img id="${iid}" class="img-preview" src="${val[iid]||''}" style="display:${val[iid]?'block':'none'}" onclick="zoomImg(this.src)">
                         </div>`;
@@ -277,6 +288,7 @@
     }
 
     function uploadFile(input, imgId) {
+        if (!input.files || !input.files[0]) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const base64 = e.target.result;
