@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy & Lilly Gym</title>
+    <title>Massy & Lilly Hub</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; }
+        :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; --food: #ff9800; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #2c3e50; }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
@@ -18,30 +18,29 @@
         .day-dot.today { border: 2px solid var(--primary); }
         
         .agenda-section { padding: 15px; margin: 0 12px 20px; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .agenda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .btn-add { background: var(--primary); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .agenda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .btn-add-group { display: flex; gap: 5px; }
+        .btn-add { color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-weight: bold; }
         
-        .appuntamento-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
-        .appuntamento-item:last-child { border-bottom: none; }
-        .cal-link { text-decoration: none; font-size: 1.2rem; margin-right: 10px; filter: grayscale(1); transition: 0.2s; }
-        .cal-link:hover { filter: grayscale(0); }
-        .btn-del { color: #ff5252; font-weight: bold; padding: 5px; cursor: pointer; font-size: 1.2rem; }
+        .appuntamento-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+        .m-text { color: var(--massimo); font-weight: bold; margin-right: 5px; }
+        .l-text { color: var(--liliana); font-weight: bold; margin-right: 5px; }
 
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; height: 90vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
-        .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; background: transparent; color: #888; }
+        .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; gap:5px; }
+        .tab-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; background: transparent; color: #888; font-size: 0.7rem; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #ccc; }
-        .m-border { border-left-color: var(--massimo); }
-        .l-border { border-left-color: var(--liliana); }
-        .time-header { background: #eceff1; color: #546e7a; font-size: 0.7rem; font-weight: 800; padding: 5px 12px; border-radius: 20px; display: inline-block; margin: 15px 0 8px; text-transform: uppercase; }
-        .btn-view { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
         
-        textarea.extra-notes { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; resize: none; box-sizing: border-box; }
-
+        .card { background: white; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 5px solid #ccc; position: relative; }
+        .input-vocal-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 10px; padding: 10px; font-family: inherit; resize: none; box-sizing: border-box; }
+        .btn-mic { background: #f0f0f0; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; }
+        
+        .food-img-preview { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; border: 1px solid #ddd; }
+        .btn-view { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
         #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; align-items: center; justify-content: center; }
         #img-viewer img { max-width: 95%; max-height: 85%; border: 3px solid white; border-radius: 10px; }
     </style>
@@ -63,60 +62,70 @@
 
 <div class="agenda-section">
     <div class="agenda-header">
-        <h3 id="agenda-date-label" style="margin:0; font-size:1rem; color:var(--primary);">Agenda</h3>
-        <button class="btn-add" onclick="aggiungiAppuntamento()">+</button>
+        <h3 id="agenda-date-label" style="margin:0; font-size:0.9rem; color:var(--primary);">Agenda</h3>
+        <div class="btn-add-group">
+            <button class="btn-add" style="background:var(--massimo)" onclick="aggiungiApt('m')">+ MASSY</button>
+            <button class="btn-add" style="background:var(--liliana)" onclick="aggiungiApt('l')">+ LILLY</button>
+        </div>
     </div>
-    <div id="lista-appuntamenti">
-        <div style="color:#bbb; text-align:center; padding:10px;">Seleziona un giorno...</div>
-    </div>
+    <div id="lista-appuntamenti"></div>
 </div>
 
 <div style="padding: 0 15px;">
-    <button class="btn-view" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI ALLENAMENTO</button>
+    <button class="btn-view" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI GIORNATA</button>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h2 id="modal-title" style="color:var(--primary); margin:0;"></h2>
             <span style="font-size:2.5rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
         </div>
+        
         <div class="tab-bar">
             <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-food')">🍎 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
         
         <div id="tab-gym" class="tab-content active">
-            <div class="time-header">🏋️ SALA PESI</div>
-            <div class="card m-border">
-                <label><input type="checkbox" id="check-pesi-m" onchange="salvaCheck(this)"> SALA PESI M.</label>
+            <div class="card" style="border-left-color:var(--massimo)">
                 <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA MASSY</button>
             </div>
-            <div class="card l-border">
-                <label><input type="checkbox" id="check-pesi-l" onchange="salvaCheck(this)"> SALA PESI L.</label>
+            <div class="card" style="border-left-color:var(--liliana)">
                 <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA LILLY</button>
             </div>
+            <div id="gym-list-m"></div>
+            <div id="gym-list-l"></div>
+        </div>
 
-            <div class="time-header">📝 ALTRO ALLENAMENTO</div>
-            <div class="card" style="border-left-color:#607d8b">
-                <textarea id="extra-notes" class="extra-notes" placeholder="Esempio: 5km corsa, piscina, bici..." rows="3" oninput="salvaExtra(this.value)"></textarea>
+        <div id="tab-food" class="tab-content">
+            <div class="card" style="border-left-color:var(--massimo)">
+                <div style="font-weight:bold; color:var(--massimo); margin-bottom:10px;">🍽️ MENÙ MASSIMO</div>
+                <div class="input-vocal-group">
+                    <textarea id="food-m" placeholder="Cosa ha mangiato Massimo?" oninput="salvaDato('food-m', this.value)"></textarea>
+                    <button class="btn-mic" onclick="avviaVocale('food-m')">🎤</button>
+                </div>
+                <input type="file" id="file-m" accept="image/*" style="display:none" onchange="uploadFoto(this, 'img-m')">
+                <button class="btn-view" style="background:#ccc; color:333;" onclick="document.getElementById('file-m').click()">📸 AGGIUNGI FOTO</button>
+                <img id="img-m" class="food-img-preview" onclick="ingrandisci(this.src)">
             </div>
 
-            <div class="time-header">📅 CORSI PALESTRA</div>
-            <div id="gym-list-m" class="card m-border"></div>
-            <div id="gym-list-l" class="card l-border"></div>
+            <div class="card" style="border-left-color:var(--liliana)">
+                <div style="font-weight:bold; color:var(--liliana); margin-bottom:10px;">🍽️ MENÙ LILLIANA</div>
+                <div class="input-vocal-group">
+                    <textarea id="food-l" placeholder="Cosa ha mangiato Lilly?" oninput="salvaDato('food-l', this.value)"></textarea>
+                    <button class="btn-mic" onclick="avviaVocale('food-l')">🎤</button>
+                </div>
+                <input type="file" id="file-l" accept="image/*" style="display:none" onchange="uploadFoto(this, 'img-l')">
+                <button class="btn-view" style="background:#ccc; color:333;" onclick="document.getElementById('file-l').click()">📸 AGGIUNGI FOTO</button>
+                <img id="img-l" class="food-img-preview" onclick="ingrandisci(this.src)">
+            </div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div class="time-header">🎵 MUSICA & ATMOSFERA</div>
             <button class="btn-view" style="background:var(--massimo)" onclick="window.open('spotify:','_blank')">🎧 SPOTIFY MASSY</button>
             <button class="btn-view" style="background:var(--liliana); margin-top:10px;" onclick="window.open('spotify:','_blank')">🎧 SPOTIFY LILLY</button>
-            
-            <div class="time-header">🎬 VIDEO GUIDATI</div>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+vinyasa+italiano','_blank')">🧘 YOGA</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata+ansia+stress','_blank')">🧠 MEDITAZIONE</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+4k','_blank')">🌊 ONDE DEL MARE</button>
         </div>
     </div>
 </div>
@@ -124,25 +133,17 @@
 <div id="img-viewer" onclick="this.style.display='none'"><img id="view-src"></div>
 
 <script>
+    // Configurazione Firebase (mantenuta la tua)
     const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP", i:"Beppe"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"POWER & FUNCTIONAL", i:"Giorgio R."}, {t:"12:00", c:"ACQUA GYM", i:"Francesca"}, {t:"13:00", c:"FAT BURNS", i:"Giorgio R."}, {t:"13:00", c:"ACQUA BIKE", i:"Francesca"}, {t:"17:00", c:"PILATES", i:"Duilio"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}],
-        "Martedì": [{t:"09:00", c:"GYM DANCE", i:"Giuseppe"}, {t:"10:00", c:"TONE UP", i:"Duilio"}, {t:"11:00", c:"PILATES", i:"Duilio"}, {t:"13:00", c:"TONE UP", i:"Nicola"}, {t:"13:00", c:"ACQUA TONE", i:"Fabio"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"TRX", i:"Beppe"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE", i:"Roby"}, {t:"10:00", c:"TONIFICAZIONE", i:"Roby"}, {t:"10:15", c:"ACQUA STRONG", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"12:00", c:"ACQUA GYM", i:"Simo"}, {t:"13:00", c:"TOTAL BODY", i:"Simone L."}, {t:"13:00", c:"ACQUA BIKE", i:"Simo"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"POWER YOGA", i:"Domenico"}],
-        "Giovedì": [{t:"09:00", c:"TONE UP", i:"Duilio"}, {t:"10:00", c:"PILATES", i:"Giuseppe"}, {t:"11:00", c:"TONE UP", i:"Giuseppe"}, {t:"13:00", c:"POWER YOGA", i:"Domenico"}, {t:"13:30", c:"FIT BOXE", i:"Giancarlo"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"19:00", c:"SPINNING", i:"Michela"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"10:00", c:"CIRCUIT TRAINING", i:"Simo"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}, {t:"13:00", c:"ACQUA GYM", i:"Francy"}, {t:"17:00", c:"YOGA", i:"Riccardo"}, {t:"18:00", c:"FIT DANCE", i:"Stefano P."}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}],
-        "Sabato": [{t:"09:00", c:"YOGA", i:"Giancarlo"}, {t:"10:00", c:"TONE UP", i:"Giancarlo"}, {t:"11:00", c:"MOBILITY", i:"Simona B."}, {t:"11:30", c:"ACQUA BIKE", i:"-"}, {t:"12:00", c:"FIT DANCE", i:"Stefano P."}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}],
-        "Domenica": [{t:"10:00", c:"SALA PESI LIBERA", i:"-"}]
-    };
 
     let dataInizio = new Date();
     dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
     let curKey = "";
     let curDate = new Date();
 
+    // Logica Calendario
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         for(let i=0; i<7; i++){
@@ -166,65 +167,77 @@
         caricaAgenda();
     }
 
-    function generaLinkCalendario(titolo, dataObj) {
-        const y = dataObj.getFullYear();
-        const m = (dataObj.getMonth() + 1).toString().padStart(2, '0');
-        const d = dataObj.getDate().toString().padStart(2, '0');
-        const dataFormattata = `${y}${m}${d}`;
-        return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titolo)}&dates=${dataFormattata}/${dataFormattata}&details=Promemoria+Massy+Lilly+Gym&sf=true&output=xml`;
+    // Gestione Agenda Suddivisa
+    function aggiungiApt(user) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'it-IT';
+        alert("Parla ora per inserire l'appuntamento...");
+        recognition.start();
+        recognition.onresult = (event) => {
+            const testo = event.results[0][0].transcript;
+            if (testo) db.ref("agenda/" + curKey).push({ testo: testo, user: user });
+        };
     }
 
     function caricaAgenda() {
         const lista = document.getElementById('lista-appuntamenti');
         db.ref("agenda/" + curKey).on('value', snap => {
-            const dati = snap.val();
             lista.innerHTML = "";
-            if (!dati) {
-                lista.innerHTML = "<div style='color:#ccc; font-style:italic; font-size:0.8rem; text-align:center; padding:10px;'>Nessun impegno salvato</div>";
-                return;
-            }
+            const dati = snap.val();
+            if (!dati) { lista.innerHTML = "<div style='text-align:center;color:#ccc;padding:10px;'>Vuoto</div>"; return; }
             Object.keys(dati).forEach(id => {
                 const item = dati[id];
-                const linkCal = generaLinkCalendario(item.testo, curDate);
+                const label = item.user === 'm' ? '<span class="m-text">M:</span>' : '<span class="l-text">L:</span>';
                 const div = document.createElement('div');
                 div.className = "appuntamento-item";
-                div.innerHTML = `
-                    <div style="display:flex; align-items:center;">
-                        <a href="${linkCal}" target="_blank" class="cal-link">📅</a>
-                        <span>${item.testo}</span>
-                    </div>
-                    <span class="btn-del" onclick="eliminaAppuntamento('${id}')">×</span>`;
+                div.innerHTML = `<div>${label} ${item.testo}</div><span style="color:red;cursor:pointer" onclick="eliminaApt('${id}')">×</span>`;
                 lista.appendChild(div);
             });
         });
     }
 
-    function aggiungiAppuntamento() {
-        const testo = prompt("Cosa c'è in programma?");
-        if (testo) db.ref("agenda/" + curKey).push({ testo: testo });
+    function eliminaApt(id) { if(confirm("Elimina?")) db.ref("agenda/" + curKey + "/" + id).remove(); }
+
+    // Input Vocale per Menù
+    function avviaVocale(targetId) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'it-IT';
+        recognition.start();
+        recognition.onresult = (event) => {
+            const speechToText = event.results[0][0].transcript;
+            document.getElementById(targetId).value = speechToText;
+            salvaDato(targetId, speechToText);
+        };
     }
 
-    function eliminaAppuntamento(id) {
-        if(confirm("Eliminare l'impegno?")) db.ref("agenda/" + curKey + "/" + id).remove();
+    // Gestione Foto (Base64 per semplicità su database)
+    function uploadFoto(input, imgId) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64 = e.target.result;
+            document.getElementById(imgId).src = base64;
+            document.getElementById(imgId).style.display = 'block';
+            salvaDato(imgId, base64);
+        };
+        reader.readAsDataURL(input.files[0]);
     }
+
+    function salvaDato(campo, valore) { db.ref("dailyData/" + curKey + "/" + campo).set(valore); }
 
     function apriDettaglio(data) {
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + data.getDate();
+        document.getElementById('modal-title').innerText = data.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
         document.getElementById('modal').style.display = 'flex';
         db.ref("dailyData/" + curKey).once('value', snap => {
             const v = snap.val() || {};
-            document.getElementById('check-pesi-m').checked = v['check-pesi-m'] || false;
-            document.getElementById('check-pesi-l').checked = v['check-pesi-l'] || false;
-            document.getElementById('extra-notes').value = v['extra-notes'] || "";
-            
-            const build = (u) => (palinsesto[gL] || []).map(c => {
-                const id = `chk-${u}-${c.t.replace(':','')}-${c.c.substring(0,3)}`;
-                return `<div style="padding:6px 0; border-bottom:1px solid #f9f9f9;"><input type="checkbox" ${v[id]?'checked':''} onchange="salvaCheck(this,'${id}')"> <b>${c.t}</b> - ${c.c} <small style="color:#888">(${c.i})</small></div>`;
-            }).join("");
-            
-            document.getElementById('gym-list-m').innerHTML = "<div style='color:var(--massimo); font-weight:bold; margin-bottom:5px;'>Corsi Massimo:</div>" + build('m');
-            document.getElementById('gym-list-l').innerHTML = "<div style='color:var(--liliana); font-weight:bold; margin-bottom:5px;'>Corsi Liliana:</div>" + build('l');
+            ['food-m', 'food-l'].forEach(id => document.getElementById(id).value = v[id] || "");
+            ['img-m', 'img-l'].forEach(id => {
+                if(v[id]) { 
+                    document.getElementById(id).src = v[id]; 
+                    document.getElementById(id).style.display = 'block';
+                } else {
+                    document.getElementById(id).style.display = 'none';
+                }
+            });
         });
     }
 
@@ -234,11 +247,10 @@
         document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
     }
 
-    function salvaCheck(el, id) { db.ref("dailyData/" + curKey + "/" + (id||el.id)).set(el.checked); }
-    function salvaExtra(val) { db.ref("dailyData/" + curKey + "/extra-notes").set(val); }
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
+    function ingrandisci(src) { document.getElementById('view-src').src = src; document.getElementById('img-viewer').style.display = 'flex'; }
 
     window.onload = () => { selezionaGiorno(new Date()); };
 </script>
