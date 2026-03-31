@@ -197,19 +197,13 @@
         if (text) db.ref("agenda/" + curKey).push({ t: text, u: u });
     }
 
-    // MODIFICATA PER NOTIFICA SERA PRIMA ALLE 22:00
     function addToCalendar(text) {
         const date = new Date(curDate);
         const dayBefore = new Date(date);
-        dayBefore.setDate(date.getDate() - 1); // Giorno precedente
-        
-        const format = (d) => d.toISOString().replace(/-|:|\.\d+/g, '');
-        // Impostiamo l'ora alle 22:00 (20:00 UTC assumendo l'ora legale italiana +2)
-        // Per sicurezza usiamo un formato compatibile che Google Calendar interpreta come ora locale se non specifichiamo Z
+        dayBefore.setDate(date.getDate() - 1);
         const dateString = dayBefore.toISOString().split('T')[0].replace(/-/g, '');
         const start = dateString + "T220000"; 
         const end = dateString + "T223000";
-
         const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("PROMEMORIA: " + text)}&dates=${start}/${end}&details=Ricordati dell'impegno di domani!`;
         window.open(url, '_blank');
     }
@@ -221,14 +215,7 @@
             const v = snap.val(); if(!v) return;
             Object.keys(v).forEach(id => {
                 const item = v[id];
-                const row = `
-                <div class="apt-item">
-                    <span>${item.t}</span>
-                    <div class="apt-actions">
-                        <span onclick="addToCalendar('${item.t.replace(/'/g, "\\'")}')" style="cursor:pointer">📅</span>
-                        <span style="color:red; font-weight:bold; cursor:pointer" onclick="db.ref('agenda/${curKey}/${id}').remove()">×</span>
-                    </div>
-                </div>`;
+                const row = `<div class="apt-item"><span>${item.t}</span><div class="apt-actions"><span onclick="addToCalendar('${item.t.replace(/'/g, "\\'")}')" style="cursor:pointer">📅</span><span style="color:red; font-weight:bold; cursor:pointer" onclick="db.ref('agenda/${curKey}/${id}').remove()">×</span></div></div>`;
                 if(item.u === 'm') m.innerHTML += row; else l.innerHTML += row;
             });
         });
@@ -263,7 +250,7 @@
                                 <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)">${val[tid]||''}</textarea>
                                 <button class="action-btn" onclick="startVoiceFood('${tid}')">🎤</button>
                                 <button class="action-btn" onclick="document.getElementById('file-${iid}').click()">📸</button>
-                                <input type="file" id="file-${iid}" accept="image/*" capture="environment" style="display:none" onchange="uploadFile(this, '${iid}')">
+                                <input type="file" id="file-${iid}" accept="image/*" style="display:none" onchange="processAndUpload(this, '${iid}')">
                             </div>
                             <img id="${iid}" class="img-preview" src="${val[iid]||''}" style="display:${val[iid]?'block':'none'}" onclick="zoomImg(this.src)">
                         </div>`;
@@ -271,6 +258,30 @@
                 </div>
             `).join("");
         });
+    }
+
+    function processAndUpload(input, imgId) {
+        if (!input.files || !input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width; let height = img.height;
+                const max = 800;
+                if (width > height) { if (width > max) { height *= max / width; width = max; } }
+                else { if (height > max) { width *= max / height; height = max; } }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                document.getElementById(imgId).src = compressedBase64;
+                document.getElementById(imgId).style.display = 'block';
+                db.ref("dailyData/" + curKey + "/" + imgId).set(compressedBase64);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
     }
 
     function startVoiceFood(id) {
@@ -281,18 +292,6 @@
             document.getElementById(id).value = t;
             db.ref("dailyData/" + curKey + "/" + id).set(t);
         };
-    }
-
-    function uploadFile(input, imgId) {
-        if (!input.files || !input.files[0]) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64 = e.target.result;
-            document.getElementById(imgId).src = base64;
-            document.getElementById(imgId).style.display = 'block';
-            db.ref("dailyData/" + curKey + "/" + imgId).set(base64);
-        };
-        reader.readAsDataURL(input.files[0]);
     }
 
     function openTab(e, id) {
