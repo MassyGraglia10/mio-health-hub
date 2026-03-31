@@ -7,8 +7,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; --food: #ff9800; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #2c3e50; }
+        :root { --primary: #26a69a; --bg: #f4f7f6; --massimo: #2196f3; --liliana: #e91e63; --relax: #9c27b0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #2c3e50; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: white; padding: 12px; position: sticky; top:0; z-index:100; }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -17,33 +17,33 @@
         .day-dot.selected { background: var(--primary); color: white; }
         .day-dot.today { border: 2px solid var(--primary); }
         
+        /* AGENDA HOME */
         .agenda-section { padding: 15px; margin: 0 12px 20px; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .agenda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-add-group { display: flex; gap: 5px; }
-        .btn-add { color: white; border: none; padding: 8px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
-        
-        .apt-list { margin-top: 10px; }
-        .user-block { margin-bottom: 15px; padding: 10px; border-radius: 10px; background: #fafafa; }
-        .m-block { border-left: 4px solid var(--massimo); }
-        .l-block { border-left: 4px solid var(--liliana); }
-        .appuntamento-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .user-box { margin-bottom: 15px; padding: 10px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
+        .m-border { border-left: 5px solid var(--massimo); }
+        .l-border { border-left: 5px solid var(--liliana); }
+        .apt-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .btn-add { color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
 
+        /* MODALE E SCHEDE */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(5px); }
-        .modal-content { background: white; height: 90vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
-        .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; gap:4px; }
+        .modal-content { background: white; height: 92vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
+        .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; gap:4px; position: sticky; top: 0; z-index: 10; }
         .tab-btn { flex: 1; border: none; padding: 10px 2px; border-radius: 10px; font-weight: 800; cursor: pointer; background: transparent; color: #888; font-size: 0.65rem; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
+        /* FOOD SECTION */
         .food-card { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 15px; }
-        .meal-row { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
-        .meal-input-group { display: flex; gap: 5px; align-items: center; }
-        textarea { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px; font-size: 0.85rem; resize: none; }
-        .btn-icon { background: #f0f0f0; border: none; border-radius: 8px; width: 35px; height: 35px; cursor: pointer; font-size: 1.1rem; }
-        .img-pre { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; display: none; margin-top: 5px; }
+        .meal-box { margin-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
+        .input-row { display: flex; gap: 5px; align-items: center; margin-top: 5px; }
+        textarea { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px; font-size: 0.85rem; height: 40px; }
+        .action-btn { background: #f0f0f0; border: none; border-radius: 8px; width: 38px; height: 38px; cursor: pointer; font-size: 1.1rem; }
+        .img-preview { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; display: none; margin-top: 8px; border: 1px solid #ddd; }
         
-        .btn-view { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
+        .btn-full { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
         #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; align-items: center; justify-content: center; }
         #img-viewer img { max-width: 95%; max-height: 85%; border-radius: 10px; }
     </style>
@@ -51,13 +51,13 @@
 <body>
 
 <div class="header">
-    <h2>🏋️ Massy & Lilly</h2>
-    <div id="sync-status" style="font-size: 0.6rem;">✅ DATABASE ATTIVO</div>
+    <h2 id="main-title">🏋️ Massy & Lilly Hub</h2>
+    <div id="sync-status" style="font-size: 0.6rem;">● DATABASE SINCRONIZZATO</div>
 </div>
 
 <div class="nav-bar">
     <button class="btn-nav" onclick="cambiaSett(-7)">◀</button>
-    <div id="week-label" style="font-weight:bold;">...</div>
+    <div id="week-label" style="font-weight:bold; font-size: 0.9rem;">...</div>
     <button class="btn-nav" onclick="cambiaSett(7)">▶</button>
 </div>
 
@@ -65,83 +65,82 @@
 
 <div class="agenda-section">
     <div class="agenda-header">
-        <h3 id="agenda-date-label" style="margin:0; font-size:0.9rem; color:var(--primary);">Agenda</h3>
-        <div class="btn-add-group">
-            <button class="btn-add" style="background:var(--massimo)" onclick="addAptPrompt('m')">+ MASSY</button>
-            <button class="btn-add" style="background:var(--liliana)" onclick="addAptPrompt('l')">+ LILLY</button>
-        </div>
+        <h3 id="agenda-date-label" style="margin:0; font-size:0.9rem; color:var(--primary);">Agenda Oggi</h3>
     </div>
-    <div id="apt-container" class="apt-list">
-        <div class="user-block m-block">
-            <div style="font-size:0.7rem; font-weight:800; color:var(--massimo)">MASSIMO</div>
-            <div id="list-m"></div>
+    
+    <div class="user-box m-border">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:800; color:var(--massimo); font-size:0.7rem;">MASSIMO</span>
+            <button class="btn-add" style="background:var(--massimo)" onclick="inputApt('m')">+ AGGIUNGI</button>
         </div>
-        <div class="user-block l-block">
-            <div style="font-size:0.7rem; font-weight:800; color:var(--liliana)">LILIANA</div>
-            <div id="list-l"></div>
+        <div id="list-m"></div>
+    </div>
+
+    <div class="user-box l-border">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:800; color:var(--liliana); font-size:0.7rem;">LILIANA</span>
+            <button class="btn-add" style="background:var(--liliana)" onclick="inputApt('l')">+ AGGIUNGI</button>
         </div>
+        <div id="list-l"></div>
     </div>
 </div>
 
 <div style="padding: 0 15px;">
-    <button class="btn-view" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI GIORNATA</button>
+    <button class="btn-full" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI PALINSESTO E MENÙ</button>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h2 id="modal-title" style="color:var(--primary); margin:0; font-size:1.2rem;"></h2>
-            <span style="font-size:2.5rem; color:#ccc; cursor:pointer;" onclick="chiudi()">×</span>
+            <h2 id="modal-day-title" style="color:var(--primary); margin:0; font-size:1.1rem;"></h2>
+            <span style="font-size:2.5rem; color:#ccc;" onclick="chiudi()">×</span>
         </div>
         
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ GYM</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ CORSI</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-food')">🍎 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
         
         <div id="tab-gym" class="tab-content active">
-            <button class="btn-view" style="background:var(--massimo)" onclick="apriScheda('m')">📋 SCHEDA MASSY</button>
-            <button class="btn-view" style="background:var(--liliana)" onclick="apriScheda('l')">📋 SCHEDA LILLY</button>
-            <div id="gym-list-m" style="margin-top:15px"></div>
-            <div id="gym-list-l" style="margin-top:15px"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-full" style="background:var(--massimo)" onclick="viewScheda('m')">SCHEDA MASSY</button>
+                <button class="btn-full" style="background:var(--liliana)" onclick="viewScheda('l')">SCHEDA LILLY</button>
+            </div>
+            <div id="gym-m" style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;"></div>
+            <div id="gym-l" style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;"></div>
         </div>
 
         <div id="tab-food" class="tab-content">
-            <div class="food-card" style="border-left: 5px solid var(--massimo)">
-                <div style="font-weight:bold; color:var(--massimo)">🍽️ MENÙ MASSIMO</div>
-                <div id="menu-m-fields"></div>
-            </div>
-            <div class="food-card" style="border-left: 5px solid var(--liliana)">
-                <div style="font-weight:bold; color:var(--liliana)">🍽️ MENÙ LILIANA</div>
-                <div id="menu-l-fields"></div>
-            </div>
+            <div id="food-container"></div>
         </div>
 
         <div id="tab-relax" class="tab-content">
-            <div style="font-size:0.7rem; font-weight:800; color:#888; margin:10px 0;">VIDEO GUIDATI</div>
-            <button class="btn-view" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano','_blank')">🧘 PILATES</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=yoga+vinyasa+italiano','_blank')">🧘 YOGA</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata+ansia+stress','_blank')">🧠 MEDITAZIONE</button>
-            <button class="btn-view" style="background:var(--relax); margin-top:10px;" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+4k','_blank')">🌊 ONDE DEL MARE</button>
+            <div style="font-size:0.7rem; font-weight:800; color:#888; margin-bottom:10px;">VIDEO E PLAYLIST</div>
+            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano')">🧘 PILATES</button>
+            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano')">🧘 YOGA</button>
+            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata')">🧠 MEDITAZIONE</button>
+            <button class="btn-full" style="background:var(--massimo)" onclick="window.open('spotify:')">🎧 SPOTIFY MASSY</button>
+            <button class="btn-full" style="background:var(--liliana)" onclick="window.open('spotify:')">🎧 SPOTIFY LILLY</button>
         </div>
     </div>
 </div>
 
-<div id="img-viewer" onclick="this.style.display='none'"><img id="view-src"></div>
+<div id="img-viewer" onclick="this.style.display='none'"><img id="v-img"></div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const palinsesto = {
-        "Lunedì": [{t:"09:00", c:"TONE UP", i:"Beppe"}, {t:"12:00", c:"POWER & FUNCTIONAL", i:"Giorgio R."}, {t:"17:00", c:"PILATES", i:"Duilio"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}],
-        "Martedì": [{t:"09:00", c:"GYM DANCE", i:"Giuseppe"}, {t:"10:00", c:"TONE UP", i:"Duilio"}, {t:"13:00", c:"TONE UP", i:"Nicola"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"G.A.G", i:"Beppe"}],
-        "Mercoledì": [{t:"09:00", c:"POSTURALE", i:"Roby"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"POWER YOGA", i:"Domenico"}],
-        "Giovedì": [{t:"09:00", c:"TONE UP", i:"Duilio"}, {t:"13:00", c:"POWER YOGA", i:"Domenico"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Simo"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"17:00", c:"YOGA", i:"Riccardo"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}],
-        "Sabato": [{t:"09:00", c:"YOGA", i:"Giancarlo"}, {t:"10:00", c:"TONE UP", i:"Giancarlo"}],
+    // PALINSESTO COMPLETO DA FILE EXCEL
+    const orari = {
+        "Lunedì": [{t:"09:00", c:"TONE UP", i:"Beppe"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"POWER & FUNCTIONAL", i:"Giorgio R."}, {t:"12:00", c:"ACQUA GYM", i:"Francesca"}, {t:"13:00", c:"FAT BURNS", i:"Giorgio R."}, {t:"13:00", c:"ACQUA BIKE", i:"Francesca"}, {t:"16:00", c:"BODY FIT", i:"Gianni"}, {t:"17:00", c:"PILATES", i:"Duilio"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"18:00", c:"ACQUA TONE", i:"Fabio"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}, {t:"19:00", c:"ACQUA GYM", i:"Fabio"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE", i:"Giuseppe"}, {t:"10:00", c:"TONE UP", i:"Duilio"}, {t:"11:00", c:"PILATES", i:"Duilio"}, {t:"12:00", c:"AERO DANCE", i:"Nicola"}, {t:"13:00", c:"TONE UP", i:"Nicola"}, {t:"13:00", c:"ACQUA TONE", i:"Fabio"}, {t:"14:00", c:"LATIN MOOVE", i:"Osvaldo"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:15", c:"ACQUA GYM", i:"Francy"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"ACQUA BIKE", i:"Francy"}, {t:"19:00", c:"ZUMBA", i:"Beppe"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE", i:"Roby"}, {t:"10:00", c:"TONIFICAZIONE", i:"Roby"}, {t:"10:15", c:"ACQUA STRONG", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"12:00", c:"ACQUA GYM", i:"Super Simo"}, {t:"13:00", c:"TOTAL BODY", i:"Simone L."}, {t:"13:00", c:"ACQUA BIKE", i:"Super Simo"}, {t:"15:00", c:"YOGA", i:"Riccardo"}, {t:"16:00", c:"TONE UP", i:"Gianni"}, {t:"16:00", c:"ACQUA BIKE", i:"Fabio"}, {t:"17:00", c:"BODY SCULPTURE", i:"Duilio"}, {t:"17:00", c:"ACQUA TONE", i:"Giulia"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"POWER YOGA", i:"Domenico"}, {t:"19:00", c:"ACQUA GYM", i:"Giulia"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP", i:"Duilio"}, {t:"10:00", c:"PILATES", i:"Giuseppe"}, {t:"11:00", c:"TONE UP", i:"Giuseppe"}, {t:"12:00", c:"AERO DANCE", i:"Nicola"}, {t:"13:00", c:"POWER YOGA", i:"Domenico"}, {t:"13:30", c:"FIT BOXE", i:"Giancarlo"}, {t:"13:00", c:"ACQUA GYM", i:"Giulia"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"18:15", c:"ACQUA FIT", i:"Francy"}, {t:"19:00", c:"ZUMBA", i:"Beppe"}, {t:"19:00", c:"ACQUA BIKE", i:"Francy"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Super Simo"}, {t:"10:00", c:"CIRCUIT TRAINING", i:"Super Simo"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}, {t:"13:00", c:"ACQUA GYM", i:"Francy"}, {t:"13:00", c:"SPINN", i:"Michela"}, {t:"17:00", c:"YOGA", i:"Riccardo"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"18:00", c:"ACQUA TONE", i:"Fabio"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}, {t:"19:00", c:"ACQUA GYM", i:"Fabio"}],
+        "Sabato": [{t:"09:00", c:"YOGA", i:"Giancarlo"}, {t:"10:00", c:"TONE UP", i:"Giancarlo"}, {t:"11:00", c:"MOBILITY", i:"Simona B."}, {t:"11:30", c:"ACQUA BIKE", i:"-"}, {t:"12:00", c:"FIT DANCE", i:"Stefano P."}, {t:"12:00", c:"ACQUA GYM", i:"Katty"}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}],
         "Domenica": [{t:"10:00", c:"SALA PESI LIBERA", i:"-"}]
     };
 
@@ -155,108 +154,110 @@
         for(let i=0; i<7; i++){
             let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
             let dot = document.createElement('div');
-            const isToday = d.toDateString() == new Date().toDateString();
-            const isSelected = d.toDateString() == curDate.toDateString();
-            dot.className = `day-dot ${isToday?'today':''} ${isSelected?'selected':''}`;
-            dot.onclick = () => selezionaGiorno(new Date(d));
-            dot.innerHTML = `<div style="font-size:0.5rem;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</div><b style="font-size:1.1rem;">${d.getDate()}</b>`;
+            const isT = d.toDateString() == new Date().toDateString();
+            const isS = d.toDateString() == curDate.toDateString();
+            dot.className = `day-dot ${isT?'today':''} ${isS?'selected':''}`;
+            dot.onclick = () => selectDay(new Date(d));
+            dot.innerHTML = `<div style="font-size:0.55rem;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</div><b style="font-size:1.1rem;">${d.getDate()}</b>`;
             grid.appendChild(dot);
         }
         document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + " - " + new Date(new Date(dataInizio).setDate(dataInizio.getDate()+6)).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
     }
 
-    function selezionaGiorno(data) {
-        curDate = data;
-        curKey = `${data.getFullYear()}-${data.getMonth()+1}-${data.getDate()}`;
-        document.getElementById('agenda-date-label').innerText = "Agenda " + data.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
+    function selectDay(d) {
+        curDate = d;
+        curKey = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        document.getElementById('agenda-date-label').innerText = "Agenda " + d.toLocaleDateString('it-IT', {day:'numeric', month:'long'});
         renderCalendar();
-        caricaAgenda();
+        loadAgenda();
     }
 
-    function caricaAgenda() {
+    // AGENDA VOCALE E TESTUALE
+    function inputApt(u) {
+        const modalApt = prompt("Scrivi l'appuntamento (lascia vuoto per dettare):");
+        if (modalApt === "") startVoiceApt(u);
+        else if (modalApt) db.ref("agenda/" + curKey).push({ t: modalApt, u: u });
+    }
+
+    function startVoiceApt(u) {
+        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        rec.lang = 'it-IT'; rec.start();
+        rec.onresult = (e) => db.ref("agenda/" + curKey).push({ t: e.results[0][0].transcript, u: u });
+    }
+
+    function loadAgenda() {
         db.ref("agenda/" + curKey).on('value', snap => {
-            document.getElementById('list-m').innerHTML = "";
-            document.getElementById('list-l').innerHTML = "";
-            const dati = snap.val();
-            if (!dati) return;
-            Object.keys(dati).forEach(id => {
-                const item = dati[id];
-                const div = document.createElement('div');
-                div.className = "appuntamento-item";
-                div.innerHTML = `<span>${item.testo}</span><span style="color:red" onclick="eliminaApt('${id}')">×</span>`;
-                document.getElementById(item.user === 'm' ? 'list-m' : 'list-l').appendChild(div);
+            const m = document.getElementById('list-m'); const l = document.getElementById('list-l');
+            m.innerHTML = ""; l.innerHTML = "";
+            const v = snap.val(); if(!v) return;
+            Object.keys(v).forEach(id => {
+                const item = v[id];
+                const row = `<div class="apt-item"><span>${item.t}</span><span style="color:red" onclick="db.ref('agenda/${curKey}/${id}').remove()">×</span></div>`;
+                if(item.u === 'm') m.innerHTML += row; else l.innerHTML += row;
             });
         });
     }
 
-    function addAptPrompt(u) {
-        const t = prompt("Scrivi l'impegno o premi OK per dettare:");
-        if (t === "") { avviaVocaleApt(u); }
-        else if (t) { db.ref("agenda/" + curKey).push({ testo: t, user: u }); }
-    }
-
-    function avviaVocaleApt(u) {
-        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        rec.lang = 'it-IT'; rec.start();
-        rec.onresult = (e) => { db.ref("agenda/" + curKey).push({ testo: e.results[0][0].transcript, user: u }); };
-    }
-
-    function eliminaApt(id) { if(confirm("Elimina?")) db.ref("agenda/" + curKey + "/" + id).remove(); }
-
-    function apriDettaglio(data) {
-        let gL = data.toLocaleDateString('it-IT', {weekday:'long'}); gL = gL.charAt(0).toUpperCase() + gL.slice(1);
-        document.getElementById('modal-title').innerText = gL + " " + data.getDate();
+    // GESTIONE MODALE (CORSI E MENÙ)
+    function apriDettaglio(d) {
+        let giorno = d.toLocaleDateString('it-IT', {weekday:'long'});
+        giorno = giorno.charAt(0).toUpperCase() + giorno.slice(1);
+        document.getElementById('modal-day-title').innerText = giorno + " " + d.getDate();
         document.getElementById('modal').style.display = 'flex';
         
         db.ref("dailyData/" + curKey).once('value', snap => {
-            const v = snap.val() || {};
+            const val = snap.val() || {};
             
-            // Build Gym Palinsesto
-            const buildGym = (u) => (palinsesto[gL] || []).map(c => {
-                const id = `chk-${u}-${c.t.replace(':','')}`;
-                return `<div style="font-size:0.8rem; padding:4px 0;"><input type="checkbox" ${v[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${c.t} - ${c.c}</div>`;
+            // Corsi
+            const buildGym = (user) => (orari[giorno] || []).map(o => {
+                const id = `chk-${user}-${o.t}-${o.c}`.replace(/\s/g,'');
+                return `<div style="font-size:0.8rem; padding:4px 0;"><input type="checkbox" ${val[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${o.t} - <b>${o.c}</b> <small>(${o.i})</small></div>`;
             }).join("");
-            document.getElementById('gym-list-m').innerHTML = "<b>CORSI MASSIMO:</b>" + buildGym('m');
-            document.getElementById('gym-list-l').innerHTML = "<b>CORSI LILIANA:</b>" + buildGym('l');
+            document.getElementById('gym-m').innerHTML = "<div style='color:var(--massimo); font-weight:bold; font-size:0.7rem'>MASSY:</div>" + buildGym('m');
+            document.getElementById('gym-l').innerHTML = "<div style='color:var(--liliana); font-weight:bold; font-size:0.7rem'>LILLY:</div>" + buildGym('l');
 
-            // Build Food Fields
+            // Menù
             const meals = ["Colazione", "Pranzo", "Cena"];
-            const buildFood = (u) => meals.map(m => {
-                const idT = `food-${u}-${m}`; const idI = `img-${u}-${m}`;
-                return `
-                <div class="meal-row">
-                    <small><b>${m.toUpperCase()}</b></small>
-                    <div class="meal-input-group">
-                        <textarea id="${idT}" placeholder="..." oninput="db.ref('dailyData/${curKey}/${idT}').set(this.value)">${v[idT]||''}</textarea>
-                        <button class="btn-icon" onclick="avviaVocaleFood('${idT}')">🎤</button>
-                        <button class="btn-icon" onclick="document.getElementById('f-${idI}').click()">📸</button>
-                    </div>
-                    <input type="file" id="f-${idI}" accept="image/*" style="display:none" onchange="uploadFoto(this, '${idI}')">
-                    <img id="${idI}" class="img-pre" src="${v[idI]||''}" style="display:${v[idI]?'block':'none'}" onclick="ingrandisci(this.src)">
-                </div>`;
-            }).join("");
-            document.getElementById('menu-m-fields').innerHTML = buildFood('m');
-            document.getElementById('menu-l-fields').innerHTML = buildFood('l');
+            const users = [{n:"MASSIMO", k:"m", c:"var(--massimo)"}, {n:"LILIANA", k:"l", c:"var(--liliana)"}];
+            document.getElementById('food-container').innerHTML = users.map(u => `
+                <div class="food-card" style="border-left:5px solid ${u.c}">
+                    <div style="font-weight:bold; color:${u.c}; font-size:0.7rem; margin-bottom:10px;">🍽️ MENÙ ${u.n}</div>
+                    ${meals.map(m => {
+                        const tid = `f-${u.k}-${m}`; const iid = `img-${u.k}-${m}`;
+                        return `
+                        <div class="meal-box">
+                            <small><b>${m}</b></small>
+                            <div class="input-row">
+                                <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)">${val[tid]||''}</textarea>
+                                <button class="action-btn" onclick="startVoiceFood('${tid}')">🎤</button>
+                                <button class="action-btn" onclick="document.getElementById('file-${iid}').click()">📸</button>
+                                <input type="file" id="file-${iid}" accept="image/*" capture="environment" style="display:none" onchange="uploadFile(this, '${iid}')">
+                            </div>
+                            <img id="${iid}" class="img-preview" src="${val[iid]||''}" style="display:${val[iid]?'block':'none'}" onclick="zoomImg(this.src)">
+                        </div>`;
+                    }).join("")}
+                </div>
+            `).join("");
         });
     }
 
-    function avviaVocaleFood(id) {
+    function startVoiceFood(id) {
         const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         rec.lang = 'it-IT'; rec.start();
-        rec.onresult = (e) => { 
+        rec.onresult = (e) => {
             const t = e.results[0][0].transcript;
             document.getElementById(id).value = t;
             db.ref("dailyData/" + curKey + "/" + id).set(t);
         };
     }
 
-    function uploadFoto(input, imgId) {
+    function uploadFile(input, imgId) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            const b64 = e.target.result;
-            document.getElementById(imgId).src = b64;
+            const base64 = e.target.result;
+            document.getElementById(imgId).src = base64;
             document.getElementById(imgId).style.display = 'block';
-            db.ref("dailyData/" + curKey + "/" + imgId).set(b64);
+            db.ref("dailyData/" + curKey + "/" + imgId).set(base64);
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -269,10 +270,10 @@
 
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
-    function apriScheda(u) { document.getElementById('view-src').src = (u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); document.getElementById('img-viewer').style.display = 'flex'; }
-    function ingrandisci(s) { document.getElementById('view-src').src = s; document.getElementById('img-viewer').style.display = 'flex'; }
+    function zoomImg(s) { document.getElementById('v-img').src = s; document.getElementById('img-viewer').style.display = 'flex'; }
+    function viewScheda(u) { zoomImg(u === 'm' ? "Schedamassimo.jpg" : "schedaLiliana.jpg"); }
 
-    window.onload = () => { selezionaGiorno(new Date()); };
+    window.onload = () => selectDay(new Date());
 </script>
 </body>
 </html>
