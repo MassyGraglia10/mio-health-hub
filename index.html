@@ -122,12 +122,14 @@
         <div id="tab-relax" class="tab-content">
             <div style="font-size:0.7rem; font-weight:800; color:#888; margin-bottom:10px;">PLAYLIST SPOTIFY</div>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com')">🎧 SPOTY MASSY</button>
-                <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com')">🎧 SPOTY LILLY</button>
+                <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/')">🎧 SPOTY MASSY</button>
+                <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/')">🎧 SPOTY LILLY</button>
             </div>
             <div style="font-size:0.7rem; font-weight:800; color:#888; margin-bottom:10px;">VIDEO RELAX</div>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+4k+relax')">🌊 RUMORE DEL MARE</button>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano')">🧘 PILATES</button>
+            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano')">🧘 YOGA</button>
+            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata')">🧠 MEDITAZIONE</button>
         </div>
     </div>
 </div>
@@ -140,12 +142,12 @@
     const db = firebase.database();
 
     const orari = {
-        "Lunedì": [{t:"09:00", c:"TONE UP", i:"Beppe"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"POWER & FUNCTIONAL", i:"Giorgio R."}, {t:"18:00", c:"S. PUMP", i:"Beppe"}],
-        "Martedì": [{t:"09:00", c:"GYM DANCE", i:"Giuseppe"}, {t:"11:00", c:"PILATES", i:"Duilio"}, {t:"13:00", c:"ACQUA TONE", i:"Fabio"}, {t:"19:00", c:"ZUMBA", i:"Beppe"}],
-        "Mercoledì": [{t:"10:15", c:"ACQUA STRONG", i:"Francy"}, {t:"13:00", c:"TOTAL BODY", i:"Simone L."}, {t:"18:00", c:"G.A.G", i:"Beppe"}],
-        "Giovedì": [{t:"10:00", c:"PILATES", i:"Giuseppe"}, {t:"13:30", c:"FIT BOXE", i:"Giancarlo"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}],
-        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Super Simo"}, {t:"13:00", c:"SPINN", i:"Michela"}, {t:"18:00", c:"ACQUA TONE", i:"Fabio"}],
-        "Sabato": [{t:"10:00", c:"TONE UP", i:"Giancarlo"}, {t:"12:00", c:"ACQUA GYM", i:"Katty"}],
+        "Lunedì": [{t:"09:00", c:"TONE UP", i:"Beppe"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"POWER & FUNCTIONAL", i:"Giorgio R."}, {t:"12:00", c:"ACQUA GYM", i:"Francesca"}, {t:"13:00", c:"FAT BURNS", i:"Giorgio R."}, {t:"13:00", c:"ACQUA BIKE", i:"Francesca"}, {t:"16:00", c:"BODY FIT", i:"Gianni"}, {t:"17:00", c:"PILATES", i:"Duilio"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"18:00", c:"ACQUA TONE", i:"Fabio"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}, {t:"19:00", c:"ACQUA GYM", i:"Fabio"}],
+        "Martedì": [{t:"09:00", c:"GYM DANCE", i:"Giuseppe"}, {t:"10:00", c:"TONE UP", i:"Duilio"}, {t:"11:00", c:"PILATES", i:"Duilio"}, {t:"12:00", c:"AERO DANCE", i:"Nicola"}, {t:"13:00", c:"TONE UP", i:"Nicola"}, {t:"13:00", c:"ACQUA TONE", i:"Fabio"}, {t:"14:00", c:"LATIN MOOVE", i:"Osvaldo"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:15", c:"ACQUA GYM", i:"Francy"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"ACQUA BIKE", i:"Francy"}, {t:"19:00", c:"ZUMBA", i:"Beppe"}],
+        "Mercoledì": [{t:"09:00", c:"POSTURALE", i:"Roby"}, {t:"10:00", c:"TONIFICAZIONE", i:"Roby"}, {t:"10:15", c:"ACQUA STRONG", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"12:00", c:"ACQUA GYM", i:"Super Simo"}, {t:"13:00", c:"TOTAL BODY", i:"Simone L."}, {t:"13:00", c:"ACQUA BIKE", i:"Super Simo"}, {t:"15:00", c:"YOGA", i:"Riccardo"}, {t:"16:00", c:"TONE UP", i:"Gianni"}, {t:"16:00", c:"ACQUA BIKE", i:"Fabio"}, {t:"17:00", c:"BODY SCULPTURE", i:"Duilio"}, {t:"17:00", c:"ACQUA TONE", i:"Giulia"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"19:00", c:"POWER YOGA", i:"Domenico"}, {t:"19:00", c:"ACQUA GYM", i:"Giulia"}],
+        "Giovedì": [{t:"09:00", c:"TONE UP", i:"Duilio"}, {t:"10:00", c:"PILATES", i:"Giuseppe"}, {t:"11:00", c:"TONE UP", i:"Giuseppe"}, {t:"12:00", c:"AERO DANCE", i:"Nicola"}, {t:"13:00", c:"POWER YOGA", i:"Domenico"}, {t:"13:30", c:"FIT BOXE", i:"Giancarlo"}, {t:"13:00", c:"ACQUA GYM", i:"Giulia"}, {t:"17:00", c:"PILATES", i:"Manuela"}, {t:"18:00", c:"S. PUMP", i:"Beppe"}, {t:"18:15", c:"ACQUA FIT", i:"Francy"}, {t:"19:00", c:"ZUMBA", i:"Beppe"}, {t:"19:00", c:"ACQUA BIKE", i:"Francy"}],
+        "Venerdì": [{t:"09:00", c:"G.A.G", i:"Super Simo"}, {t:"10:00", c:"CIRCUIT TRAINING", i:"Super Simo"}, {t:"10:15", c:"ACQUA FIT", i:"Francy"}, {t:"12:00", c:"TOTAL BODY", i:"Franklin"}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}, {t:"13:00", c:"ACQUA GYM", i:"Francy"}, {t:"13:00", c:"SPINN", i:"Michela"}, {t:"17:00", c:"YOGA", i:"Riccardo"}, {t:"18:00", c:"G.A.G", i:"Beppe"}, {t:"18:00", c:"ACQUA TONE", i:"Fabio"}, {t:"19:00", c:"TOTAL BODY", i:"Franklin"}, {t:"19:00", c:"ACQUA GYM", i:"Fabio"}],
+        "Sabato": [{t:"09:00", c:"YOGA", i:"Giancarlo"}, {t:"10:00", c:"TONE UP", i:"Giancarlo"}, {t:"11:00", c:"MOBILITY", i:"Simona B."}, {t:"11:30", c:"ACQUA BIKE", i:"-"}, {t:"12:00", c:"FIT DANCE", i:"Stefano P."}, {t:"12:00", c:"ACQUA GYM", i:"Katty"}, {t:"13:00", c:"LATIN MOOVE", i:"Osvaldo"}],
         "Domenica": [{t:"10:00", c:"SALA PESI LIBERA", i:"-"}]
     };
 
@@ -155,7 +157,6 @@
     let curDate = new Date();
 
     function updateCurKey(d) {
-        // Formato YYYY-MM-DD per evitare bug con i giorni singoli (es 7 aprile)
         const day = d.getDate();
         const month = d.getMonth() + 1;
         const year = d.getFullYear();
@@ -185,8 +186,29 @@
         loadAgenda();
     }
 
+    // --- FUNZIONE VOCALE AGENDA ---
+    function startVoiceApt(u) {
+        const btn = document.getElementById('mic-' + u);
+        btn.classList.add('listening');
+        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        rec.lang = 'it-IT';
+        rec.start();
+        rec.onresult = (e) => {
+            const t = e.results[0][0].transcript;
+            db.ref("agenda/" + curKey).push({ t: t, u: u });
+            btn.classList.remove('listening');
+        };
+        rec.onerror = () => btn.classList.remove('listening');
+        rec.onend = () => btn.classList.remove('listening');
+    }
+
+    function inputApt(u) {
+        const text = prompt("Inserisci impegno");
+        if (text) db.ref("agenda/" + curKey).push({ t: text, u: u });
+    }
+
     function loadAgenda() {
-        db.ref("agenda/" + curKey).off(); // Pulisce listener precedenti
+        db.ref("agenda/" + curKey).off();
         db.ref("agenda/" + curKey).on('value', snap => {
             const m = document.getElementById('list-m'); const l = document.getElementById('list-l');
             m.innerHTML = ""; l.innerHTML = "";
@@ -199,11 +221,6 @@
         });
     }
 
-    function inputApt(u) {
-        const text = prompt("Inserisci impegno");
-        if (text) db.ref("agenda/" + curKey).push({ t: text, u: u });
-    }
-
     function apriDettaglio(d) {
         updateCurKey(d);
         let giorno = d.toLocaleDateString('it-IT', {weekday:'long'});
@@ -214,15 +231,13 @@
         db.ref("dailyData/" + curKey).once('value', snap => {
             const val = snap.val() || {};
             
-            // Build Gym
             const buildGym = (user) => (orari[giorno] || []).map(o => {
                 const id = `chk-${user}-${o.t}-${o.c}`.replace(/\s/g,'');
-                return `<div style="font-size:0.8rem; padding:4px 0;"><input type="checkbox" ${val[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${o.t} - <b>${o.c}</b></div>`;
+                return `<div style="font-size:0.8rem; padding:4px 0;"><input type="checkbox" ${val[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${o.t} - <b>${o.c}</b> <small>(${o.i})</small></div>`;
             }).join("");
             document.getElementById('gym-m').innerHTML = "<div style='color:var(--massimo); font-weight:bold; font-size:0.7rem'>MASSY:</div>" + buildGym('m');
             document.getElementById('gym-l').innerHTML = "<div style='color:var(--liliana); font-weight:bold; font-size:0.7rem'>LILLY:</div>" + buildGym('l');
 
-            // Build Food
             const meals = ["Colazione", "Pranzo", "Cena"];
             const users = [{n:"MASSIMO", k:"m", c:"var(--massimo)"}, {n:"LILIANA", k:"l", c:"var(--liliana)"}];
             document.getElementById('food-container').innerHTML = users.map(u => `
@@ -236,6 +251,7 @@
                             <small><b>${m}</b></small>
                             <div class="input-row">
                                 <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)">${val[tid]||''}</textarea>
+                                <button class="action-btn" onclick="startVoiceFood('${tid}')">🎤</button>
                                 <button class="action-btn" onclick="document.getElementById('file-${iid}').click()">📸</button>
                                 <input type="file" id="file-${iid}" accept="image/*" style="display:none" onchange="processAndUpload(this, '${iid}')">
                             </div>
@@ -248,6 +264,17 @@
                 </div>
             `).join("");
         });
+    }
+
+    // --- FUNZIONE VOCALE MENÙ ---
+    function startVoiceFood(id) {
+        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        rec.lang = 'it-IT'; rec.start();
+        rec.onresult = (e) => {
+            const t = e.results[0][0].transcript;
+            document.getElementById(id).value = t;
+            db.ref("dailyData/" + curKey + "/" + id).set(t);
+        };
     }
 
     function processAndUpload(input, imgId) {
@@ -265,7 +292,6 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-                
                 document.getElementById(imgId).src = compressedBase64;
                 document.getElementById('cont-' + imgId).style.display = 'block';
                 db.ref("dailyData/" + curKey + "/" + imgId).set(compressedBase64);
