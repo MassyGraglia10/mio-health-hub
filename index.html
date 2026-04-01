@@ -158,6 +158,7 @@
     function updateCurKey(d) { curKey = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 
     function renderCalendar() {
+        document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT', {month: 'long', year: 'numeric'}).toUpperCase();
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         const oggi = new Date().toDateString();
         for(let i=0; i<7; i++){
@@ -202,8 +203,25 @@
     }
 
     function addToCalendarPhone() {
-        alert("Sincronizzazione in corso con il calendario di sistema...");
-    }
+        db.ref("agenda/" + curKey).once('value', snap => {
+        const v = snap.val();
+        if(!v) { alert("Nessun impegno da sincronizzare per oggi!"); return; }
+
+        let events = "";
+        Object.keys(v).forEach(id => {
+            const utente = v[id].u === 'm' ? "Massimo" : "Liliana";
+            events += `BEGIN:VEVENT\nSUMMARY:${utente}: ${v[id].t}\nDTSTART:${curKey.replace(/-/g,'')}T090000\nDTEND:${curKey.replace(/-/g,'')}T100000\nEND:VEVENT\n`;
+        });
+
+        const icsData = `BEGIN:VCALENDAR\nVERSION:2.0\n${events}END:VCALENDAR`;
+        const blob = new Blob([icsData], { type: 'text/calendar' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `agenda_${curKey}.ics`;
+        link.click();
+    });
+}
 
     function apriDettaglio(d) {
         updateCurKey(d);
