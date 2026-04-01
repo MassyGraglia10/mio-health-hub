@@ -152,25 +152,33 @@
         "Domenica": [{t:"10:00",c:"SALA PESI LIBERA",i:"-"}]
     };
 
-    let dataInizio = new Date(); dataInizio.setDate(dataInizio.getDate() - (dataInizio.getDay() === 0 ? 6 : dataInizio.getDay() - 1));
+    let dataInizio = new Date(oggiNav.setDate(oggiNav.getDate() - (oggiNav.getDay() === 0 ? 6 : oggiNav.getDay() - 1)));
     let curDate = new Date(); let curKey = "";
 
     function updateCurKey(d) { curKey = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 
     function renderCalendar() {
-        document.getElementById('week-label').innerText = dataInizio.toLocaleDateString('it-IT', {month: 'long', year: 'numeric'}).toUpperCase();
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         const oggi = new Date().toDateString();
+    
         for(let i=0; i<7; i++){
-            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
-            let dot = document.createElement('div');
-            dot.className = `day-dot ${d.toDateString() === oggi?'today':''} ${d.toDateString() === curDate.toDateString()?'selected':''}`;
-            dot.onclick = () => selectDay(new Date(d));
-            dot.innerHTML = `<div style="font-size:0.55rem;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</div><b>${d.getDate()}</b>`;
-            grid.appendChild(dot);
-        }
+        let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
+        let dot = document.createElement('div');
+        dot.className = `day-dot ${d.toDateString() === oggi?'today':''} ${d.toDateString() === curDate.toDateString()?'selected':''}`;
+        dot.onclick = () => selectDay(new Date(d));
+        
+        // Qui inseriamo Giorno, Numero e Mese abbreviato
+        const giornoSett = d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase();
+        const meseAbbr = d.toLocaleDateString('it-IT',{month:'short'}).toUpperCase();
+        
+        dot.innerHTML = `
+            <div style="font-size:0.5rem; line-height:1;">${giornoSett}</div>
+            <b style="font-size:1.1rem;">${d.getDate()}</b>
+            <div style="font-size:0.5rem; line-height:1;">${meseAbbr}</div>
+        `;
+        grid.appendChild(dot);
     }
-
+}
     function selectDay(d) { curDate = d; updateCurKey(d); renderCalendar(); loadAgenda(); }
 
     function startVoiceApt(u) {
