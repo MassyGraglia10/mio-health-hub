@@ -3,55 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Massy & Lilly </title>
+    <title>Massy & Lilly Hub</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
         :root { 
-            --primary: #FEDD00; /* PANTONE® Yellow C */
-            --bg: #fffdf0; 
-            --massimo: #2196f3; 
-            --liliana: #e91e63; 
-            --relax: #9c27b0; 
-            --spotify: #1DB954; 
-            --today-color: #FF1493;
+            --primary: #FEDD00; --bg: #fffdf0; --massimo: #2196f3; --liliana: #e91e63; 
+            --relax: #9c27b0; --spotify: #1DB954; --today-color: #FF1493;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: #2c3e50; padding-bottom: 50px; }
         .header { text-align: center; background: var(--primary); color: #333; padding: 12px; position: sticky; top:0; z-index:100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: white; border-bottom: 1px solid #eee; }
         .btn-nav { background: #eee; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 12px; }
-        .day-dot { background: white; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .day-dot.selected { background: var(--primary); color: #333; font-weight: bold; border: 1px solid #b8860b; }
-        .day-dot.today { border: 2px solid var(--today-color) !important; color: var(--today-color); font-weight: bold; }
-
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; padding: 10px; }
+        .day-dot { background: white; border-radius: 10px; padding: 10px 2px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; }
+        .day-dot.selected { background: var(--primary); color: #333; border: 1px solid #b8860b; }
+        .day-dot.today { border: 2px solid var(--today-color) !important; }
         .agenda-section { padding: 15px; margin: 0 12px 20px; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .user-box { margin-bottom: 15px; padding: 10px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
         .m-border { border-left: 5px solid var(--massimo); }
         .l-border { border-left: 5px solid var(--liliana); }
         .apt-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         .btn-add { color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
-
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; height: 92vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
-        
         .tab-bar { display: flex; background: #f0f0f0; border-radius: 15px; padding: 5px; margin-bottom: 20px; gap:4px; position: sticky; top: 0; z-index: 10; }
         .tab-btn { flex: 1; border: none; padding: 10px 2px; border-radius: 10px; font-weight: 800; cursor: pointer; background: transparent; color: #888; font-size: 0.65rem; }
         .tab-btn.active { background: white; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        .meal-card { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .meal-card { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 12px; margin-bottom: 15px; }
         .img-container { position: relative; width: 100%; max-width: 150px; margin-top: 8px; border-radius: 10px; overflow: hidden; }
         .img-preview { width: 100%; display: block; border: 1px solid #ddd; }
-        .btn-del-img { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; }
-        
+        .btn-del-img { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; }
         .btn-full { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; }
-        .action-btn { background: #f0f0f0; border: none; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; }
-        
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 8px; box-sizing: border-box; }
+        .action-btn { background: #f0f0f0; border: none; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
         .listening { animation: pulse 1.5s infinite; background: #ff5252 !important; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
@@ -62,7 +50,8 @@
 
 <div class="nav-bar">
     <button class="btn-nav" onclick="cambiaSett(-7)">◀</button>
-    <div id="week-label" style="font-weight:bold; font-size: 0.9rem;">...</div>
+    <div id="week-label" style="display:none">...</div>
+    <div style="font-weight:bold; font-size: 0.8rem; color:#666;">SCORRI SETTIMANA</div>
     <button class="btn-nav" onclick="cambiaSett(7)">▶</button>
 </div>
 
@@ -71,7 +60,7 @@
 <div class="agenda-section">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 id="agenda-date-label" style="font-size:0.9rem; color:#b8860b;">Agenda</h3>
-        <button onclick="addToCalendarPhone()" style="font-size:0.6rem; border:none; background:#eee; padding:5px 10px; border-radius:5px;">📅 SINCRONIZZA TELEFONO</button>
+        <button onclick="addToCalendarPhone()" style="font-size:0.6rem; border:none; background:#e3f2fd; color:#1976d2; padding:5px 10px; border-radius:5px; font-weight:bold;">📅 SINCRONIZZA GOOGLE</button>
     </div>
     
     <div class="user-box m-border">
@@ -107,28 +96,17 @@
             <h2 id="modal-day-title" style="color:#b8860b; font-size:1.1rem;"></h2>
             <span style="font-size:2.5rem; color:#ccc;" onclick="chiudi()">×</span>
         </div>
-        
         <div class="tab-bar">
             <button class="tab-btn active" onclick="openTab(event, 'tab-gym')">🏋️ CORSI</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-food')">🍎 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
-
-        <div id="tab-gym" class="tab-content active">
-            <div id="gym-m"></div>
-            <div id="gym-l"></div>
-        </div>
-
+        <div id="tab-gym" class="tab-content active"><div id="gym-m"></div><div id="gym-l"></div></div>
         <div id="tab-food" class="tab-content"><div id="food-container"></div></div>
-
         <div id="tab-relax" class="tab-content">
-            <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/intl-it')">🎧 SPOTY MASSY</button>
-            <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/playlist/3wG8xjrf5opSS6ONz8yCv4?si=uV-fUeVrQL2KNhe_6ffLPQ')">🎧 SPOTY LILLY</button>
-            <hr>
-            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=rumore+del+mare+per+dormire')">🌊 RUMORE DEL MARE</button>
-            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano')">🧘 PILATES</button>
-            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata')">🧠 MEDITAZIONE</button>
-            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano')">🧘 YOGA</button>
+             <button class="btn-full" style="background:var(--spotify)" onclick="window.open('https://open.spotify.com/')">🎧 APRI SPOTIFY</button>
+             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout')">🧘 PILATES</button>
+             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata')">🧠 MEDITAZIONE</button>
         </div>
     </div>
 </div>
@@ -139,20 +117,21 @@
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyAS01EENxcYst32-dxZkSQ6febvYZnBtNc", authDomain: "miomenu-e2e51.firebaseapp.com", databaseURL: "https://miomenu-e2e51-default-rtdb.europe-west1.firebasedatabase.app", projectId: "miomenu-e2e51" };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     const orari = {
-        "Lunedì": [{t:"09:00",c:"TONE UP",i:"Beppe"},{t:"10:15",c:"ACQUA FIT",i:"Francy"},{t:"12:00",c:"POWER & FUNCTIONAL",i:"Giorgio R."},{t:"12:00",c:"ACQUA GYM",i:"Francesca"},{t:"13:00",c:"FAT BURNS",i:"Giorgio R."},{t:"13:00",c:"ACQUA BIKE",i:"Francesca"},{t:"16:00",c:"BODY FIT",i:"Gianni"},{t:"17:00",c:"PILATES",i:"Duilio"},{t:"18:00",c:"S. PUMP",i:"Beppe"},{t:"18:00",c:"ACQUA GYM",i:"Giulia"},{t:"19:00",c:"TOTAL BODY",i:"Franklin"},{t:"19:00",c:"ACQUA BIKE",i:"Giulia"},{t:"20:00",c:"SPINN",i:"Michela"}],
-        "Martedì": [{t:"09:00",c:"GYM DANCE",i:"Giuseppe"},{t:"10:00",c:"TONE UP",i:"Duilio"},{t:"11:00",c:"PILATES",i:"Duilio"},{t:"12:00",c:"AERO DANCE",i:"Nicola"},{t:"13:00",c:"TONE UP",i:"Nicola"},{t:"13:00",c:"ACQUA TONE",i:"Fabio"},{t:"14:00",c:"LATIN MOOVE",i:"Osvaldo"},{t:"17:00",c:"PILATES",i:"Manuela"},{t:"18:00",c:"G.A.G",i:"Beppe"},{t:"18:00",c:"ACQUA FIT",i:"Fabio"},{t:"19:00",c:"S. PUMP",i:"Beppe"},{t:"19:00",c:"ACQUA BIKE",i:"Fabio"}],
-        "Mercoledì": [{t:"09:00",c:"POSTURALE",i:"Roby"},{t:"10:00",c:"TONIFICAZIONE",i:"Roby"},{t:"10:15",c:"ACQUA STRONG",i:"Francy"},{t:"12:00",c:"TOTAL BODY",i:"Franklin"},{t:"12:00",c:"ACQUA GYM",i:"Super Simo"},{t:"13:00",c:"TOTAL BODY",i:"Simone L."},{t:"13:00",c:"ACQUA BIKE",i:"Super Simo"},{t:"15:00",c:"YOGA",i:"Riccardo"},{t:"16:00",c:"TONE UP",i:"Gianni"},{t:"16:00",c:"ACQUA BIKE",i:"Fabio"},{t:"17:00",c:"BODY SCULPTURE",i:"Duilio"},{t:"17:00",c:"ACQUA TONE",i:"Giulia"},{t:"18:00",c:"S. PUMP",i:"Beppe"},{t:"18:00",c:"ACQUA GYM",i:"Giulia"},{t:"19:00",c:"ACQUA GYM",i:"Giulia"}],
-        "Giovedì": [{t:"09:00",c:"TONE UP",i:"Duilio"},{t:"10:00",c:"PILATES",i:"Giuseppe"},{t:"11:00",c:"TONE UP",i:"Giuseppe"},{t:"12:00",c:"AERO DANCE",i:"Nicola"},{t:"13:00",c:"POWER YOGA",i:"Domenico"},{t:"13:30",c:"FIT BOXE",i:"Giancarlo"},{t:"13:00",c:"ACQUA GYM",i:"Giulia"},{t:"17:00",c:"PILATES",i:"Manuela"},{t:"18:00",c:"S. PUMP",i:"Beppe"},{t:"18:00",c:"ACQUA FIT",i:"Fabio"},{t:"19:00",c:"G.A.G",i:"Beppe"},{t:"19:00",c:"ACQUA BIKE",i:"Fabio"}],
-        "Venerdì": [{t:"09:00",c:"G.A.G",i:"Super Simo"},{t:"10:00",c:"CIRCUIT TRAINING",i:"Super Simo"},{t:"10:15",c:"ACQUA FIT",i:"Francy"},{t:"12:00",c:"TOTAL BODY",i:"Franklin"},{t:"13:00",c:"LATIN MOOVE",i:"Osvaldo"},{t:"13:00",c:"ACQUA GYM",i:"Francy"},{t:"13:00",c:"SPINN",i:"Michela"},{t:"17:00",c:"YOGA",i:"Riccardo"},{t:"18:00",c:"CIRCUIT TRAINING",i:"Franklin"},{t:"18:00",c:"ACQUA GYM",i:"Giulia"},{t:"19:00",c:"TOTAL BODY",i:"Franklin"}],
-        "Sabato": [{t:"09:00",c:"YOGA",i:"Giancarlo"},{t:"10:00",c:"TONE UP",i:"Giancarlo"},{t:"11:00",c:"MOBILITY",i:"Simona B."},{t:"11:30",c:"ACQUA BIKE",i:"-"},{t:"12:00",c:"FIT DANCE",i:"Stefano P."},{t:"12:00",c:"ACQUA GYM",i:"Katty"},{t:"13:00",c:"LATIN MOOVE",i:"Osvaldo"}],
+        "Lunedì": [{t:"09:00",c:"TONE UP",i:"Beppe"},{t:"10:15",c:"ACQUA FIT",i:"Francy"},{t:"12:00",c:"POWER & FUNCTIONAL",i:"Giorgio R."},{t:"18:00",c:"S. PUMP",i:"Beppe"},{t:"19:00",c:"TOTAL BODY",i:"Franklin"}],
+        "Martedì": [{t:"09:00",c:"GYM DANCE",i:"Giuseppe"},{t:"13:00",c:"TONE UP",i:"Nicola"},{t:"18:00",c:"G.A.G",i:"Beppe"},{t:"19:00",c:"S. PUMP",i:"Beppe"}],
+        "Mercoledì": [{t:"09:00",c:"POSTURALE",i:"Roby"},{t:"12:00",c:"TOTAL BODY",i:"Franklin"},{t:"18:00",c:"S. PUMP",i:"Beppe"}],
+        "Giovedì": [{t:"09:00",c:"TONE UP",i:"Duilio"},{t:"13:00",c:"POWER YOGA",i:"Domenico"},{t:"18:00",c:"S. PUMP",i:"Beppe"}],
+        "Venerdì": [{t:"09:00",c:"G.A.G",i:"Super Simo"},{t:"12:00",c:"TOTAL BODY",i:"Franklin"},{t:"18:00",c:"CIRCUIT TRAINING",i:"Franklin"}],
+        "Sabato": [{t:"10:00",c:"TONE UP",i:"Giancarlo"}],
         "Domenica": [{t:"10:00",c:"SALA PESI LIBERA",i:"-"}]
     };
 
-    let dataInizio = new Date(oggiNav.setDate(oggiNav.getDate() - (oggiNav.getDay() === 0 ? 6 : oggiNav.getDay() - 1)));
+    let oggiNav = new Date();
+    let dataInizio = new Date(new Date().setDate(new Date().getDate() - (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1)));
     let curDate = new Date(); let curKey = "";
 
     function updateCurKey(d) { curKey = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
@@ -160,26 +139,31 @@
     function renderCalendar() {
         const grid = document.getElementById('grid'); grid.innerHTML = "";
         const oggi = new Date().toDateString();
-    
         for(let i=0; i<7; i++){
-        let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
-        let dot = document.createElement('div');
-        dot.className = `day-dot ${d.toDateString() === oggi?'today':''} ${d.toDateString() === curDate.toDateString()?'selected':''}`;
-        dot.onclick = () => selectDay(new Date(d));
-        
-        // Qui inseriamo Giorno, Numero e Mese abbreviato
-        const giornoSett = d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase();
-        const meseAbbr = d.toLocaleDateString('it-IT',{month:'short'}).toUpperCase();
-        
-        dot.innerHTML = `
-            <div style="font-size:0.5rem; line-height:1;">${giornoSett}</div>
-            <b style="font-size:1.1rem;">${d.getDate()}</b>
-            <div style="font-size:0.5rem; line-height:1;">${meseAbbr}</div>
-        `;
-        grid.appendChild(dot);
+            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
+            let dot = document.createElement('div');
+            dot.className = `day-dot ${d.toDateString() === oggi?'today':''} ${d.toDateString() === curDate.toDateString()?'selected':''}`;
+            dot.onclick = () => selectDay(new Date(d));
+            const s = d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase();
+            const m = d.toLocaleDateString('it-IT',{month:'short'}).toUpperCase();
+            dot.innerHTML = `<div style="font-size:0.5rem; color:#888;">${s}</div><b style="font-size:1.1rem; margin:2px 0;">${d.getDate()}</b><div style="font-size:0.5rem; color:var(--today-color); font-weight:bold;">${m}</div>`;
+            grid.appendChild(dot);
+        }
     }
-}
+
     function selectDay(d) { curDate = d; updateCurKey(d); renderCalendar(); loadAgenda(); }
+
+    function loadAgenda() {
+        db.ref("agenda/" + curKey).on('value', snap => {
+            const m = document.getElementById('list-m'); const l = document.getElementById('list-l');
+            m.innerHTML = ""; l.innerHTML = "";
+            const v = snap.val(); if(!v) return;
+            Object.keys(v).forEach(id => {
+                const row = `<div class="apt-item"><span>${v[id].t}</span><span style="color:red; cursor:pointer" onclick="db.ref('agenda/${curKey}/${id}').remove()">×</span></div>`;
+                if(v[id].u === 'm') m.innerHTML += row; else l.innerHTML += row;
+            });
+        });
+    }
 
     function startVoiceApt(u) {
         const btn = document.getElementById('mic-' + u); btn.classList.add('listening');
@@ -188,7 +172,6 @@
         rec.onresult = (e) => {
             const t = e.results[0][0].transcript;
             db.ref("agenda/" + curKey).push({ t: t, u: u });
-            btn.classList.remove('listening');
         };
         rec.onend = () => btn.classList.remove('listening');
     }
@@ -198,41 +181,19 @@
         if(t) db.ref("agenda/" + curKey).push({ t: t, u: u });
     }
 
-    function loadAgenda() {
-        db.ref("agenda/" + curKey).on('value', snap => {
-            const m = document.getElementById('list-m'); const l = document.getElementById('list-l');
-            m.innerHTML = ""; l.innerHTML = "";
-            const v = snap.val(); if(!v) return;
+    function addToCalendarPhone() {
+        db.ref("agenda/" + curKey).once('value', snap => {
+            const v = snap.val();
+            if(!v) return alert("Nulla da sincronizzare!");
             Object.keys(v).forEach(id => {
-                const row = `<div class="apt-item"><span>${v[id].t}</span><span style="color:red; font-weight:bold; cursor:pointer" onclick="db.ref('agenda/${curKey}/${id}').remove()">×</span></div>`;
-                if(v[id].u === 'm') m.innerHTML += row; else l.innerHTML += row;
+                const tit = encodeURIComponent((v[id].u==='m'?'Massimo: ':'Liliana: ') + v[id].t);
+                const dG = curKey.split('-').map(x => x.padStart(2,'0')).join('');
+                window.open(`https://www.google.com/calendar/render?action=TEMPLATE&text=${tit}&dates=${dG}/${dG}`, '_blank');
             });
         });
     }
 
-    function addToCalendarPhone() {
-        db.ref("agenda/" + curKey).once('value', snap => {
-        const v = snap.val();
-        if(!v) { alert("Nessun impegno da sincronizzare per oggi!"); return; }
-
-        let events = "";
-        Object.keys(v).forEach(id => {
-            const utente = v[id].u === 'm' ? "Massimo" : "Liliana";
-            events += `BEGIN:VEVENT\nSUMMARY:${utente}: ${v[id].t}\nDTSTART:${curKey.replace(/-/g,'')}T090000\nDTEND:${curKey.replace(/-/g,'')}T100000\nEND:VEVENT\n`;
-        });
-
-        const icsData = `BEGIN:VCALENDAR\nVERSION:2.0\n${events}END:VCALENDAR`;
-        const blob = new Blob([icsData], { type: 'text/calendar' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `agenda_${curKey}.ics`;
-        link.click();
-    });
-}
-
     function apriDettaglio(d) {
-        updateCurKey(d);
         let giorno = d.toLocaleDateString('it-IT', {weekday:'long'});
         giorno = giorno.charAt(0).toUpperCase() + giorno.slice(1);
         document.getElementById('modal-day-title').innerText = giorno + " " + d.getDate();
@@ -242,18 +203,12 @@
             const val = snap.val() || {};
             const buildGym = (u) => {
                 const color = u==='m'?'var(--massimo)':'var(--liliana)';
-                let h = `<div style="text-align:center; margin-top:15px; border-top:2px solid ${color}; padding-top:10px;">
-                    <b style="color:${color}">${u==='m'?'MASSIMO':'LILIANA'}</b>
-                    <button class="btn-full" style="background:${color}; margin-bottom:10px;" onclick="zoomImg('${u==='m'?'Schedamassimo.jpg':'schedaLiliana.jpg'}')">VISUALIZZA SCHEDA</button>
-                </div>`;
-                h += `<div style="font-size:0.8rem; padding:5px 0;"><input type="checkbox" ${val['pesi-'+u]?'checked':''} onchange="db.ref('dailyData/${curKey}/pesi-${u}').set(this.checked)"> <b>🏋️ SALA PESI</b></div>`;
+                let h = `<div style="text-align:center; margin-top:15px; border-top:2px solid ${color}; padding-top:10px;"><b style="color:${color}">${u==='m'?'MASSIMO':'LILIANA'}</b><button class="btn-full" style="background:${color}" onclick="zoomImg('${u==='m'?'Schedamassimo.jpg':'schedaLiliana.jpg'}')">SCHEDA</button></div>`;
+                h += `<div style="font-size:0.8rem; padding:5px 0;"><input type="checkbox" ${val['pesi-'+u]?'checked':''} onchange="db.ref('dailyData/${curKey}/pesi-${u}').set(this.checked)"> 🏋️ PESI</div>`;
                 h += (orari[giorno] || []).map(o => {
                     const id = `chk-${u}-${o.t}-${o.c}`.replace(/\s/g,'');
-                    return `<div style="font-size:0.75rem; padding:4px 0; border-bottom:1px solid #f9f9f9;">
-                        <input type="checkbox" ${val[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${o.t} - <b>${o.c}</b> <small>(${o.i})</small>
-                    </div>`;
+                    return `<div style="font-size:0.75rem; padding:4px 0;"><input type="checkbox" ${val[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${o.t} - ${o.c}</div>`;
                 }).join("");
-                h += `<div style="margin-top:8px;"><small>Altro:</small><input type="text" value="${val['extra-'+u]||''}" onchange="db.ref('dailyData/${curKey}/extra-${u}').set(this.value)" style="width:100%; border:1px solid #ddd; padding:5px; border-radius:5px; font-size:0.75rem;"></div>`;
                 return h;
             };
             document.getElementById('gym-m').innerHTML = buildGym('m');
@@ -262,18 +217,15 @@
             const users = [{n:"MASSIMO", k:"m", c:"var(--massimo)"}, {n:"LILIANA", k:"l", c:"var(--liliana)"}];
             document.getElementById('food-container').innerHTML = users.map(u => `
                 <div class="meal-card" style="border-left:6px solid ${u.c}">
-                    <b style="color:${u.c}; font-size:0.8rem;">🍽️ ALIMENTAZIONE ${u.n}</b>
+                    <b style="color:${u.c}">🍽️ ${u.n}</b>
                     ${["Colazione", "Pranzo", "Cena"].map(m => {
                         const tid = `f-${u.k}-${m}`; const iid = `img-${u.k}-${m}`;
-                        return `<div style="margin-top:12px; padding-top:8px; border-top:1px solid #f0f0f0;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <small><b>${m.toUpperCase()}</b></small>
-                                <div style="display:flex; gap:8px;">
-                                    <button class="action-btn" onclick="startVoiceFood('${tid}')">🎤</button>
-                                    <button class="action-btn" onclick="document.getElementById('in-${iid}').click()">📷</button>
-                                </div>
+                        return `<div style="margin-top:10px;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <small>${m}</small>
+                                <button onclick="document.getElementById('in-${iid}').click()">📷</button>
                             </div>
-                            <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)" placeholder="Dettagli pasto...">${val[tid]||''}</textarea>
+                            <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)">${val[tid]||''}</textarea>
                             <input type="file" id="in-${iid}" hidden accept="image/*" onchange="uploadImg(this, '${iid}')">
                             <div id="cont-${iid}" class="img-container" style="display:${val[iid]?'block':'none'}">
                                 <img id="${iid}" class="img-preview" src="${val[iid]||''}" onclick="zoomImg(this.src)">
@@ -283,16 +235,6 @@
                     }).join("")}
                 </div>`).join("");
         });
-    }
-
-    function startVoiceFood(id) {
-        const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        rec.lang = 'it-IT'; rec.start();
-        rec.onresult = (e) => {
-            const t = e.results[0][0].transcript;
-            document.getElementById(id).value = t;
-            db.ref("dailyData/" + curKey + "/" + id).set(t);
-        };
     }
 
     function uploadImg(input, id) {
@@ -314,15 +256,15 @@
         }
     }
 
+    function chiudi() { document.getElementById('modal').style.display = 'none'; }
+    function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function openTab(e, id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); e.currentTarget.classList.add('active');
     }
-
-    function chiudi() { document.getElementById('modal').style.display = 'none'; }
-    function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
     function zoomImg(s) { document.getElementById('v-img').src = s; document.getElementById('img-viewer').style.display = 'flex'; }
+
     window.onload = () => selectDay(new Date());
 </script>
 </body>
