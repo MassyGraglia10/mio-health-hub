@@ -23,14 +23,16 @@
         
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 12px; }
         .day-dot { background: white; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .day-dot.selected { background: var(--primary); color: #333; font-weight: bold; }
+        .day-dot.selected { background: var(--primary); color: #333; font-weight: bold; border: 1px solid orange; }
         .day-dot.today { border: 2px solid var(--today-color) !important; color: var(--today-color); font-weight: bold; }
 
         .agenda-section { padding: 15px; margin: 0 12px 20px; background: white; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .user-box { margin-bottom: 15px; padding: 10px; border-radius: 12px; background: #fcfcfc; border: 1px solid #f0f0f0; }
         .m-border { border-left: 5px solid var(--massimo); }
         .l-border { border-left: 5px solid var(--liliana); }
-        
+        .apt-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .btn-add { color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
+
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(5px); }
         .modal-content { background: white; height: 92vh; border-radius: 25px 25px 0 0; overflow-y: auto; padding: 20px; }
         
@@ -40,14 +42,11 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .meal-box { margin-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
-        .img-container { position: relative; width: 100%; max-width: 200px; margin-top: 5px; display: none; }
-        .img-preview { width: 100%; border-radius: 10px; border: 1px solid #ddd; }
-        .btn-del-img { position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .img-container { position: relative; width: 100%; max-width: 120px; margin-top: 5px; }
+        .img-preview { width: 100%; border-radius: 8px; border: 1px solid #ddd; }
+        .btn-del-img { position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 10px; }
         
         .btn-full { border: none; padding: 12px; border-radius: 12px; color: white; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 8px; box-sizing: border-box; }
-        .action-btn { background: #f0f0f0; border: none; border-radius: 8px; width: 35px; height: 35px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -63,16 +62,30 @@
 <div class="calendar-grid" id="grid"></div>
 
 <div class="agenda-section">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 id="agenda-date-label" style="font-size:0.9rem; color:#b8860b;">Agenda</h3>
         <button onclick="askNotify()" style="font-size:0.6rem; border:none; background:none; color:#888;">🔔 NOTIFICHE</button>
     </div>
-    <div class="user-box m-border"><div id="list-m"></div></div>
-    <div class="user-box l-border"><div id="list-l"></div></div>
+    
+    <div class="user-box m-border">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:bold; color:var(--massimo); font-size:0.7rem;">MASSIMO</span>
+            <button class="btn-add" style="background:var(--massimo)" onclick="inputApt('m')">+ AGGIUNGI</button>
+        </div>
+        <div id="list-m"></div>
+    </div>
+
+    <div class="user-box l-border">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:bold; color:var(--liliana); font-size:0.7rem;">LILIANA</span>
+            <button class="btn-add" style="background:var(--liliana)" onclick="inputApt('l')">+ AGGIUNGI</button>
+        </div>
+        <div id="list-l"></div>
+    </div>
 </div>
 
 <div style="padding: 0 15px;">
-    <button class="btn-full" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ CORSI E MENÙ</button>
+    <button class="btn-full" style="background:#455a64;" onclick="apriDettaglio(curDate)">⚙️ GESTISCI TUTTO</button>
 </div>
 
 <div class="modal" id="modal">
@@ -86,15 +99,30 @@
             <button class="tab-btn" onclick="openTab(event, 'tab-food')">🍎 MENÙ</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-relax')">🧘 RELAX</button>
         </div>
-        <div id="tab-gym" class="tab-content active"><div id="gym-m"></div><div id="gym-l"></div></div>
+
+        <div id="tab-gym" class="tab-content active">
+            <div style="display:flex; gap:10px;">
+                <button class="btn-full" style="background:var(--massimo)" onclick="zoomImg('Schedamassimo.jpg')">SCHEDA MASSY</button>
+                <button class="btn-full" style="background:var(--liliana)" onclick="zoomImg('schedaLiliana.jpg')">SCHEDA LILLY</button>
+            </div>
+            <div id="gym-m"></div><div id="gym-l"></div>
+        </div>
+
         <div id="tab-food" class="tab-content"><div id="food-container"></div></div>
+
         <div id="tab-relax" class="tab-content">
             <button class="btn-full" style="background:var(--spotify)" onclick="window.open('spotify:user:massimo')">🎧 SPOTY MASSY</button>
-            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+workout+italiano')">🧘 PILATES</button>
+            <button class="btn-full" style="background:var(--spotify)" onclick="window.open('spotify:user:liliana')">🎧 SPOTY LILLY</button>
+            <hr>
+            <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=pilates+allenamento+italiano')">🧘 PILATES</button>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=meditazione+guidata')">🧠 MEDITAZIONE</button>
             <button class="btn-full" style="background:var(--relax)" onclick="window.open('https://www.youtube.com/results?search_query=yoga+italiano')">🧘 YOGA</button>
         </div>
     </div>
+</div>
+
+<div id="img-viewer" onclick="this.style.display='none'" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); display:none; z-index:2000; align-items:center; justify-content:center;">
+    <img id="v-img" style="max-width:95%; max-height:85%; border-radius:10px;">
 </div>
 
 <script>
@@ -102,14 +130,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // TUTTI I CORSI DAL TUO EXCEL
     const orari = {
-        "Lunedì": [{t:"09:00",c:"TONE UP",i:"Beppe"},{t:"10:15",c:"ACQUA FIT",i:"Francy"},{t:"12:00",c:"POWER & FUNCTIONAL",i:"Giorgio R."},{t:"12:00",c:"ACQUA GYM",i:"Francesca"},{t:"13:00",c:"FAT BURNS",i:"Giorgio R."},{t:"16:00",c:"BODY FIT",i:"Gianni"},{t:"17:00",c:"PILATES",i:"Duilio"},{t:"18:00",c:"S. PUMP",i:"Beppe"}],
-        "Martedì": [{t:"09:00",c:"GYM DANCE",i:"Giuseppe"},{t:"10:00",c:"TONE UP",i:"Duilio"},{t:"11:00",c:"PILATES",i:"Duilio"},{t:"12:00",c:"AERO DANCE",i:"Nicola"},{t:"13:00",c:"ACQUA TONE",i:"Fabio"},{t:"17:00",c:"PILATES",i:"Manuela"},{t:"18:00",c:"G.A.G",i:"Beppe"}],
-        "Mercoledì": [{t:"09:00",c:"POSTURALE",i:"Roby"},{t:"10:00",c:"TONIFICAZIONE",i:"Roby"},{t:"12:00",c:"TOTAL BODY",i:"Franklin"},{t:"13:00",c:"TOTAL BODY",i:"Simone L."},{t:"16:00",c:"TONE UP",i:"Gianni"},{t:"17:00",c:"BODY SCULPTURE",i:"Duilio"},{t:"19:00",c:"ACQUA GYM",i:"Giulia"}],
-        "Giovedì": [{t:"09:00",c:"TONE UP",i:"Duilio"},{t:"10:00",c:"PILATES",i:"Giuseppe"},{t:"12:00",c:"AERO DANCE",i:"Nicola"},{t:"13:00",c:"POWER YOGA",i:"Domenico"},{t:"17:00",c:"PILATES",i:"Manuela"},{t:"18:00",c:"S. PUMP",i:"Beppe"}],
-        "Venerdì": [{t:"09:00",c:"G.A.G",i:"Super Simo"},{t:"10:00",c:"CIRCUIT TRAINING",i:"Super Simo"},{t:"12:00",c:"TOTAL BODY",i:"Franklin"},{t:"13:00",c:"LATIN MOOVE",i:"Osvaldo"},{t:"17:00",c:"YOGA",i:"Riccardo"},{t:"19:00",c:"TOTAL BODY",i:"Franklin"}],
-        "Sabato": [{t:"09:00",c:"YOGA",i:"Giancarlo"},{t:"10:00",c:"TONE UP",i:"Giancarlo"},{t:"12:00",c:"FIT DANCE",i:"Stefano P."}],
+        "Lunedì": [{t:"09:00",c:"TONE UP",i:"Beppe"},{t:"10:15",c:"ACQUA FIT",i:"Francy"},{t:"12:00",c:"POWER & FUNCTIONAL",i:"Giorgio R."},{t:"18:00",c:"S. PUMP",i:"Beppe"}],
+        "Martedì": [{t:"09:00",c:"GYM DANCE",i:"Giuseppe"},{t:"11:00",c:"PILATES",i:"Duilio"},{t:"13:00",c:"ACQUA TONE",i:"Fabio"},{t:"18:00",c:"G.A.G",i:"Beppe"}],
+        "Mercoledì": [{t:"09:00",c:"POSTURALE",i:"Roby"},{t:"13:00",c:"TOTAL BODY",i:"Simone L."},{t:"17:00",c:"BODY SCULPTURE",i:"Duilio"},{t:"19:00",c:"ACQUA GYM",i:"Giulia"}],
+        "Giovedì": [{t:"09:00",c:"TONE UP",i:"Duilio"},{t:"13:00",c:"POWER YOGA",i:"Domenico"},{t:"17:00",c:"PILATES",i:"Manuela"},{t:"18:00",c:"S. PUMP",i:"Beppe"}],
+        "Venerdì": [{t:"09:00",c:"G.A.G",i:"Super Simo"},{t:"13:00",c:"LATIN MOOVE",i:"Osvaldo"},{t:"17:00",c:"YOGA",i:"Riccardo"},{t:"19:00",c:"TOTAL BODY",i:"Franklin"}],
+        "Sabato": [{t:"09:00",c:"YOGA",i:"Giancarlo"},{t:"12:00",c:"FIT DANCE",i:"Stefano P."}],
         "Domenica": [{t:"10:00",c:"SALA PESI LIBERA",i:"-"}]
     };
 
@@ -133,14 +160,33 @@
 
     function selectDay(d) { curDate = d; updateCurKey(d); renderCalendar(); loadAgenda(); }
 
+    function inputApt(u) {
+        const t = prompt("Inserisci impegno:");
+        if(t) db.ref("agenda/" + curKey).push({ t: t, u: u });
+    }
+
+    // AGGIUNGI AL CALENDARIO TELEFONO
+    function addToPhone(text) {
+        const dateStr = curKey.replace(/-/g, '');
+        const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(text)}&dates=${dateStr}/${dateStr}`;
+        window.open(url, '_blank');
+    }
+
     function loadAgenda() {
         db.ref("agenda/" + curKey).on('value', snap => {
             const m = document.getElementById('list-m'); const l = document.getElementById('list-l');
-            m.innerHTML = "<b>Massy:</b>"; l.innerHTML = "<b>Lilly:</b>";
+            m.innerHTML = ""; l.innerHTML = "";
             const v = snap.val(); if(!v) return;
             Object.keys(v).forEach(id => {
-                const row = `<div style="font-size:0.8rem; padding:4px 0;">- ${v[id].t}</div>`;
-                if(v[id].u === 'm') m.innerHTML += row; else l.innerHTML += row;
+                const item = v[id];
+                const row = `<div class="apt-item">
+                    <span>${item.t}</span>
+                    <div style="display:flex; gap:10px;">
+                        <span onclick="addToPhone('${item.t}')" style="cursor:pointer">📅</span>
+                        <span style="color:red; font-weight:bold; cursor:pointer" onclick="db.ref('agenda/${curKey}/${id}').remove()">×</span>
+                    </div>
+                </div>`;
+                if(item.u === 'm') m.innerHTML += row; else l.innerHTML += row;
             });
         });
     }
@@ -155,38 +201,41 @@
         db.ref("dailyData/" + curKey).once('value', snap => {
             const val = snap.val() || {};
             const buildGym = (u) => {
-                let h = `<div style="color:${u==='m'?'var(--massimo)':'var(--liliana)'}; font-weight:800; font-size:0.7rem; margin-top:10px;">CORSI ${u==='m'?'MASSY':'LILLY'}</div>`;
+                let h = `<div style="color:${u==='m'?'var(--massimo)':'var(--liliana)'}; font-weight:bold; font-size:0.7rem; margin-top:10px;">CORSI ${u==='m'?'MASSY':'LILLY'}</div>`;
                 h += `<div style="font-size:0.8rem; padding:5px 0;"><input type="checkbox" ${val['pesi-'+u]?'checked':''} onchange="db.ref('dailyData/${curKey}/pesi-${u}').set(this.checked)"> <b>🏋️ SALA PESI</b></div>`;
                 h += (orari[giorno] || []).map(o => {
                     const id = `chk-${u}-${o.t}-${o.c}`.replace(/\s/g,'');
                     return `<div style="font-size:0.7rem;"><input type="checkbox" ${val[id]?'checked':''} onchange="db.ref('dailyData/${curKey}/${id}').set(this.checked)"> ${o.t} - ${o.c} (${o.i})</div>`;
                 }).join("");
-                h += `<input type="text" placeholder="Altro allenamento..." value="${val['extra-'+u]||''}" onchange="db.ref('dailyData/${curKey}/extra-${u}').set(this.value)" style="width:100%; margin-top:5px; font-size:0.7rem; padding:5px; border-radius:5px; border:1px solid #ddd;">`;
+                h += `<input type="text" placeholder="Altro..." value="${val['extra-'+u]||''}" onchange="db.ref('dailyData/${curKey}/extra-${u}').set(this.value)" style="width:100%; font-size:0.7rem; margin-top:5px; border:1px solid #ddd; border-radius:5px; padding:3px;">`;
                 return h;
             };
             document.getElementById('gym-m').innerHTML = buildGym('m');
             document.getElementById('gym-l').innerHTML = buildGym('l');
 
-            const users = [{n:"MASSIMO", k:"m", c:"var(--massimo)"}, {n:"LILIANA", k:"l", c:"var(--liliana)"}];
-            document.getElementById('food-container').innerHTML = users.map(u => `
-                <div class="food-card" style="border-left:5px solid ${u.c}; padding:10px; background:white; margin-bottom:10px; border-radius:10px;">
-                    <b>${u.n}</b>
+            document.getElementById('food-container').innerHTML = ["MASSIMO", "LILIANA"].map((name, idx) => {
+                const k = name === "MASSIMO" ? "m" : "l";
+                const c = name === "MASSIMO" ? "var(--massimo)" : "var(--liliana)";
+                return `
+                <div style="border-left:5px solid ${c}; padding:10px; background:white; margin-bottom:10px; border-radius:10px;">
+                    <b style="color:${c}; font-size:0.7rem;">${name}</b>
                     ${["Colazione", "Pranzo", "Cena"].map(m => {
-                        const tid = `f-${u.k}-${m}`; const iid = `img-${u.k}-${m}`;
-                        return `<div class="meal-box">
+                        const tid = `f-${k}-${m}`; const iid = `img-${k}-${m}`;
+                        return `<div style="margin-top:8px; border-bottom:1px dashed #eee; padding-bottom:5px;">
                             <small>${m}</small>
                             <div style="display:flex; gap:5px; align-items:center;">
-                                <textarea id="${tid}" oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)">${val[tid]||''}</textarea>
-                                <button class="action-btn" onclick="document.getElementById('in-${iid}').click()">📷</button>
+                                <textarea oninput="db.ref('dailyData/${curKey}/${tid}').set(this.value)" style="height:35px;">${val[tid]||''}</textarea>
+                                <button onclick="document.getElementById('in-${iid}').click()" style="padding:5px;">📷</button>
                                 <input type="file" id="in-${iid}" hidden accept="image/*" onchange="uploadImg(this, '${iid}')">
                             </div>
                             <div id="cont-${iid}" class="img-container" style="display:${val[iid]?'block':'none'}">
-                                <img id="${iid}" class="img-preview" src="${val[iid]||''}">
+                                <img id="${iid}" class="img-preview" src="${val[iid]||''}" onclick="zoomImg(this.src)">
                                 <button class="btn-del-img" onclick="deleteImg('${iid}')">×</button>
                             </div>
                         </div>`;
                     }).join("")}
-                </div>`).join("");
+                </div>`;
+            }).join("");
         });
     }
 
@@ -194,9 +243,10 @@
         if(!input.files[0]) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById(id).src = e.target.result;
+            const base64 = e.target.result;
+            document.getElementById(id).src = base64;
             document.getElementById('cont-'+id).style.display = 'block';
-            db.ref("dailyData/" + curKey + "/" + id).set(e.target.result);
+            db.ref("dailyData/" + curKey + "/" + id).set(base64);
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -216,6 +266,7 @@
 
     function chiudi() { document.getElementById('modal').style.display = 'none'; }
     function cambiaSett(n) { dataInizio.setDate(dataInizio.getDate()+n); renderCalendar(); }
+    function zoomImg(s) { document.getElementById('v-img').src = s; document.getElementById('img-viewer').style.display = 'flex'; }
     window.onload = () => selectDay(new Date());
 </script>
 </body>
