@@ -62,7 +62,7 @@
 
 <div class="nav-bar">
     <button class="btn-nav" onclick="cambiaSett(-7)">◀</button>
-    <div id="week-label" style="font-weight:bold; font-size: 0.9rem;">...</div>
+    <div id="week-label" style="display:none"></div> 
     <button class="btn-nav" onclick="cambiaSett(7)">▶</button>
 </div>
 
@@ -158,16 +158,25 @@
     function updateCurKey(d) { curKey = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 
     function renderCalendar() {
-        const grid = document.getElementById('grid'); grid.innerHTML = "";
-        const oggi = new Date().toDateString();
-        for(let i=0; i<7; i++){
-            let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
-            let dot = document.createElement('div');
-            dot.className = `day-dot ${d.toDateString() === oggi?'today':''} ${d.toDateString() === curDate.toDateString()?'selected':''}`;
-            dot.onclick = () => selectDay(new Date(d));
-            dot.innerHTML = `<div style="font-size:0.55rem;">${d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase()}</div><b>${d.getDate()}</b>`;
-            grid.appendChild(dot);
-        }
+       const grid = document.getElementById('grid'); grid.innerHTML = "";
+       const oggi = new Date().toDateString();
+       for(let i=0; i<7; i++){
+           let d = new Date(dataInizio); d.setDate(dataInizio.getDate()+i);
+           let dot = document.createElement('div');
+           dot.className = `day-dot ${d.toDateString() === oggi?'today':''} ${d.toDateString() === curDate.toDateString()?'selected':''}`;
+           dot.onclick = () => selectDay(new Date(d));
+        
+           // Estraiamo Giorno (LUN), Numero (1) e Mese (APR)
+           const giornoSett = d.toLocaleDateString('it-IT',{weekday:'short'}).toUpperCase();
+           const mese = d.toLocaleDateString('it-IT',{month:'short'}).toUpperCase();
+        
+           dot.innerHTML = `
+               <div style="font-size:0.55rem; color:#888;">${giornoSett}</div>
+               <b style="font-size:1.1rem; display:block; margin:2px 0;">${d.getDate()}</b>
+               <div style="font-size:0.5rem; color:var(--today-color); font-weight:bold;">${mese}</div>
+          `;
+          grid.appendChild(dot);
+       }
     }
 
     function selectDay(d) { curDate = d; updateCurKey(d); renderCalendar(); loadAgenda(); }
@@ -201,8 +210,23 @@
         });
     }
 
-    function addToCalendarPhone() {
-        alert("Sincronizzazione in corso con il calendario di sistema...");
+     function addToCalendarPhone() {
+        db.ref("agenda/" + curKey).once('value', snap => {
+            const v = snap.val();
+            if(!v) return alert("Non ci sono impegni da sincronizzare per oggi!");
+            
+            const d = curDate;
+            const dataGoogle = d.getFullYear() + 
+                ("0" + (d.getMonth() + 1)).slice(-2) + 
+                ("0" + d.getDate()).slice(-2);
+
+            Object.keys(v).forEach(id => {
+                const utente = v[id].u === 'm' ? "MASSIMO: " : "LILIANA: ";
+                const titolo = encodeURIComponent(utente + v[id].t);
+                const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${titolo}&dates=${dataGoogle}/${dataGoogle}&details=Promemoria+da+Hub+Famiglia`;
+                window.open(url, '_blank');
+            });
+        });
     }
 
     function apriDettaglio(d) {
